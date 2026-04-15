@@ -36,6 +36,19 @@ This changes the math, the leverage profile, and the risk profile fundamentally.
 | **Net revenue per client** | **$69–79** | ✅ Good |
 | **Effective hourly rate (human time)** | **$140–316** | ✅ Great |
 
+**Growth plan at $129/mo (launch price):**
+
+| Metric | Value | Status |
+|---|---|---|
+| Revenue per client/mo | $129 | ✅ |
+| Payment processing fees (~5%) | -$6 | |
+| Hosting costs | -$5 | |
+| AI/chatbot tool costs | -$5 | |
+| AI agent operational costs (API calls, compute) | -$5–15 | |
+| Human time per client/mo (oversight only) | ~15–30 min | |
+| **Net revenue per client** | **$98–108** | ✅ Strong |
+| **Effective hourly rate (human time)** | **$196–432** | ✅ Excellent |
+
 **At $149/mo Growth plan:**
 
 | Metric | Value | Status |
@@ -257,15 +270,17 @@ Any one of these changing terms, rate-limiting, or blocking you is a risk.
 
 ---
 
-## 7. Revised Pricing (Optional but Recommended)
+## 7. Revised Pricing (Implemented in Doc 02)
+
+> **Status:** These recommendations have been adopted. Launch prices are locked in doc 02 as Starter $79, Growth $129, Pro $249. The table below is retained for reference.
 
 The original pricing now works economically. However:
 
-| Package | Original | Still Works? | Recommendation |
+| Package | Original | Still Works? | Recommendation (now implemented) |
 |---|---|---|---|
-| Starter | $59–79/mo | ✅ Barely | Raise to $79 minimum |
-| Growth | $99–149/mo | ✅ Yes | Keep at $129–149 |
-| Pro | $199–299/mo | ✅ Strong | Keep at $249–299 |
+| Starter | $59–79/mo | ✅ Barely | Raised to **$79** |
+| Growth | $99–149/mo | ✅ Yes | Locked at **$129** |
+| Pro | $199–299/mo | ✅ Strong | Locked at **$249** |
 
 **The main reason to still raise prices:** client quality. At $59 you attract the cheapest, most demanding clients who churn fast. At $149+ you attract business owners who value the service and stay.
 

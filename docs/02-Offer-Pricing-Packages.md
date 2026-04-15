@@ -32,33 +32,34 @@ Because an AI agent handles delivery, support, and operations at near-zero margi
 
 ### Growth
 - Everything in Starter
-- More page capacity
-- Better chatbot setup and controls
+- **8 pages** (up from 5)
+- Chatbot with custom training up to 25 FAQ entries + conversation controls
 - Basic CMS access for approved content fields
-- Monthly content edits
-- One landing page refresh or campaign update per month
-- Priority support window
+- **3 content edits/month** (text swaps, image updates, section changes)
+- **1 landing page refresh or campaign update per month**
+- Priority support window (4-hour response)
 
 ### Pro
 - Everything in Growth
-- Faster turnaround for edit requests
-- Higher monthly change allowance
-- Conversion-focused landing pages
-- Advanced analytics summary
-- Quarterly site improvement review
-- Priority issue handling
+- **12 pages** (up from 8)
+- **5 content edits/month** (up from 3)
+- **Same-day turnaround** on edit requests (up from 24-hour)
+- Conversion-focused landing pages (up to 2/month)
+- Advanced analytics summary with monthly insights email
+- Quarterly site improvement review with written recommendations
+- Priority issue handling (1-hour critical response)
 
-## Suggested price anchors
+## Launch prices
 
-The following range is intentionally conservative for early testing:
+Locked-in prices for go-to-market. Ranges are preserved for future adjustment; the agent uses the exact launch price in all sales interactions.
 
-| Package | Indicative monthly price |
-|---|---|
-| Starter | $59–$79 |
-| Growth | $99–$149 |
-| Pro | $199–$299 |
+| Package | Launch price | Allowable range |
+|---|---|---|
+| Starter | **$79/mo** | $59–$79 |
+| Growth | **$129/mo** | $99–$149 |
+| Pro | **$249/mo** | $199–$299 |
 
-Price should be tested against niche quality, close rate, and churn. If a niche is highly commercial and lead value is high, price can rise materially.
+Price should be tested against niche quality, close rate, and churn. If a niche is highly commercial and lead value is high, price can rise within the allowable range or the range itself can be expanded with a docs update.
 
 ## Setup fee logic
 
@@ -78,7 +79,7 @@ The base subscription should not include:
 - SEO guarantees
 - Ad management
 - Logo/brand creation from scratch
-- Copywriting from scratch unless explicitly sold
+- Original long-form copywriting or strategic messaging unless explicitly sold (content assembly and adaptation from public sources is included)
 
 ## Add-ons
 

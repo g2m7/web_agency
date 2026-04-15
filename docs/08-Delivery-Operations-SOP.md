@@ -8,6 +8,48 @@ Fulfill the service profitably, consistently, and fast using the AI agent for al
 
 The system is template-first, agent-operated, and human-supervised. Every repeated step is automated. The human intervenes only at quality gates and for edge cases.
 
+## Hosting and domain architecture
+
+### Hosting platform
+
+Sites are deployed to **Cloudflare Pages** (or Vercel/Netlify as fallback). Rationale:
+- Zero-config SSL
+- Global CDN for fast mobile loading
+- Free tier covers early clients; scales affordably
+- Agent deploys via Git push or CLI — fully automatable
+- Custom domains via DNS CNAME
+
+### Domain ownership model
+
+- **Client-owned domains (default).** The client registers and owns their domain. The agent configures DNS (CNAME to hosting) and provides instructions if the client needs to make changes themselves.
+- **Agency-registered domains (exception only).** If the client cannot manage domain registration, the agency can register on the client's behalf, but the client retains beneficial ownership. Document this in the client record.
+
+### Deployment process
+
+1. Agent builds site from niche template + client content
+2. Agent deploys to staging subdomain (e.g., `client.preview.ourdomain.com`)
+3. Human reviews staging site
+4. On approval, agent publishes to production:
+   - If client domain: agent provides DNS instructions or configures DNS if access is granted
+   - If preview subdomain: agent promotes to custom subdomain or client domain
+5. Agent verifies HTTPS, checks core paths, confirms analytics firing
+
+### Cancellation and domain transition
+
+When a client cancels:
+1. Site remains live for **7 calendar days** after cancellation effective date (grace period for client to export content)
+2. Agent offers the client a static export of their site content upon request
+3. If the domain is client-owned, agent removes DNS records and hosting; client points domain wherever they choose
+4. If the domain is agency-registered, agent initiates domain transfer to the client within 14 days
+5. After 7-day grace period, agent removes the hosted site and staging preview
+6. Agent marks all client assets as archived in records
+
+### DNS management
+
+- Agent manages DNS for hosting purposes only (CNAME/A records pointing to hosting)
+- Email DNS (MX, SPF, DKIM) remains the client's responsibility
+- Agent does not modify DNS records that affect the client's email or other services
+
 ## Delivery components
 
 Base service includes:

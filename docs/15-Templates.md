@@ -34,6 +34,8 @@ If improving the site ever becomes a priority, I'm here. Just reply and I'll sen
 
 ## Demo + pricing email template (Step 2 — sent only after prospect says yes)
 
+> **Price reference:** Agent fills `{{price}}` and `{{package_name}}` using the locked launch prices from doc 02: Starter = $79/mo, Growth = $129/mo, Pro = $249/mo.
+
 Thanks for the interest, {{first_name}}.
 
 Here's a cleaner version of {{business_name}}'s site, built with your existing business info:
@@ -123,6 +125,13 @@ Before the agent contacts a lead, confirm:
 - Business appears active
 - Hook email angle available
 - Package likely affordable
+
+## CAN-SPAM email footer (append to every outbound email)
+
+---
+{{sender_name}}
+{{sender_physical_address}}
+Reply "stop" to unsubscribe from emails like this.
 
 ## Agent guardrails reminder (internal — not sent to clients)
 

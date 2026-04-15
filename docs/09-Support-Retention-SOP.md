@@ -96,12 +96,12 @@ When the agent detects a churn signal:
 
 If a client cancels:
 
-1. Agent confirms the effective date
-2. Agent clarifies what happens to the website and hosting
-3. Agent clarifies whether content export is provided
-4. Agent revokes dashboards and support access at the correct time
-5. Agent marks the account status clearly
-6. Agent logs the cancellation reason
+1. Agent confirms the effective cancellation date.
+2. **Follow the cancellation and domain transition procedure in doc 08** (7-day grace period, content export offer, domain transfer rules, site removal timeline).
+3. Agent clarifies whether content export is provided (yes — offered upon request per doc 08).
+4. Agent revokes dashboards and support access at the correct time.
+5. Agent marks the account status clearly (Cancelled + reason).
+6. Agent logs the cancellation reason.
 
 ## Support boundaries
 

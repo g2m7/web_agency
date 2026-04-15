@@ -94,6 +94,7 @@ Recommended model for agent-operated delivery:
 - Agent assembles and runs QA automatically
 - Human does a final quality review before publishing
 - Launch-after-window model: if the human has not flagged issues within 24 hours of preview, the agent proceeds to launch
+- **The 24-hour window IS the human quality gate** — the operator is expected to check previews within 24 hours. If absent for longer periods (vacation, sick, travel), the operator should pause the onboarding pipeline before going offline.
 
 ## Post-launch handoff
 

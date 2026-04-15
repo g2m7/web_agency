@@ -59,6 +59,15 @@ Use a 0–2 scale for each category:
 - Multiple services that can be organized better
 - Evidence that a better site could improve lead handling
 
+## Scoring normalization
+
+Raw scores sum across 7 categories (max raw = 14). For lead scoring and pipeline use, **normalize to a 0–10 scale**: `normalized_score = (raw_score / 14) × 10`, rounded to one decimal.
+
+This normalized score feeds directly into the prospect scoring formula in SOP 03 and the lead priority tiers:
+- Hot: 7–10
+- Warm: 4–6
+- Low: 0–3
+
 ## Red-flag findings to mention in outreach
 
 Use only one or two of these per email:

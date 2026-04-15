@@ -85,6 +85,24 @@ Store:
 - Failed payment notes
 - Cancellation date if any
 
+## Terms of Service
+
+A lightweight Terms of Service page must be linked from every Dodo/Polar checkout page. This protects against chargebacks and sets clear expectations.
+
+### Required sections
+1. **Scope of service** — what each package includes (reference doc 02)
+2. **Cancellation terms** — cancel anytime after first billing cycle; no partial-month refunds
+3. **Refund policy** — no refunds for delivered work; subscription runs until end of billing period
+4. **Content ownership** — client owns their content; agency retains template/framework rights
+5. **Site ownership on cancellation** — client receives content export; hosting ends after 7-day grace period; client-owned domains transfer with client
+6. **Limitation of liability** — service provided as-is; no guarantees of revenue, SEO rankings, or lead volume
+7. **Disputes** — handled via email; escalated to human operator
+
+### Implementation
+- Host the ToS as a static page (e.g., `terms.ourdomain.com`)
+- Reference the ToS URL in Dodo checkout settings
+- Agent includes a link to the ToS in the welcome email
+
 ## Transition rule for later
 
 Once the business proves retention and scale, billing can later move to a different setup if that improves economics. The validation stage should prioritize fast collection and clean recurring operations over perfect long-term infrastructure.

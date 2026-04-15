@@ -14,8 +14,67 @@
 - Set up Dodo Payments with subscription checkout links
 - Build the agent's first capability: Google Maps prospecting + auto-scoring
 - Build the agent's audit capability (screenshot + score + issue identification)
-- Build the niche template (complete, polished, ready for content swap)
+- Build the niche template (see Template Tech Spec below)
 - Prepare analytics, chatbot, and CMS setup as reusable configs
+
+### Template Tech Spec
+
+This is the core deliverable of the entire business. Every client site is assembled from a niche template + client content swap.
+
+**Technology stack:**
+- **Framework:** Static HTML + Tailwind CSS (or Astro for multi-page support). Rationale: zero build complexity, instant deploy to Cloudflare Pages/Vercel, no server-side runtime, fast page loads, easy content swap.
+- **No WordPress, no CMS runtime, no server-side rendering.** Static files only.
+
+**Template structure per niche:**
+```
+niche-template/
+├── index.html          # Homepage
+├── about.html          # About page
+├── services.html       # Services page
+├── contact.html        # Contact page
+├── gallery.html        # Gallery/portfolio (optional per niche)
+├── faq.html            # FAQ page (chatbot training source)
+├── assets/
+│   ├── css/
+│   │   └── custom.css  # Niche-specific overrides + client brand colors
+│   ├── js/
+│   │   └── chatbot.js  # AI chat assistant widget
+│   └── img/
+│       └── placeholder/  # Placeholder images replaced per client
+├── data/
+│   ├── content.json    # All client-specific content (business name, services, areas, testimonials, CTA config, contact info)
+│   └── faq.json        # FAQ entries for chatbot training
+└── config.json         # Site config: CTA type (call/form/whatsapp/booking), analytics ID, chatbot ID, domain
+```
+
+**Content swap mechanism:**
+1. All client-specific text lives in `data/content.json` — not hardcoded in HTML
+2. HTML templates use `{{mustache}}` or `<slot>` placeholders populated from the JSON at build time
+3. Agent's job: fill `content.json` with client data → run build → deploy
+4. This means adding a new client = editing one JSON file + adding images, not touching HTML
+
+**Chatbot integration:**
+- Embedded widget loaded via `chatbot.js`
+- Knowledge source: `faq.json` (client-specific FAQs)
+- Fallback: "I'll have someone reach out to you" → triggers support notification
+- Chatbot provider TBD (Tidio, Chatbase, or custom) — must support programmatic knowledge-base upload
+
+**Analytics:**
+- Google Analytics 4 tag injected via `config.json` → script in layout partial
+- Monthly report generated from GA4 API by agent
+
+**Template versioning:**
+- Templates live in a Git repo, one branch per niche
+- Client sites are built from a template snapshot (not symlinked)
+- This ensures updating the template doesn't break live sites
+- Client-specific changes live in the client's own deploy repo/folder
+
+**Design principles:**
+- Mobile-first layout (audited businesses have bad mobile → this must be perfect)
+- Above-the-fold: business name, value prop, CTA — visible in <2 seconds
+- Trust section: reviews/testimonials prominently placed
+- Service area clearly visible for local businesses
+- Fast load target: <3s on 4G mobile, Lighthouse performance >85
 
 ## Phase 3: Validation with human oversight
 
@@ -61,6 +120,7 @@
 
 - Form US LLC (Wyoming or Delaware, ~$300–500)
 - Consider migrating from Dodo to Stripe for better margins
+- **Introduce annual pricing option** (e.g., 2 months free for annual commitment) — deferred until monthly model is proven and churn data supports discounting
 - Add second niche using proven agent playbook
 - Hire VA for final QA if human review time becomes a bottleneck
 - Target 25–50 clients

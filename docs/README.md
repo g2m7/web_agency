@@ -30,6 +30,8 @@ This pack captures the full operating system for an AI-agent-operated website-re
 - `14-Implementation-Roadmap.md` — phased execution with agent quality gates
 - `15-Templates.md` — hook email templates, demo email templates, agent guardrails
 - `16-Business-Model-Audit.md` — full model audit with AI-agent assumptions
+- `17-Agent-Platform-Decision.md` — agent platform evaluation, 7 workflow specs, guardrails, phased autonomy, build reference
+- `18-Documentation-Audit.md` — full cross-document audit: consistency checks, gaps, flaws, and priority fix list
 
 ## How to use this pack
 

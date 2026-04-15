@@ -106,6 +106,53 @@ Complete the sequence and archive the lead.
 - Mention cancel-anytime policy.
 - Keep it brief and confident.
 
+## Email infrastructure
+
+### Sending service
+
+Use a dedicated transactional/email API service (Resend, SendGrid, or Amazon SES) for all outbound agent emails. Do **not** send cold outreach from a personal Gmail or Workspace inbox — it will flag quickly at volume.
+
+### Domain setup
+
+1. Register a dedicated outreach domain (e.g., `getsiteup.com` or similar — not your primary domain)
+2. Configure DNS records:
+   - **SPF** — authorizes the sending service
+   - **DKIM** — signs outgoing mail
+   - **DMARC** — policy set to `v=DMARC1; p=none` during warm-up, then `p=quarantine` after 30 days
+3. Verify domain with the sending service before any emails go out
+
+### Warm-up schedule
+
+Do not send 20+ cold emails on day one. Follow a gradual warm-up:
+
+| Days | Daily send limit | Notes |
+|---|---|---|
+| 1–7 | 5 emails/day | Manual review of every send |
+| 8–14 | 10 emails/day | Agent sends, human spot-checks |
+| 15–21 | 15 emails/day | Monitor reply rate and bounce rate |
+| 22–30 | 20 emails/day | Full Phase 3 volume |
+| 30+ | Scale as reply rate allows | Do not exceed 30/day on a single domain |
+
+### Monitoring
+
+- Use mail-tester.com to check domain reputation weekly during warm-up
+- Monitor bounce rate — must stay below 5%
+- Monitor spam complaint rate — must stay below 0.3%
+- If either threshold is breached: **stop sending**, investigate, switch domain if needed
+- Track inbox placement using a seed-list tool (e.g., GlockApps) monthly
+
+### From-address format
+
+- Use a real-looking name and address: `First Name` from `name@outreach-domain.com`
+- Do not use `noreply@`, `hello@`, or generic addresses
+- The from name should feel like a person, not a company
+
+### Bounce and complaint handling
+
+- Hard bounce → remove lead immediately, do not retry
+- Soft bounce → retry once after 24 hours, then remove
+- Spam complaint → log, stop sending to that lead, review copy for patterns if complaints cluster
+
 ## Agent guardrails for sales
 
 The agent MUST NOT:

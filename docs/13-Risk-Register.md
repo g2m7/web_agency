@@ -97,6 +97,10 @@ Make the hidden failure points visible before they become expensive. With an AI-
 ### 17. Delivering faster than quality allows
 - **Mitigation:** Human quality gate before every launch, launch checklist, controlled capacity during early validation.
 
+### 18. Seasonal churn clustering
+- **Risk:** Clients from the same niche (e.g., wedding vendors, landscaping) churn simultaneously during off-season, creating revenue cliffs that look worse than they are.
+- **Mitigation:** Track churn by cohort (join month + niche). After 5+ clients, include cohort analysis in monthly review. Diversify niches before relying on a single seasonal niche. Consider pause options instead of full cancellation for seasonal businesses.
+
 ## Risk Priority Matrix
 
 | Priority | Risk | Owner | Status |
@@ -110,3 +114,4 @@ Make the hidden failure points visible before they become expensive. With an AI-
 | P2 | AI cost scaling | Human | Monitor monthly |
 | P2 | Churn after month 1 | Agent (detection) + human (action) | Track and respond |
 | P2 | Platform dependency | Human | Identify backups now |
+| P2 | Seasonal churn clustering | Human | Monitor by cohort; add to monthly review after 5+ clients |
