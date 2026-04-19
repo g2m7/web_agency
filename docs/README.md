@@ -33,6 +33,7 @@ This pack captures the full operating system for an AI-agent-operated website-re
 - `17-Agent-Platform-Decision.md` — agent platform evaluation, 7 workflow specs, guardrails, phased autonomy, build reference
 - `18-Documentation-Audit.md` — full cross-document audit: consistency checks, gaps, flaws, and priority fix list
 - `19-Application-Architecture.md` — concrete build spec: database schema, state machine, policy engine, idempotency, job queue, API endpoints, observability, automated evals, rollout phases
+- `20-Application-Build-Test-Guide.md` — A-to-Z instructions for taking the app scaffold to bootable, tested, production-viable: Docker setup, boot verification, seed data, handler implementation, webhook testing, policy verification, access control, observability, production readiness
 
 ## How to use this pack
 
@@ -46,6 +47,7 @@ This pack captures the full operating system for an AI-agent-operated website-re
 8. `15` contains all templates the agent uses for customer communication.
 9. `16` contains the full business model audit and financial projections.
 10. `19` is the build spec — database, state machine, policy engine, API, and observability. Read after `17` before writing any code.
+11. `20` is the implementation guide — Docker, boot, seed, handlers, webhooks, policy verification, production readiness. Read after `19` when ready to make the app bootable.
 
 ## Key differences from a traditional web agency
 
