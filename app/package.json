@@ -1,0 +1,44 @@
+{
+  "name": "web-agency-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:golden": "vitest run --config vitest.config.ts tests/golden",
+    "test:adversarial": "vitest run --config vitest.config.ts tests/adversarial",
+    "test:integration": "vitest run --config vitest.config.ts tests/integration",
+    "test:unit": "vitest run --config vitest.config.ts tests/unit",
+    "payload:migrate": "payload migrate",
+    "payload:migrate:create": "payload migrate:create",
+    "generate:types": "payload generate:types",
+    "generate:graphQLSchema": "payload generate:graphQLSchema"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "3.83.0",
+    "@payloadcms/next": "3.83.0",
+    "@payloadcms/richtext-lexical": "3.83.0",
+    "bullmq": "^5.53.0",
+    "ioredis": "^5.6.1",
+    "next": "15.4.11",
+    "payload": "3.83.0",
+    "resend": "^4.6.0",
+    "zod": "^3.24.0",
+    "graphql": "^16.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "eslint": "^9.25.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0"
+  }
+}

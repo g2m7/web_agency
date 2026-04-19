@@ -32,6 +32,7 @@ This pack captures the full operating system for an AI-agent-operated website-re
 - `16-Business-Model-Audit.md` — full model audit with AI-agent assumptions
 - `17-Agent-Platform-Decision.md` — agent platform evaluation, 7 workflow specs, guardrails, phased autonomy, build reference
 - `18-Documentation-Audit.md` — full cross-document audit: consistency checks, gaps, flaws, and priority fix list
+- `19-Application-Architecture.md` — concrete build spec: database schema, state machine, policy engine, idempotency, job queue, API endpoints, observability, automated evals, rollout phases
 
 ## How to use this pack
 
@@ -44,6 +45,7 @@ This pack captures the full operating system for an AI-agent-operated website-re
 7. Treat `14` as the execution sequence — phases include human approval gates that are removed as agent quality proves out.
 8. `15` contains all templates the agent uses for customer communication.
 9. `16` contains the full business model audit and financial projections.
+10. `19` is the build spec — database, state machine, policy engine, API, and observability. Read after `17` before writing any code.
 
 ## Key differences from a traditional web agency
 
