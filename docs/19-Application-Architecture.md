@@ -8,6 +8,8 @@ This document defines the concrete build specification for the application layer
 
 **Relationship to doc 17:** Doc 17 defines the 7 workflow specs, phased autonomy, and guardrails. This document defines the software system that enforces and executes those specs.
 
+**System boundary:** Payload is the internal operations system of record (execution, policy enforcement, workflow state, and audit trail). If a CRM is added, use it as a sales engagement interface and sync only key lifecycle events to avoid duplicate sources of truth.
+
 ---
 
 ## 1. System Overview

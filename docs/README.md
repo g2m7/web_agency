@@ -48,6 +48,13 @@ This pack captures the full operating system for an AI-agent-operated website-re
 9. `16` contains the full business model audit and financial projections.
 10. `19` is the build spec — database, state machine, policy engine, API, and observability. Read after `17` before writing any code.
 11. `20` is the implementation guide — Docker, boot, seed, handlers, webhooks, policy verification, production readiness. Read after `19` when ready to make the app bootable.
+12. `21` is the deployment guide — VPS setup, DNS, Nginx, SSL, first deploy, multi-domain config, backups. Read when the app is bootable locally and ready for production.
+
+## System boundary: Payload vs CRM
+
+- Payload CMS (in `app/`) is the internal operations system of record: workflow execution, policy checks, state transitions, webhooks, jobs, and audit trail.
+- A CRM, if added later, should be treated as sales engagement UI (pipeline management, rep workflows), not as the operational source of truth.
+- If both are used, sync key lifecycle events only (for example: lead qualified, demo sent, paid, onboarded, cancelled) to avoid data drift.
 
 ## Key differences from a traditional web agency
 

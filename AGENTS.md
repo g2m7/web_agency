@@ -6,7 +6,7 @@
 ## What this repo is
 - AI-agent-operated web agency: business documentation in `docs/` + application layer in `app/`.
 - `docs/` — SOPs, pricing, templates, risk register, KPIs, architecture spec (`docs/19-Application-Architecture.md`).
-- `app/` — Payload CMS 3.0 (v3.83.0) application on Next.js 15.4.11, with pnpm, TypeScript, Vitest, BullMQ.
+- `app/` — Payload CMS 3.0 (v3.83.0) application on Next.js 15.4.11, with pnpm, TypeScript, Vitest, BullMQ. Payload is the internal ops system (execution + audit trail), not a full sales CRM replacement.
 - Application status: scaffolded, type-safe (0 tsc errors), 136 tests passing. Not yet bootable — job handlers are stubs, no local dev DB/Redis wired.
 
 ## Tooling commands (run inside `app/`)
@@ -14,6 +14,7 @@
 - `npx tsc --noEmit` — typecheck (must pass with 0 errors)
 - `npx vitest run` — run all 136 tests
 - `pnpm dev` — start Next.js dev server (requires Postgres + Redis, not yet configured)
+- `docker compose -f docker-compose.prod.yml up -d --build` — production deploy (run on VPS from `app/`)
 
 ## Canonical sources (read first)
 - `docs/README.md` for document map and intended read order.
@@ -35,6 +36,7 @@
 - **Jobs** (`app/src/jobs/`): BullMQ queue with 10 handlers (stubs). `scheduler.ts` handles cron + event-triggered scheduling.
 - **Webhooks** (`app/src/endpoints/webhooks/`): Dodo, Polar, Resend, Cloudflare deploy callbacks with HMAC verification and idempotency.
 - **Tests** (`app/tests/`): unit (66), golden (8), adversarial (18), integration/smoke (24), regression (20) — 136 total.
+- **Boundary**: If a dedicated CRM is used, treat CRM as sales engagement UI and Payload as operational system of record; sync key lifecycle events only.
 
 ## Editing rules
 - Treat documentation consistency as the main correctness check; when changing offer/scope/workflow, update all affected SOP/template/risk/KPI docs in the same pass.

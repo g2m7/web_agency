@@ -38,6 +38,8 @@ Run `docker compose up -d` from `app/`. Verify with `docker compose ps` that bot
 
 ## Boot Verification
 
+Before boot checks, keep the tool boundary explicit: Payload is the internal ops system and audit trail, not a full sales CRM replacement. If a CRM is used, keep pipeline execution and policy-critical state in Payload.
+
 ### Payload CMS Initialization
 
 Run `pnpm dev` from `app/`. Payload should:
