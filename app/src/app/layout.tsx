@@ -1,6 +1,4 @@
-import type { ImportMap } from 'payload'
-
-import { RootLayout } from '@payloadcms/next/layouts/Root/index.js'
+import { RootLayout, handleServerFunctions } from '@payloadcms/next/layouts'
 import config from '@payload-config'
 
 import { importMap } from './(payload)/admin/importMap.js'
@@ -16,9 +14,11 @@ const Layout = ({ children }: Args) => {
       importMap={importMap}
       serverFunction={async function (args) {
         'use server'
-        // @ts-expect-error
-        const { serverFunction } = await import('./_next/server-function.js')
-        return serverFunction(args)
+        return handleServerFunctions({
+          args,
+          config: Promise.resolve(config),
+          importMap,
+        })
       }}
     >
       {children}
