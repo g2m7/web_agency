@@ -4,6 +4,9 @@ services:
     ports:
       - "127.0.0.1:3006:3006"
     env_file: .env
+    environment:
+      DATABASE_URL: postgres://web_agency:${DB_PASSWORD}@postgres:5432/web_agency
+      REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
         condition: service_healthy
