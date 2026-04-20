@@ -44,7 +44,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
-  cors: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean),
+  cors: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3006'].filter(Boolean),
   admin: {
     user: 'operators',
     meta: {

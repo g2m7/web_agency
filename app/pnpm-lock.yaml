@@ -32,6 +32,12 @@ importers:
       payload:
         specifier: 3.83.0
         version: 3.83.0(graphql@16.13.2)(typescript@5.9.3)
+      react:
+        specifier: 19.2.5
+        version: 19.2.5
+      react-dom:
+        specifier: 19.2.5
+        version: 19.2.5(react@19.2.5)
       resend:
         specifier: ^4.6.0
         version: 4.8.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
