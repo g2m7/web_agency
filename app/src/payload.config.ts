@@ -2,6 +2,10 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 import { Leads } from './collections/Leads'
 import { Clients } from './collections/Clients'
@@ -42,7 +46,7 @@ export default buildConfig({
   globals: [SystemConfig],
   endpoints: webhookEndpoints,
   typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts'),
+    outputFile: path.resolve(__dirname, 'payload-types.ts')
   },
   cors: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3006'].filter(Boolean),
   admin: {
