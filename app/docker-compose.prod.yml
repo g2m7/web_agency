@@ -5,8 +5,10 @@ services:
       - "127.0.0.1:3006:3006"
     env_file: .env
     environment:
-      DATABASE_URL: postgres://web_agency:${DB_PASSWORD}@postgres:5432/web_agency
+      DATABASE_URL: postgres://${DB_USER:-web_agency}:${DB_PASSWORD:-web_agency}@postgres:5432/${DB_NAME:-web_agency}
       REDIS_URL: redis://redis:6379
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:3006}
+      NODE_ENV: production
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,7 +27,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-web_agency}
       POSTGRES_USER: ${DB_USER:-web_agency}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-web_agency}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
