@@ -1,20 +1,103 @@
+import { randomUUID } from 'crypto'
 import type { DbClient } from '../../db'
 import type { ScheduledJob } from '../queue'
+import {
+  scrapeGoogleMaps,
+  parseCityState,
+  buildNicheCityKey,
+  type ScrapedBusiness,
+} from '../../scraper/google-maps'
+
+export interface LeadGenResult {
+  status: string
+  niche: string
+  cities: string[]
+  leads_before: number
+  leads_created: number
+  leads_skipped: number
+  errors: string[]
+  job_id: string
+}
 
 export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
   const config = await db.findGlobal({ slug: 'system-config' })
-  const niche = config.active_niche
-  const cities = config.active_cities ?? []
+  const niche = config.active_niche ?? 'hvac'
+  const cities: string[] = config.active_cities ?? []
 
   const existingLeads = await db.find({ collection: 'leads', limit: 0 })
   const leadsBefore = existingLeads.totalDocs
+
+  let leadsCreated = 0
+  let leadsSkipped = 0
+  const errors: string[] = []
+
+  for (const cityEntry of cities) {
+    const { city, state } = parseCityState(cityEntry)
+
+    let businesses: ScrapedBusiness[]
+    try {
+      businesses = await scrapeGoogleMaps(niche, city, state, { signal: AbortSignal.timeout(30_000) })
+    } catch (err: any) {
+      errors.push(`${city}, ${state}: ${err.message}`)
+      continue
+    }
+
+    for (const biz of businesses) {
+      const nicheCityKey = buildNicheCityKey(niche, city, biz.name)
+
+      const existing = await db.find({
+        collection: 'leads',
+        where: { niche_city_key: { equals: nicheCityKey } },
+        limit: 1,
+      })
+
+      if (existing.totalDocs > 0) {
+        leadsSkipped++
+        continue
+      }
+
+      try {
+        await db.create({
+          collection: 'leads',
+          data: {
+            id: randomUUID(),
+            businessName: biz.name,
+            niche,
+            city,
+            state,
+            websiteUrl: biz.website ?? null,
+            googleMapsUrl: biz.mapsUrl,
+            email: null,
+            phone: biz.phone ?? null,
+            decisionMaker: null,
+            status: 'new',
+            auditScore: null,
+            auditData: null,
+            priorityTier: null,
+            exclusionReason: null,
+            source: 'google_maps',
+            nicheCityKey,
+          },
+        })
+        leadsCreated++
+      } catch (err: any) {
+        if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
+          leadsSkipped++
+        } else {
+          errors.push(`insert ${biz.name}: ${err.message}`)
+        }
+      }
+    }
+  }
 
   return {
     status: 'completed',
     niche,
     cities,
     leads_before: leadsBefore,
-    message: `Lead gen job queued for ${niche} in ${cities.join(', ')}. Skill execution required.`,
+    leads_created: leadsCreated,
+    leads_skipped: leadsSkipped,
+    errors,
     job_id: job.id,
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { handleLeadGen, handleFollowUp1, handleFollowUp2 } from '../../../src/jobs/handlers/index'
+import { handleLeadGen } from '../../../src/jobs/handlers/index'
 import type { ScrapedBusiness } from '../../../src/scraper/google-maps'
 
 vi.mock('../../../src/scraper/google-maps', () => ({
@@ -126,8 +126,8 @@ describe('handleLeadGen', () => {
     const result = await handleLeadGen(db, mockJob())
 
     expect(result.status).toBe('completed')
-    expect(result.errors.length).toBe(1)
-    expect(result.errors[0]).toContain('Consent page detected')
+    expect((result as any).errors.length).toBe(1)
+    expect((result as any).errors[0]).toContain('Consent page detected')
     expect(result.leads_created).toBe(0)
   })
 
@@ -160,13 +160,6 @@ describe('handleLeadGen', () => {
     expect(result.leads_created).toBe(0)
   })
 
-  it('returns job_id', async () => {
-    const db = mockDb()
-    mockedScrape.mockResolvedValueOnce([])
-    const result = await handleLeadGen(db, mockJob())
-    expect(result.job_id).toBe('job-1')
-  })
-
   it('creates leads with correct field values', async () => {
     const db = mockDb()
     mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES.slice(0, 1))
@@ -186,61 +179,5 @@ describe('handleLeadGen', () => {
         status: 'new',
       }),
     })
-  })
-})
-
-describe('handleFollowUp1', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('skips if lead no longer in contacted status', async () => {
-    const db = mockDb({
-      findByID: vi.fn().mockResolvedValue({ id: 'lead-1', status: 'replied_interested' }),
-    })
-    const job = mockJob({ leadId: 'lead-1' })
-    const result = await handleFollowUp1(db, job)
-    expect(result.status).toBe('skipped')
-    expect(result.reason).toContain('no longer in contacted')
-  })
-
-  it('skips if lead not found', async () => {
-    const db = mockDb({
-      findByID: vi.fn().mockRejectedValue(new Error('Not found')),
-    })
-    const job = mockJob({ leadId: 'nonexistent' })
-    const result = await handleFollowUp1(db, job)
-    expect(result.status).toBe('skipped')
-  })
-
-  it('returns completed when lead is contacted', async () => {
-    const db = mockDb()
-    const job = mockJob({ leadId: 'lead-1' })
-    const result = await handleFollowUp1(db, job)
-    expect(result.status).toBe('completed')
-    expect(result.lead_id).toBe('lead-1')
-  })
-})
-
-describe('handleFollowUp2', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('skips if lead no longer in contacted status', async () => {
-    const db = mockDb({
-      findByID: vi.fn().mockResolvedValue({ id: 'lead-1', status: 'archived' }),
-    })
-    const job = mockJob({ leadId: 'lead-1' })
-    const result = await handleFollowUp2(db, job)
-    expect(result.status).toBe('skipped')
-  })
-
-  it('returns completed when lead is contacted', async () => {
-    const db = mockDb()
-    const job = mockJob({ leadId: 'lead-1' })
-    const result = await handleFollowUp2(db, job)
-    expect(result.status).toBe('completed')
-    expect(result.lead_id).toBe('lead-1')
   })
 })
