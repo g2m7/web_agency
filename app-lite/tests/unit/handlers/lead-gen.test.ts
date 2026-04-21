@@ -3,20 +3,26 @@ import { handleLeadGen } from '../../../src/jobs/handlers/index'
 import type { ScrapedBusiness } from '../../../src/scraper/google-maps'
 
 vi.mock('../../../src/scraper/google-maps', () => ({
+  scrapeMultipleCities: vi.fn(),
   scrapeGoogleMaps: vi.fn(),
   parseCityState: (entry: string) => {
-    const commaIdx = entry.trim().lastIndexOf(',')
+    const cleaned = entry.trim()
+    const commaIdx = cleaned.lastIndexOf(',')
     if (commaIdx !== -1) {
-      return { city: entry.substring(0, commaIdx).trim(), state: entry.substring(commaIdx + 1).trim() }
+      return { city: cleaned.substring(0, commaIdx).trim(), state: cleaned.substring(commaIdx + 1).trim() }
     }
-    return { city: entry.trim(), state: '' }
+    const parts = cleaned.split(/\s+/)
+    if (parts.length >= 2 && parts[parts.length - 1]!.length === 2) {
+      return { city: parts.slice(0, -1).join(' '), state: parts[parts.length - 1]! }
+    }
+    return { city: cleaned, state: '' }
   },
   buildNicheCityKey: (niche: string, city: string, name: string) =>
     `${niche.toLowerCase()}:${city.toLowerCase()}:${name.toLowerCase().trim()}`,
 }))
 
-import { scrapeGoogleMaps } from '../../../src/scraper/google-maps'
-const mockedScrape = vi.mocked(scrapeGoogleMaps)
+import { scrapeMultipleCities } from '../../../src/scraper/google-maps'
+const mockedScrapeMultiple = vi.mocked(scrapeMultipleCities)
 
 const MOCK_BUSINESSES: ScrapedBusiness[] = [
   {
@@ -67,6 +73,12 @@ function mockJob(data: Record<string, unknown> = {}) {
   return { id: 'job-1', data, attemptsMade: 0, maxAttempts: 3, name: 'lead_gen' } as any
 }
 
+function singleCityResult(city: string, state: string, businesses: ScrapedBusiness[]): Map<string, ScrapedBusiness[]> {
+  const m = new Map<string, ScrapedBusiness[]>()
+  m.set(`${city}, ${state}`, businesses)
+  return m
+}
+
 describe('handleLeadGen', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -74,7 +86,7 @@ describe('handleLeadGen', () => {
 
   it('reads SystemConfig for niche and cities', async () => {
     const db = mockDb()
-    mockedScrape.mockResolvedValueOnce([])
+    mockedScrapeMultiple.mockResolvedValueOnce(new Map())
     const result = await handleLeadGen(db, mockJob())
 
     expect(db.findGlobal).toHaveBeenCalledWith({ slug: 'system-config' })
@@ -88,14 +100,14 @@ describe('handleLeadGen', () => {
         .mockResolvedValueOnce({ totalDocs: 5, docs: [] })
         .mockResolvedValue({ totalDocs: 0, docs: [] }),
     })
-    mockedScrape.mockResolvedValueOnce([])
+    mockedScrapeMultiple.mockResolvedValueOnce(new Map())
     const result = await handleLeadGen(db, mockJob())
     expect(result.leads_before).toBe(5)
   })
 
   it('creates leads from scraped businesses', async () => {
     const db = mockDb()
-    mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES)
+    mockedScrapeMultiple.mockResolvedValueOnce(singleCityResult('Austin', 'TX', MOCK_BUSINESSES))
 
     const result = await handleLeadGen(db, mockJob())
 
@@ -111,7 +123,7 @@ describe('handleLeadGen', () => {
         .mockResolvedValueOnce({ totalDocs: 1, docs: [{ id: 'existing' }] })
         .mockResolvedValue({ totalDocs: 0, docs: [] }),
     })
-    mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES)
+    mockedScrapeMultiple.mockResolvedValueOnce(singleCityResult('Austin', 'TX', MOCK_BUSINESSES))
 
     const result = await handleLeadGen(db, mockJob())
 
@@ -119,9 +131,9 @@ describe('handleLeadGen', () => {
     expect(result.leads_skipped).toBe(1)
   })
 
-  it('records errors when scraper fails for a city', async () => {
+  it('records errors when scraper fails', async () => {
     const db = mockDb()
-    mockedScrape.mockRejectedValueOnce(new Error('Consent page detected'))
+    mockedScrapeMultiple.mockRejectedValueOnce(new Error('Consent page detected'))
 
     const result = await handleLeadGen(db, mockJob())
 
@@ -139,12 +151,14 @@ describe('handleLeadGen', () => {
         current_phase: 5,
       }),
     })
-    mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES.slice(0, 1))
-    mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES.slice(1, 2))
+    const results = new Map<string, ScrapedBusiness[]>()
+    results.set('Austin, TX', [MOCK_BUSINESSES[0]!])
+    results.set('Denver, CO', [MOCK_BUSINESSES[1]!])
+    mockedScrapeMultiple.mockResolvedValueOnce(results)
 
     const result = await handleLeadGen(db, mockJob())
 
-    expect(mockedScrape).toHaveBeenCalledTimes(2)
+    expect(mockedScrapeMultiple).toHaveBeenCalledTimes(1)
     expect(result.leads_created).toBe(2)
   })
 
@@ -152,7 +166,7 @@ describe('handleLeadGen', () => {
     const db = mockDb({
       create: vi.fn().mockRejectedValueOnce(new Error('unique constraint violation')),
     })
-    mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES.slice(0, 1))
+    mockedScrapeMultiple.mockResolvedValueOnce(singleCityResult('Austin', 'TX', [MOCK_BUSINESSES[0]!]))
 
     const result = await handleLeadGen(db, mockJob())
 
@@ -162,7 +176,7 @@ describe('handleLeadGen', () => {
 
   it('creates leads with correct field values', async () => {
     const db = mockDb()
-    mockedScrape.mockResolvedValueOnce(MOCK_BUSINESSES.slice(0, 1))
+    mockedScrapeMultiple.mockResolvedValueOnce(singleCityResult('Austin', 'TX', [MOCK_BUSINESSES[0]!]))
 
     await handleLeadGen(db, mockJob())
 

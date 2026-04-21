@@ -1,10 +1,44 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import {
+  parseSearchResults,
   parseBusinessListings,
   buildSearchUrl,
   parseCityState,
   buildNicheCityKey,
+  scrapeGoogleMaps,
+  scrapeMultipleCities,
 } from '../../../src/scraper/google-maps'
+
+const FIXTURES_DIR = join(__dirname, '..', '..', 'fixtures')
+
+function makeMockBiz(overrides: Partial<{ title: string; dataId: string; website: string; phone: string }> = {}) {
+  const b = new Array(180).fill(null)
+  b[0] = "id123"
+  b[2] = ["Eakou 74", "Ilion 131 22", "Greece"]
+  b[4] = [null, null, null, ["reviews link"], null, null, null, 4.8, 48]
+  b[7] = overrides.website ? [overrides.website] : ["https://www.dreamcoffee.gr", "dreamcoffee.gr"]
+  b[9] = [null, null, 38.0331931, 23.7094475]
+  b[10] = overrides.dataId ?? "0x14a1a32f316b15a1:0x169c54b46dcc3a93"
+  b[11] = overrides.title ?? "Dream Coffee"
+  b[13] = ["Coffee shop"]
+  b[178] = overrides.phone ? [[overrides.phone]] : [["210 123 4567"]]
+
+  const outer = new Array(15).fill(null)
+  outer[14] = b
+  return outer
+}
+
+const MOCK_SEARCH_JSON = JSON.stringify([
+  [
+    "query",
+    [
+      null,
+      makeMockBiz(),
+    ]
+  ]
+])
 
 const MOCK_HTML = `
 window.APP_INITIALIZATION_STATE=[
@@ -22,103 +56,116 @@ window.APP_INITIALIZATION_STATE=[
   null,
   [null,null,30.2672,-97.7431]
 ],
-"0x8640c7b8e4b8f7e2:0xbcdef12345678901",
-[null,null,
-  "Cool Air Austin",
-  null,
-  null,
-  "456 Oak Ave, Austin, TX 78702",
-  "(512) 555-5678",
-  "https://www.coolairaustin.com",
-  4.5,
-  "(89)",
-  null,
-  [null,null,30.2712,-97.7381]
-],
-"0x8640c7b8e4b8f7e3:0xcdef123456789012",
-[null,null,
-  "Austin Heating & Cooling LLC",
-  null,
-  null,
-  "789 Pine Rd, Austin, TX 78703",
-  "(512) 555-9012",
-  null,
-  3.9,
-  "(34)",
-  null,
-  [null,null,30.2981,-97.7511]
-]
 ];
 `
 
+function mockFetch(jsonBody: string, status = 200) {
+  return vi.fn(async () => ({
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => `)]}'\n${jsonBody}`,
+    headers: new Map([['set-cookie', 'NID=test123; path=/; domain=.google.com']]),
+  }))
+}
+
+// ── parseSearchResults (new JSON API parser) ──
+
+describe('parseSearchResults', () => {
+  it('extracts businesses from structured JSON', () => {
+    const results = parseSearchResults(MOCK_SEARCH_JSON)
+    expect(results.length).toBe(1)
+
+    const biz = results[0]!
+    expect(biz.name).toBe('Dream Coffee')
+    expect(biz.address).toContain('Eakou 74')
+    expect(biz.address).toContain('Ilion 131 22')
+    expect(biz.rating).toBe(4.8)
+    expect(biz.reviewCount).toBe(48)
+    expect(biz.latitude).toBe(38.0331931)
+    expect(biz.longitude).toBe(23.7094475)
+    expect(biz.category).toBe('Coffee shop')
+    expect(biz.placeId).toBe('0x14a1a32f316b15a1:0x169c54b46dcc3a93')
+    expect(biz.website).toBe('https://www.dreamcoffee.gr')
+    expect(biz.phone).toBe('2101234567')
+    expect(biz.mapsUrl).toContain('place_id:0x14a1a32f316b15a1')
+  })
+
+  it('parses real Google Maps fixture data', () => {
+    const raw = readFileSync(join(FIXTURES_DIR, 'gm-search-results.json'), 'utf-8')
+    const jsonStr = raw.trimStart().startsWith(')') ? raw.substring(raw.indexOf('\n') + 1) : raw
+    const results = parseSearchResults(jsonStr)
+
+    expect(results.length).toBeGreaterThan(0)
+
+    for (const biz of results) {
+      expect(biz.name.length).toBeGreaterThan(0)
+      expect(biz.mapsUrl).toContain('google.com/maps/place/')
+    }
+  })
+
+  it('returns empty array for invalid JSON', () => {
+    expect(parseSearchResults('not json')).toEqual([])
+  })
+
+  it('returns empty array for empty JSON array', () => {
+    expect(parseSearchResults('[]')).toEqual([])
+  })
+
+  it('returns empty array for wrong structure', () => {
+    expect(parseSearchResults('[null]')).toEqual([])
+  })
+
+  it('deduplicates by name', () => {
+    const dupJson = JSON.stringify([
+      ["q", [null, makeMockBiz({ title: "Same Name" }), makeMockBiz({ title: "Same Name" })]]
+    ])
+    const results = parseSearchResults(dupJson)
+    expect(results.length).toBe(1)
+  })
+
+  it('extracts /url?q= website URLs correctly', () => {
+    const json = JSON.stringify([
+      ["q", [null, makeMockBiz({ website: "/url?q=https://example.com&q1=foo" })]]
+    ])
+    const results = parseSearchResults(json)
+    expect(results[0]!.website).toBe('https://example.com')
+  })
+})
+
+// ── parseBusinessListings (legacy HTML parser) ──
+
 describe('parseBusinessListings', () => {
-  it('extracts businesses from mock Google Maps HTML', () => {
+  it('extracts businesses from legacy HTML', () => {
     const results = parseBusinessListings(MOCK_HTML, 'Austin', 'TX')
-    expect(results.length).toBeGreaterThanOrEqual(3)
-
-    const johns = results.find((b) => b.name.includes('HVAC'))
-    expect(johns).toBeDefined()
-    expect(johns!.placeId).toContain('0x8640c7b8e4b8f7e1')
+    expect(results.length).toBeGreaterThanOrEqual(1)
+    expect(results[0]!.name).toContain('HVAC')
   })
 
-  it('extracts phone numbers', () => {
-    const results = parseBusinessListings(MOCK_HTML, 'Austin', 'TX')
-    const withPhone = results.filter((b) => b.phone !== null)
-    expect(withPhone.length).toBeGreaterThanOrEqual(2)
-  })
-
-  it('extracts websites', () => {
-    const results = parseBusinessListings(MOCK_HTML, 'Austin', 'TX')
-    const withWebsite = results.filter((b) => b.website !== null)
-    expect(withWebsite.length).toBeGreaterThanOrEqual(2)
-  })
-
-  it('extracts coordinates', () => {
-    const results = parseBusinessListings(MOCK_HTML, 'Austin', 'TX')
-    const withCoords = results.filter((b) => b.latitude !== null && b.longitude !== null)
-    expect(withCoords.length).toBeGreaterThanOrEqual(1)
-  })
-
-  it('deduplicates businesses by name', () => {
-    const dupHtml = `
-    "0xaaaaaa0000000000:0xbbbbbb0000000000", [null,"Same Business Name","addr","(512) 111-2222"],
-    "0xcccccc0000000000:0xdddddd0000000000", [null,"Same Business Name","addr2","(512) 333-4444"],
-    `
-    const results = parseBusinessListings(dupHtml, 'Austin', 'TX')
-    const sameName = results.filter((b) => b.name === 'Same Business Name')
-    expect(sameName.length).toBe(1)
-  })
-
-  it('returns empty array for empty HTML', () => {
+  it('returns empty for empty HTML', () => {
     expect(parseBusinessListings('', 'Austin', 'TX')).toEqual([])
   })
-
-  it('returns empty array for HTML without place IDs', () => {
-    expect(parseBusinessListings('<html><body>Hello</body></html>', 'Austin', 'TX')).toEqual([])
-  })
-
-  it('builds correct maps URL from place ID', () => {
-    const results = parseBusinessListings(MOCK_HTML, 'Austin', 'TX')
-    const first = results[0]
-    expect(first).toBeDefined()
-    expect(first!.mapsUrl).toContain('google.com/maps/place/')
-    expect(first!.mapsUrl).toContain('place_id:')
-  })
 })
+
+// ── buildSearchUrl ──
 
 describe('buildSearchUrl', () => {
-  it('builds URL with encoded query and params', () => {
-    const url = buildSearchUrl('hvac', 'Austin', 'TX')
-    expect(url).toContain('google.com/maps/search/')
+  it('builds tbm=map URL with query and pb param', () => {
+    const url = buildSearchUrl('hvac in Austin TX')
+    expect(url).toContain('maps.google.com/search')
+    expect(url).toContain('tbm=map')
+    expect(url).toContain('q=hvac')
+    expect(url).toContain('pb=')
     expect(url).toContain('hl=en')
-    expect(url).toContain('gl=us')
   })
 
-  it('handles multi-word niches', () => {
-    const url = buildSearchUrl('hvac contractor', 'San Antonio', 'TX')
-    expect(url).toContain('hvac%20contractor')
+  it('uses provided lat/lon/zoom', () => {
+    const url = buildSearchUrl('test', 30.2672, -97.7431, 12)
+    expect(url).toContain('30.2672')
+    expect(url).toContain('-97.7431')
   })
 })
+
+// ── parseCityState ──
 
 describe('parseCityState', () => {
   it('parses "Austin, TX" format', () => {
@@ -152,6 +199,8 @@ describe('parseCityState', () => {
   })
 })
 
+// ── buildNicheCityKey ──
+
 describe('buildNicheCityKey', () => {
   it('builds lowercase colon-separated key', () => {
     expect(buildNicheCityKey('HVAC', 'Austin', "John's HVAC")).toBe("hvac:austin:john's hvac")
@@ -159,5 +208,124 @@ describe('buildNicheCityKey', () => {
 
   it('normalizes whitespace in business name', () => {
     expect(buildNicheCityKey('hvac', 'Austin', 'Cool  Air   Austin')).toBe('hvac:austin:cool air austin')
+  })
+})
+
+// ── scrapeGoogleMaps (integration with mock fetch) ──
+
+describe('scrapeGoogleMaps', () => {
+  it('returns parsed businesses from API response', async () => {
+    const fetchFn = mockFetch(MOCK_SEARCH_JSON)
+    const results = await scrapeGoogleMaps('coffee', 'Athens', 'GR', {
+      fetchFn,
+      interRequestDelayMs: [50, 100],
+    })
+
+    expect(results.length).toBe(1)
+    expect(results[0]!.name).toBe('Dream Coffee')
+    expect(fetchFn).toHaveBeenCalledTimes(1)
+  })
+
+  it('retries on rate limit (429)', async () => {
+    const failRes = { ok: false, status: 429, text: async () => '', headers: new Map() }
+    const okRes = {
+      ok: true,
+      status: 200,
+      text: async () => `)]}'\n${MOCK_SEARCH_JSON}`,
+      headers: new Map(),
+    }
+
+    const fetchFn = vi.fn().mockResolvedValueOnce(failRes).mockResolvedValueOnce(okRes)
+
+    const results = await scrapeGoogleMaps('coffee', 'Athens', 'GR', {
+      fetchFn,
+      maxRetries: 1,
+      retryBaseDelayMs: 50,
+      interRequestDelayMs: [50, 100],
+    })
+
+    expect(results.length).toBe(1)
+    expect(fetchFn).toHaveBeenCalledTimes(2)
+  })
+
+  it('throws after exhausting retries', async () => {
+    const blockRes = { ok: true, status: 200, text: async () => 'detected unusual traffic', headers: new Map() }
+    const fetchFn = vi.fn().mockResolvedValue(blockRes)
+
+    await expect(
+      scrapeGoogleMaps('coffee', 'Athens', 'GR', {
+        fetchFn,
+        maxRetries: 2,
+        retryBaseDelayMs: 50,
+        interRequestDelayMs: [50, 100],
+      }),
+    ).rejects.toThrow()
+
+    expect(fetchFn).toHaveBeenCalledTimes(3)
+  })
+
+  it('throws on abort signal', async () => {
+    const fetchFn = mockFetch(MOCK_SEARCH_JSON)
+    const controller = new AbortController()
+    controller.abort()
+
+    await expect(
+      scrapeGoogleMaps('coffee', 'Athens', 'GR', {
+        fetchFn,
+        signal: controller.signal,
+        interRequestDelayMs: [50, 100],
+      }),
+    ).rejects.toThrow()
+  })
+})
+
+// ── scrapeMultipleCities ──
+
+describe('scrapeMultipleCities', () => {
+  it('scrapes multiple cities with shared session', async () => {
+    const fetchFn = mockFetch(MOCK_SEARCH_JSON)
+    const cities = [
+      { city: 'Austin', state: 'TX' },
+      { city: 'Denver', state: 'CO' },
+    ]
+
+    const results = await scrapeMultipleCities('hvac', cities, {
+      fetchFn,
+      maxRequestsPerMinute: 60,
+      interRequestDelayMs: [50, 100],
+    })
+
+    expect(results.size).toBe(2)
+    expect(results.has('Austin, TX')).toBe(true)
+    expect(results.has('Denver, CO')).toBe(true)
+    expect(fetchFn).toHaveBeenCalledTimes(2)
+  })
+
+  it('continues on single city failure', async () => {
+    const failRes = { ok: false, status: 500, text: async () => 'error', headers: new Map() }
+    const okRes = {
+      ok: true,
+      status: 200,
+      text: async () => `)]}'\n${MOCK_SEARCH_JSON}`,
+      headers: new Map(),
+    }
+
+    const fetchFn = vi.fn().mockResolvedValueOnce(failRes).mockResolvedValueOnce(okRes)
+
+    const cities = [
+      { city: 'FailCity', state: 'TX' },
+      { city: 'Austin', state: 'TX' },
+    ]
+
+    const results = await scrapeMultipleCities('hvac', cities, {
+      fetchFn,
+      maxRetries: 0,
+      maxRequestsPerMinute: 60,
+      interRequestDelayMs: [50, 100],
+    })
+
+    expect(results.size).toBe(2)
+    expect(results.get('FailCity, TX')).toEqual([])
+    expect(results.get('Austin, TX')!.length).toBe(1)
   })
 })

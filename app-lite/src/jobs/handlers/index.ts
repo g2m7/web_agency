@@ -1,10 +1,11 @@
 import type { DbClient } from '../../db'
 import type { ScheduledJob } from '../queue'
 import {
-  scrapeGoogleMaps,
+  scrapeMultipleCities,
   parseCityState,
   buildNicheCityKey,
   type ScrapedBusiness,
+  type ScraperOptions,
 } from '../../scraper/google-maps'
 
 export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
@@ -15,65 +16,84 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
   const existingLeads = await db.find({ collection: 'leads', limit: 0 })
   const leadsBefore = existingLeads.totalDocs
 
-  let leadsCreated = 0
-  let leadsSkipped = 0
+  const cityStates = cities.map((entry) => parseCityState(entry))
+
+  const scraperOptions: ScraperOptions = {
+    signal: AbortSignal.timeout(Math.max(cities.length * 60_000, 120_000)),
+    maxRequestsPerMinute: 8,
+    maxRetries: 3,
+    retryBaseDelayMs: 4000,
+    interRequestDelayMs: [5000, 12000],
+    proxies: (config.scraper_proxies as any[])?.map((p: any) => ({
+      url: p.url,
+      username: p.username,
+      password: p.password,
+    })),
+  }
+
+  let allBusinesses: Array<{ city: string; state: string; biz: ScrapedBusiness }> = []
   const errors: string[] = []
 
-  for (const cityEntry of cities) {
-    const { city, state } = parseCityState(cityEntry)
+  try {
+    const results = await scrapeMultipleCities(niche, cityStates, scraperOptions)
+    for (const [key, businesses] of results) {
+      const { city, state } = parseCityState(key)
+      for (const biz of businesses) {
+        allBusinesses.push({ city, state, biz })
+      }
+    }
+  } catch (err: any) {
+    if (err.name !== 'AbortError') {
+      errors.push(`batch scrape: ${err.message}`)
+    }
+  }
 
-    let businesses: ScrapedBusiness[]
-    try {
-      businesses = await scrapeGoogleMaps(niche, city, state, { signal: AbortSignal.timeout(30_000) })
-    } catch (err: any) {
-      errors.push(`${city}, ${state}: ${err.message}`)
+  let leadsCreated = 0
+  let leadsSkipped = 0
+
+  for (const { city, state, biz } of allBusinesses) {
+    const nicheCityKey = buildNicheCityKey(niche, city, biz.name)
+
+    const existing = await db.find({
+      collection: 'leads',
+      where: { niche_city_key: { equals: nicheCityKey } },
+      limit: 1,
+    })
+
+    if (existing.totalDocs > 0) {
+      leadsSkipped++
       continue
     }
 
-    for (const biz of businesses) {
-      const nicheCityKey = buildNicheCityKey(niche, city, biz.name)
-
-      const existing = await db.find({
+    try {
+      await db.create({
         collection: 'leads',
-        where: { niche_city_key: { equals: nicheCityKey } },
-        limit: 1,
+        data: {
+          id: crypto.randomUUID(),
+          businessName: biz.name,
+          niche,
+          city,
+          state,
+          websiteUrl: biz.website ?? null,
+          googleMapsUrl: biz.mapsUrl,
+          email: null,
+          phone: biz.phone ?? null,
+          decisionMaker: null,
+          status: 'new',
+          auditScore: null,
+          auditData: null,
+          priorityTier: null,
+          exclusionReason: null,
+          source: 'google_maps',
+          nicheCityKey,
+        },
       })
-
-      if (existing.totalDocs > 0) {
+      leadsCreated++
+    } catch (err: any) {
+      if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
         leadsSkipped++
-        continue
-      }
-
-      try {
-        await db.create({
-          collection: 'leads',
-          data: {
-            id: crypto.randomUUID(),
-            businessName: biz.name,
-            niche,
-            city,
-            state,
-            websiteUrl: biz.website ?? null,
-            googleMapsUrl: biz.mapsUrl,
-            email: null,
-            phone: biz.phone ?? null,
-            decisionMaker: null,
-            status: 'new',
-            auditScore: null,
-            auditData: null,
-            priorityTier: null,
-            exclusionReason: null,
-            source: 'google_maps',
-            nicheCityKey,
-          },
-        })
-        leadsCreated++
-      } catch (err: any) {
-        if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
-          leadsSkipped++
-        } else {
-          errors.push(`insert ${biz.name}: ${err.message}`)
-        }
+      } else {
+        errors.push(`insert ${biz.name}: ${err.message}`)
       }
     }
   }
