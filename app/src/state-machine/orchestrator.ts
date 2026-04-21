@@ -1,4 +1,4 @@
-import type { Payload } from 'payload'
+import type { DbClient } from '../db'
 import type { LeadStatus, ClientStatus, PolicyAction } from '../types'
 import { isValidLeadTransition, isValidClientTransition, getLeadTransition } from './states'
 import { runPolicyCheck } from '../policy/engine'
@@ -12,14 +12,14 @@ interface TransitionOptions {
 }
 
 export async function transitionLead(
-  payload: Payload,
+  db: DbClient,
   leadId: string,
   fromStatus: LeadStatus,
   toStatus: LeadStatus,
   options: TransitionOptions,
 ): Promise<{ success: boolean; reason?: string }> {
   if (!isValidLeadTransition(fromStatus, toStatus)) {
-    await logBlockedTransition(payload, leadId, 'lead', fromStatus, toStatus, options, 'Invalid transition')
+    await logBlockedTransition(db, leadId, 'lead', fromStatus, toStatus, options, 'Invalid transition')
     return { success: false, reason: `Invalid transition: ${fromStatus} → ${toStatus}` }
   }
 
@@ -27,8 +27,8 @@ export async function transitionLead(
   const policyAction = inferPolicyAction(toStatus)
 
   if (policyAction && !options.skipPolicy) {
-    const lead = await payload.findByID({ collection: 'leads', id: leadId })
-    const systemConfig = await getSystemConfig(payload)
+    const lead = await db.findByID({ collection: 'leads', id: leadId })
+    const systemConfig = await getSystemConfig(db)
 
     const policyResult = await runPolicyCheck({
       action: policyAction,
@@ -37,12 +37,12 @@ export async function transitionLead(
     })
 
     if (policyResult.blocked) {
-      await logBlockedTransition(payload, leadId, 'lead', fromStatus, toStatus, options, policyResult.blockingReason ?? 'Policy blocked')
+      await logBlockedTransition(db, leadId, 'lead', fromStatus, toStatus, options, policyResult.blockingReason ?? 'Policy blocked')
       return { success: false, reason: policyResult.blockingReason }
     }
 
     if (policyResult.requiresHumanApproval) {
-      await payload.create({
+      await db.create({
         collection: 'pipeline-events',
         data: {
           lead: leadId,
@@ -59,13 +59,13 @@ export async function transitionLead(
     }
   }
 
-  await payload.update({
+  await db.update({
     collection: 'leads',
     id: leadId,
     data: { status: toStatus },
   })
 
-  await payload.create({
+  await db.create({
     collection: 'pipeline-events',
     data: {
       lead: leadId,
@@ -79,28 +79,28 @@ export async function transitionLead(
     },
   })
 
-  await scheduleAfterTransition(payload, 'lead', leadId, toStatus)
+  await scheduleAfterTransition(db, 'lead', leadId, toStatus)
 
   return { success: true }
 }
 
 export async function transitionClient(
-  payload: Payload,
+  db: DbClient,
   clientId: string,
   fromStatus: ClientStatus,
   toStatus: ClientStatus,
   options: TransitionOptions,
 ): Promise<{ success: boolean; reason?: string }> {
   if (!isValidClientTransition(fromStatus, toStatus)) {
-    await logBlockedTransition(payload, clientId, 'client', fromStatus, toStatus, options, 'Invalid transition')
+    await logBlockedTransition(db, clientId, 'client', fromStatus, toStatus, options, 'Invalid transition')
     return { success: false, reason: `Invalid transition: ${fromStatus} → ${toStatus}` }
   }
 
   const policyAction = inferPolicyActionForClient(toStatus)
 
   if (policyAction && !options.skipPolicy) {
-    const client = await payload.findByID({ collection: 'clients', id: clientId })
-    const systemConfig = await getSystemConfig(payload)
+    const client = await db.findByID({ collection: 'clients', id: clientId })
+    const systemConfig = await getSystemConfig(db)
 
     const policyResult = await runPolicyCheck({
       action: policyAction,
@@ -109,12 +109,12 @@ export async function transitionClient(
     })
 
     if (policyResult.blocked) {
-      await logBlockedTransition(payload, clientId, 'client', fromStatus, toStatus, options, policyResult.blockingReason ?? 'Policy blocked')
+      await logBlockedTransition(db, clientId, 'client', fromStatus, toStatus, options, policyResult.blockingReason ?? 'Policy blocked')
       return { success: false, reason: policyResult.blockingReason }
     }
 
     if (policyResult.requiresHumanApproval) {
-      await payload.create({
+      await db.create({
         collection: 'pipeline-events',
         data: {
           client: clientId,
@@ -131,13 +131,13 @@ export async function transitionClient(
     }
   }
 
-  await payload.update({
+  await db.update({
     collection: 'clients',
     id: clientId,
     data: { status: toStatus },
   })
 
-  await payload.create({
+  await db.create({
     collection: 'pipeline-events',
     data: {
       client: clientId,
@@ -150,7 +150,7 @@ export async function transitionClient(
     },
   })
 
-  await scheduleAfterTransition(payload, 'client', clientId, toStatus)
+  await scheduleAfterTransition(db, 'client', clientId, toStatus)
 
   return { success: true }
 }
@@ -171,7 +171,7 @@ function inferPolicyActionForClient(toStatus: ClientStatus): PolicyAction | null
 }
 
 async function logBlockedTransition(
-  payload: Payload,
+  db: DbClient,
   entityId: string,
   entityType: 'lead' | 'client',
   fromStatus: string,
@@ -179,7 +179,7 @@ async function logBlockedTransition(
   options: TransitionOptions,
   reason: string,
 ) {
-  await payload.create({
+  await db.create({
     collection: 'policy-checks',
     data: {
       action_type: entityType === 'lead' ? 'send_email' : 'launch_site',
@@ -192,16 +192,16 @@ async function logBlockedTransition(
   })
 }
 
-async function getSystemConfig(payload: Payload) {
-  const config = await payload.findGlobal({ slug: 'system-config' })
+async function getSystemConfig(db: DbClient) {
+  const config = await db.findGlobal({ slug: 'system-config' })
   return {
-    current_phase: (config as any).current_phase ?? 2,
-    email_approval_required: (config as any).email_approval_required ?? true,
-    demo_approval_required: (config as any).demo_approval_required ?? true,
-    launch_approval_required: (config as any).launch_approval_required ?? true,
-    active_niche: (config as any).active_niche ?? '',
-    active_cities: (config as any).active_cities ?? [],
-    dodo_checkout_links: (config as any).dodo_checkout_links ?? {},
-    maintenance_mode: (config as any).maintenance_mode ?? false,
+    current_phase: config.current_phase ?? 2,
+    email_approval_required: config.email_approval_required ?? true,
+    demo_approval_required: config.demo_approval_required ?? true,
+    launch_approval_required: config.launch_approval_required ?? true,
+    active_niche: config.active_niche ?? '',
+    active_cities: config.active_cities ?? [],
+    dodo_checkout_links: config.dodo_checkout_links ?? {},
+    maintenance_mode: config.maintenance_mode ?? false,
   }
 }

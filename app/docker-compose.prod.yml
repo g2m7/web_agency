@@ -2,21 +2,17 @@ services:
   app:
     build: .
     ports:
-      - "127.0.0.1:3006:3006"
+      - "127.0.0.1:${APP_PORT:-3006}:3006"
     env_file: .env
     environment:
       DATABASE_URL: postgres://${DB_USER:-web_agency}:${DB_PASSWORD:-web_agency}@postgres:5432/${DB_NAME:-web_agency}
-      REDIS_URL: redis://redis:6379
-      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:3006}
       NODE_ENV: production
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3006/api/access || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3006/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -37,17 +33,5 @@ services:
       retries: 5
     restart: unless-stopped
 
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
 volumes:
   pgdata:
-  redisdata:

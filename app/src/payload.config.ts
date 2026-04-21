@@ -1,6 +1,5 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
@@ -19,7 +18,6 @@ import { PipelineEvents } from './collections/PipelineEvents'
 import { SkillVersions } from './collections/SkillVersions'
 import { Operators } from './collections/Operators'
 import { SystemConfig } from './globals/SystemConfig'
-import { webhookEndpoints } from './endpoints/webhooks'
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-in-production',
@@ -27,9 +25,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL,
     },
-    migrationDir: './migrations',
   }),
-  editor: lexicalEditor({}),
   collections: [
     Operators,
     Leads,
@@ -44,9 +40,8 @@ export default buildConfig({
     SkillVersions,
   ],
   globals: [SystemConfig],
-  endpoints: webhookEndpoints,
   typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts')
+    outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
   cors: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3006'].filter(Boolean),
   admin: {
@@ -56,10 +51,12 @@ export default buildConfig({
     },
   },
   onInit: async (payload) => {
-    payload.logger.info('Payload initialized — starting BullMQ workers')
+    payload.logger.info('Payload initialized — starting job workers')
+    const { createDbClientFromPayload } = await import('./db/index')
+    const db = createDbClientFromPayload(payload)
     const { startWorkers } = await import('./jobs/workers')
-    await startWorkers(payload)
-    const { startScheduler } = await import('./jobs/scheduler')
-    await startScheduler(payload)
+    await startWorkers(db)
+    const { startRecurringJobs } = await import('./jobs/scheduler')
+    await startRecurringJobs(db)
   },
 })

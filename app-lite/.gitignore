@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Database
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Build
+dist/
+
+# Drizzle migrations
+drizzle/
+
+# Environment
+.env
+
+# OS
+.DS_Store
+Thumbs.db

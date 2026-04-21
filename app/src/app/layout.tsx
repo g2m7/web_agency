@@ -1,6 +1,5 @@
 import { RootLayout, handleServerFunctions } from '@payloadcms/next/layouts'
 import config from '@payload-config'
-
 import { importMap } from './(payload)/admin/importMap.js'
 
 type Args = {
@@ -12,10 +11,10 @@ const Layout = ({ children }: Args) => {
     <RootLayout
       config={Promise.resolve(config)}
       importMap={importMap}
-      serverFunction={async function (args) {
+      serverFunction={async function (clientArgs: { name: string; args: Record<string, unknown> }) {
         'use server'
         return handleServerFunctions({
-          args,
+          ...clientArgs,
           config: Promise.resolve(config),
           importMap,
         })

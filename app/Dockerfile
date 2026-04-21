@@ -22,11 +22,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src/payload.config.ts ./src/payload.config.ts
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/package.json ./package.json
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 3006
 ENV PORT=3006
 ENV HOSTNAME="0.0.0.0"
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["node", "server.js"]

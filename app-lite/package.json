@@ -1,0 +1,33 @@
+{
+  "name": "web-agency-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "start": "bun src/index.ts",
+    "typecheck": "bun x tsc --noEmit",
+    "test": "bun x vitest run",
+    "test:watch": "bun x vitest",
+    "test:unit": "bun x vitest run tests/unit",
+    "test:golden": "bun x vitest run tests/golden",
+    "test:adversarial": "bun x vitest run tests/adversarial",
+    "test:integration": "bun x vitest run tests/integration",
+    "test:regression": "bun x vitest run tests/regression",
+    "db:generate": "bun x drizzle-kit generate",
+    "db:migrate": "bun x drizzle-kit migrate",
+    "db:studio": "bun x drizzle-kit studio"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "drizzle-orm": "^0.45.2",
+    "resend": "^4.6.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0",
+    "@types/bun": "latest"
+  }
+}

@@ -1,10 +1,13 @@
 import { RootPage, generatePageMetadata } from '@payloadcms/next/views'
 import config from '@payload-config'
-
 import { importMap } from '../importMap.js'
 
 export const generateMetadata = () => {
-  return generatePageMetadata({ config })
+  return generatePageMetadata({
+    config: Promise.resolve(config),
+    params: Promise.resolve({}),
+    searchParams: Promise.resolve({}),
+  })
 }
 
 const Page = async (args: {

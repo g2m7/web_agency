@@ -1,13 +1,11 @@
 node_modules
-.next
 .git
 .env
 .env.local
 coverage
-dist
 *.tsbuildinfo
-.migrations
 tests
 docker-compose*.yml
 Dockerfile
 .dockerignore
+prisma/migrations

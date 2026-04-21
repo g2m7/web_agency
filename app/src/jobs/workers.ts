@@ -1,19 +1,19 @@
-import { Worker } from 'bullmq'
-import type { Payload } from 'payload'
-import type { Job } from 'bullmq'
-import { MAIN_QUEUE, connection } from './queue'
-import { handleLeadGen } from './handlers/index'
-import { handleFollowUp1 } from './handlers/index'
-import { handleFollowUp2 } from './handlers/index'
-import { handleDemoBuild } from './handlers/index'
-import { handleOnboarding } from './handlers/index'
-import { handleMonthlyReport } from './handlers/index'
-import { handleChurnCheck } from './handlers/index'
-import { handleSupportAutoReply } from './handlers/index'
-import { handleBillingRetry } from './handlers/index'
-import { handleSiteQa } from './handlers/index'
+import type { DbClient } from '../db'
+import type { ScheduledJob } from './queue'
+import {
+  handleLeadGen,
+  handleFollowUp1,
+  handleFollowUp2,
+  handleDemoBuild,
+  handleOnboarding,
+  handleMonthlyReport,
+  handleChurnCheck,
+  handleSupportAutoReply,
+  handleBillingRetry,
+  handleSiteQa,
+} from './handlers/index'
 
-const handlers: Record<string, (payload: Payload, job: Job) => Promise<Record<string, unknown>>> = {
+const handlers: Record<string, (db: DbClient, job: ScheduledJob) => Promise<Record<string, unknown>>> = {
   lead_gen: handleLeadGen,
   follow_up_1: handleFollowUp1,
   follow_up_2: handleFollowUp2,
@@ -26,91 +26,93 @@ const handlers: Record<string, (payload: Payload, job: Job) => Promise<Record<st
   site_qa: handleSiteQa,
 }
 
-let worker: Worker | null = null
+let pollInterval: ReturnType<typeof setInterval> | null = null
 
-export async function startWorkers(payload: Payload) {
-  worker = new Worker(
-    'web-agency',
-    async (job: Job) => {
-      const handler = handlers[job.name]
-      if (!handler) {
-        throw new Error(`No handler for job type: ${job.name}`)
-      }
+export async function startWorkers(db: DbClient) {
+  console.log('Job worker polling started')
 
-      const jobRecord = await payload.find({
+  pollInterval = setInterval(async () => {
+    try {
+      await pollAndProcess(db)
+    } catch (err) {
+      console.error('Worker poll error:', err)
+    }
+  }, 30_000) // Poll every 30 seconds
+}
+
+async function pollAndProcess(db: DbClient) {
+  const dueJobs = await db.find({
+    collection: 'jobs',
+    where: {
+      and: [
+        { status: { equals: 'queued' } },
+        { run_at: { less_than: new Date().toISOString() } },
+      ],
+    },
+    limit: 10,
+    sort: 'run_at',
+  })
+
+  for (const jobDoc of dueJobs.docs) {
+    const job: ScheduledJob = {
+      id: String(jobDoc.id),
+      name: jobDoc.job_type,
+      data: (jobDoc.input_data as Record<string, unknown>) ?? {},
+      attemptsMade: (jobDoc.attempts as number) ?? 0,
+      maxAttempts: (jobDoc.max_attempts as number) ?? 3,
+    }
+
+    const handler = handlers[job.name]
+    if (!handler) {
+      console.error(`No handler for job type: ${job.name}`)
+      continue
+    }
+
+    await db.update({
+      collection: 'jobs',
+      id: job.id,
+      data: { status: 'running', started_at: new Date().toISOString(), attempts: job.attemptsMade + 1 },
+    })
+
+    try {
+      const result = await handler(db, job)
+
+      await db.update({
         collection: 'jobs',
-        where: {
-          and: [
-            { job_type: { equals: job.name } },
-            { status: { equals: 'queued' } },
-          ],
+        id: job.id,
+        data: {
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          output_data: result,
         },
-        limit: 1,
-        sort: '-createdAt',
+      })
+    } catch (error) {
+      const isDead = job.attemptsMade + 1 >= job.maxAttempts
+      await db.update({
+        collection: 'jobs',
+        id: job.id,
+        data: {
+          status: isDead ? 'dead' : 'queued',
+          failed_at: new Date().toISOString(),
+          error_message: error instanceof Error ? error.message : String(error),
+          ...(isDead ? {} : { run_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() }),
+        },
       })
 
-      let jobId: string | undefined
-      const jobDoc = jobRecord.docs[0]
-      if (jobDoc) {
-        jobId = String(jobDoc.id)
-        await payload.update({
-          collection: 'jobs',
-          id: jobId,
-          data: { status: 'running', started_at: new Date().toISOString(), attempts: { increment: 1 } },
-        })
+      if (isDead) {
+        const { sendAlert } = await import('../services/email')
+        await sendAlert(
+          `Job dead: ${job.name}`,
+          `Job ${job.id} (${job.name}) has exhausted all retries.\n\nError: ${error instanceof Error ? error.message : String(error)}`,
+        )
       }
-
-      try {
-        const result = await handler(payload, job)
-
-        if (jobId) {
-          await payload.update({
-            collection: 'jobs',
-            id: jobId,
-            data: {
-              status: 'completed',
-              completed_at: new Date().toISOString(),
-              output_data: result,
-            },
-          })
-        }
-
-        return result
-      } catch (error) {
-        if (jobId) {
-          const isDead = job.attemptsMade >= (job.opts?.attempts ?? 3) - 1
-          await payload.update({
-            collection: 'jobs',
-            id: jobId,
-            data: {
-              status: isDead ? 'dead' : 'failed',
-              failed_at: new Date().toISOString(),
-              error_message: error instanceof Error ? error.message : String(error),
-            },
-          })
-
-          if (isDead) {
-            const { sendAlert } = await import('../services/email')
-            await sendAlert(
-              `Job dead: ${job.name}`,
-              `Job ${job.id} (${job.name}) has exhausted all retries.\n\nError: ${error instanceof Error ? error.message : String(error)}`,
-            )
-          }
-        }
-        throw error
-      }
-    },
-    { connection, concurrency: 5 },
-  )
-
-  worker.on('failed', (job, err) => {
-    console.error(`Job ${job?.id} failed:`, err.message)
-  })
+    }
+  }
 }
 
 export async function stopWorkers() {
-  if (worker) {
-    await worker.close()
-    worker = null
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
   }
 }
