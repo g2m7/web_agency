@@ -29,7 +29,7 @@ vi.mock('../../../src/scraper/email-enricher', () => ({
   enrichEmailFromWebsite: vi.fn(),
   computePriorityTier: (hasWebsite: boolean, hasPhone: boolean) => {
     if (hasWebsite && hasPhone) return 'hot'
-    if (hasWebsite) return 'warm'
+    if (hasWebsite || hasPhone) return 'warm'
     return 'low'
   },
 }))

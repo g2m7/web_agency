@@ -18,6 +18,9 @@ Track weekly:
 - Demo-to-close conversion rate
 - Payments collected
 - Clients closed
+- Phone-fallback leads (no email, has phone)
+- Phone/SMS opener sent
+- Phone/SMS reply rate
 
 ## Funnel math
 
@@ -91,6 +94,7 @@ The business should reach internal confidence when:
 
 - Which niche or city had the best reply rate?
 - Which issue angle got the best response in hook emails?
+- How do phone/SMS fallback reply rates compare to email reply rates?
 - How many demos were requested vs how many emails sent?
 - Which package is easiest to close?
 - Did the agent make any errors this week? What kind?

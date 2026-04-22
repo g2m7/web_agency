@@ -55,6 +55,10 @@ Make the hidden failure points visible before they become expensive. With an AI-
 - **Risk:** Agent sends hundreds of emails with no replies.
 - **Mitigation:** Improve niche targeting, sharper issue selection, test subject lines, test SMS as an alternative channel.
 
+### 7b. Channel blind spot from email-only outreach
+- **Risk:** A large share of qualified leads have no email but have phone numbers, reducing reachable volume if only email is used.
+- **Mitigation:** Track phone-only leads as a fallback segment, run short phone/SMS opener workflow for that segment, monitor fallback reply and conversion rates separately.
+
 ### 8. High interest but low payment conversion
 - **Risk:** Prospects request demos but don't pay.
 - **Mitigation:** Simplify package choice, clarify pricing in demo email, ensure checkout link is prominent.

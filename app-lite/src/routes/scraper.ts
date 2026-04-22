@@ -66,7 +66,7 @@ scraperRoutes.get('/history', async (c) => {
   const limit = parseInt(c.req.query('limit') ?? '50', 10)
   const result = await db.find({
     collection: 'jobs',
-    where: { job_type: { equals: 'lead_gen' } },
+    where: { job_type: { in: ['lead_gen', 'email_enrich', 'email_validate'] } },
     limit,
     sort: '-createdAt',
   })
@@ -82,6 +82,7 @@ scraperRoutes.get('/results', async (c) => {
   const hasWebsite = c.req.query('hasWebsite')
   const hasPhone = c.req.query('hasPhone')
   const hasEmail = c.req.query('hasEmail')
+  const contactMode = c.req.query('contactMode')
   const emailStatus = c.req.query('emailStatus')
   const priorityTier = c.req.query('priorityTier')
   const source = c.req.query('source') ?? 'google_maps'
@@ -109,6 +110,9 @@ scraperRoutes.get('/results', async (c) => {
   if (hasPhone === 'false') docs = docs.filter((l: any) => !l.phone)
   if (hasEmail === 'true') docs = docs.filter((l: any) => l.email)
   if (hasEmail === 'false') docs = docs.filter((l: any) => !l.email)
+  if (contactMode === 'email') docs = docs.filter((l: any) => l.email)
+  if (contactMode === 'phone_only') docs = docs.filter((l: any) => !l.email && l.phone)
+  if (contactMode === 'unreachable') docs = docs.filter((l: any) => !l.email && !l.phone)
 
   return c.json({ totalDocs: result.totalDocs, docs })
 })
@@ -137,11 +141,10 @@ scraperRoutes.post('/enrich', async (c) => {
 scraperRoutes.get('/enrich/stats', async (c) => {
   const db = getDb()
 
-  const [allLeads, withEmail, pendingEmail, validEmail, riskyEmail, invalidEmail, hotLeads, warmLeads, lowLeads, enrichedLeads] =
+  const [allLeads, leadSample, pendingEmail, validEmail, riskyEmail, invalidEmail, hotLeads, warmLeads, lowLeads] =
     await Promise.all([
       db.find({ collection: 'leads', where: { source: { equals: 'google_maps' } }, limit: 0 }),
-      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }] }, limit: 5000 })
-        .then(r => ({ totalDocs: r.docs.filter((l: any) => l.email).length })),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }] }, limit: 5000 }),
       db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'pending' } }] }, limit: 0 }),
       db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'valid' } }] }, limit: 0 }),
       db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'risky' } }] }, limit: 0 }),
@@ -149,9 +152,17 @@ scraperRoutes.get('/enrich/stats', async (c) => {
       db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { priority_tier: { equals: 'hot' } }] }, limit: 0 }),
       db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { priority_tier: { equals: 'warm' } }] }, limit: 0 }),
       db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { priority_tier: { equals: 'low' } }] }, limit: 0 }),
-      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }] }, limit: 5000 })
-        .then(r => ({ totalDocs: r.docs.filter((l: any) => l.enrichedAt || l.enriched_at).length })),
     ])
+
+  const sampledLeads = leadSample.docs
+  const withEmail = sampledLeads.filter((l: any) => l.email).length
+  const enriched = sampledLeads.filter((l: any) => l.enrichedAt || l.enriched_at).length
+  const phoneOnly = sampledLeads.filter((l: any) => !l.email && l.phone).length
+  const contactable = sampledLeads.filter((l: any) => l.email || l.phone).length
+  const phoneFallbackReady = sampledLeads.filter((l: any) => {
+    const tier = l.priorityTier ?? l.priority_tier
+    return !l.email && !!l.phone && (tier === 'hot' || tier === 'warm')
+  }).length
 
   // Outreach ready: valid email + hot or warm priority
   const outreachReady = await db.find({
@@ -165,8 +176,11 @@ scraperRoutes.get('/enrich/stats', async (c) => {
 
   return c.json({
     total: allLeads.totalDocs,
-    withEmail: withEmail.totalDocs,
-    enriched: enrichedLeads.totalDocs,
+    withEmail,
+    enriched,
+    phoneOnly,
+    contactable,
+    phoneFallbackReady,
     emailPending: pendingEmail.totalDocs,
     emailValid: validEmail.totalDocs,
     emailRisky: riskyEmail.totalDocs,

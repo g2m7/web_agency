@@ -696,6 +696,13 @@
             <option value="true">Has email</option>
             <option value="false">No email</option>
           </select>
+          <label>Contact Mode</label>
+          <select id="sf-contact-mode" onchange="refreshScraperResults()">
+            <option value="">Any</option>
+            <option value="email">Email-ready</option>
+            <option value="phone_only">Phone-only</option>
+            <option value="unreachable">No contact</option>
+          </select>
           <label>Email Status</label>
           <select id="sf-email-status" onchange="refreshScraperResults()">
             <option value="">Any</option>
@@ -1151,6 +1158,16 @@
             <span class="sub">valid email + hot/warm</span>
           </div>
           <div class="stat-card">
+            <span class="label">Phone Fallback</span>
+            <span class="value" style="color:var(--yellow)">${es.phoneFallbackReady ?? 0}</span>
+            <span class="sub">phone only + hot/warm</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Contactable</span>
+            <span class="value">${es.contactable ?? 0}</span>
+            <span class="sub">email or phone available</span>
+          </div>
+          <div class="stat-card">
             <span class="label">Priority Split</span>
             <span class="value" style="font-size:14px">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
           </div>
@@ -1173,6 +1190,7 @@
       const hasWebsite = document.getElementById('sf-website').value;
       const hasPhone = document.getElementById('sf-phone').value;
       const hasEmail = document.getElementById('sf-email').value;
+      const contactMode = document.getElementById('sf-contact-mode').value;
       const emailStatus = document.getElementById('sf-email-status').value;
       const priorityTier = document.getElementById('sf-priority').value;
       if (status) params.set('status', status);
@@ -1181,6 +1199,7 @@
       if (hasWebsite) params.set('hasWebsite', hasWebsite);
       if (hasPhone) params.set('hasPhone', hasPhone);
       if (hasEmail) params.set('hasEmail', hasEmail);
+      if (contactMode) params.set('contactMode', contactMode);
       if (emailStatus) params.set('emailStatus', emailStatus);
       if (priorityTier) params.set('priorityTier', priorityTier);
       params.set('limit', '200');
@@ -1204,6 +1223,7 @@
               <th>Business</th>
               <th>City</th>
               <th>Priority</th>
+              <th>Contact</th>
               <th>Email</th>
               <th>Email Status</th>
               <th>Phone</th>
@@ -1224,6 +1244,7 @@
               const priority = l.priorityTier || l.priority_tier || '';
               const status = l.status || 'new';
               const created = l.createdAt || l.created_at;
+              const contactMode = email ? 'email' : (phone ? 'phone_only' : 'unreachable');
 
               const priorityHtml = priority
                 ? `<span class="priority-dot priority-dot-${priority}"></span><span class="badge badge-${priority}">${priority}</span>`
@@ -1237,10 +1258,17 @@
                 ? `<span class="badge badge-${eStatus}">${eStatus}</span>`
                 : '<span class="no-indicator">—</span>';
 
+              const contactModeHtml = contactMode === 'email'
+                ? '<span class="badge badge-valid">email</span>'
+                : contactMode === 'phone_only'
+                  ? '<span class="badge badge-warm">phone-only</span>'
+                  : '<span class="badge badge-low">none</span>';
+
               return `<tr>
                 <td style="max-width:200px" title="${name}">${name}</td>
                 <td class="mono">${city}${state ? ', ' + state : ''}</td>
                 <td>${priorityHtml}</td>
+                <td>${contactModeHtml}</td>
                 <td class="mono" style="max-width:180px">${emailHtml}</td>
                 <td>${eStatusHtml}</td>
                 <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">—</span>'}</td>
@@ -1268,6 +1296,7 @@
       document.getElementById('sf-website').value = '';
       document.getElementById('sf-phone').value = '';
       document.getElementById('sf-email').value = '';
+      document.getElementById('sf-contact-mode').value = '';
       document.getElementById('sf-email-status').value = '';
       document.getElementById('sf-priority').value = '';
       refreshScraperResults();
@@ -1289,15 +1318,27 @@
         list.innerHTML = jobs.map(j => {
           const output = j.outputData || j.output_data || {};
           const input = j.inputData || j.input_data || {};
-          const detail = j.status === 'completed'
-            ? `${output.leads_created ?? 0} created, ${output.leads_skipped ?? 0} skipped`
-            : j.status === 'failed'
-              ? (j.errorMessage || j.error_message || 'Unknown error')
-              : j.status === 'running'
-                ? 'In progress...'
-                : 'Waiting...';
+          const jobType = j.jobType || j.job_type || '';
+          let detail = '';
+          if (j.status === 'completed') {
+            if (jobType === 'lead_gen') {
+              detail = `${output.leads_created ?? 0} created, ${output.leads_skipped ?? 0} skipped`;
+            } else if (jobType === 'email_enrich') {
+              detail = `${output.processed ?? 0} checked, ${output.emails_found ?? 0} emails found`;
+            } else if (jobType === 'email_validate') {
+              detail = `${output.validated ?? 0} validated (${output.valid ?? 0} valid)`;
+            } else {
+              detail = 'Completed';
+            }
+          } else if (j.status === 'failed') {
+            detail = j.errorMessage || j.error_message || 'Unknown error';
+          } else if (j.status === 'running') {
+            detail = 'In progress...';
+          } else {
+            detail = 'Waiting...';
+          }
           return `<div class="row">
-            <span class="name">${input.niche ? input.niche + ' — ' : ''}${(input.cities || []).join(', ') || 'Default config'}</span>
+            <span class="name">${jobType.replace(/_/g, ' ')}${input.niche ? ' — ' + input.niche : ''}${(input.cities || []).length ? ' — ' + input.cities.join(', ') : ''}</span>
             <span class="meta">${detail}</span>
             ${badge(j.status)}
             <span class="time">${ago(j.updatedAt || j.updated_at)}</span>

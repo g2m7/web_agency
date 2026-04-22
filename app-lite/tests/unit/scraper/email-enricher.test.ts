@@ -147,7 +147,7 @@ describe('computePriorityTier', () => {
     expect(computePriorityTier(false, false)).toBe('low')
   })
 
-  test('phone only, no website = low', () => {
-    expect(computePriorityTier(false, true)).toBe('low')
+  test('phone only, no website = warm', () => {
+    expect(computePriorityTier(false, true)).toBe('warm')
   })
 })

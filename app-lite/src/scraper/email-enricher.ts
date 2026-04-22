@@ -363,6 +363,6 @@ function pickBestEmail(emails: ExtractedEmail[]): ExtractedEmail | null {
 
 export function computePriorityTier(hasWebsite: boolean, hasPhone: boolean): 'hot' | 'warm' | 'low' {
   if (hasWebsite && hasPhone) return 'hot'
-  if (hasWebsite) return 'warm'
+  if (hasWebsite || hasPhone) return 'warm'
   return 'low'
 }

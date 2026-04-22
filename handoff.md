@@ -4,48 +4,70 @@
 2026-04-22
 
 ## What Was Done (This Session)
-Implemented the complete **Email Enrichment Pipeline** — the missing stage between Google Maps scraping and outreach.
+Adapted the post-scrape workflow for the case where leads have phone numbers but no email, while preserving the email-first 2-step motion.
 
-### New Files
-- `app-lite/src/scraper/email-enricher.ts` — Website crawling engine: fetches homepage + contact/about pages, extracts emails from mailto links, JSON-LD schema.org, and body text, scores by confidence (high/medium/low)
-- `app-lite/src/scraper/email-validator.ts` — Email validation: syntax checks, role address detection (info@, admin@, etc.), disposable domain blocklist (~100 domains), MX record lookup via node:dns/promises
-- `app-lite/tests/unit/scraper/email-enricher.test.ts` — 22 tests for enricher
-- `app-lite/tests/unit/scraper/email-validator.test.ts` — 6 tests for validator
+### Code Changes
+- `app-lite/src/scraper/email-enricher.ts`
+  - Updated `computePriorityTier()` so `phone-only` leads are now `warm` (was `low`).
+- `app-lite/src/routes/scraper.ts`
+  - `/api/scraper/history` now includes `lead_gen`, `email_enrich`, and `email_validate` jobs.
+  - `/api/scraper/results` now supports `contactMode` filter:
+    - `email`
+    - `phone_only`
+    - `unreachable`
+  - `/api/scraper/enrich/stats` now returns additional metrics:
+    - `phoneOnly`
+    - `contactable`
+    - `phoneFallbackReady` (phone-only + hot/warm)
+- `app-lite/public/index.html`
+  - Added `Contact Mode` filter in Scraper view.
+  - Added `Contact` column in scraped leads table (email / phone-only / none).
+  - Added stats cards for `Phone Fallback` and `Contactable`.
+  - Updated scraper job history UI to show meaningful summaries for `lead_gen`, `email_enrich`, and `email_validate` jobs.
 
-### Modified Files
-- `app-lite/src/db/schema.ts` — Added 5 new columns to leads table: emailSource, emailConfidence, emailStatus, enrichedAt, enrichmentError
-- `app-lite/src/db/migrate.ts` — Added new columns to CREATE TABLE + safe ALTER TABLE migration for existing databases
-- `app-lite/src/db/index.ts` — Added field mappings for new columns
-- `app-lite/src/types/index.ts` — Added `email_enrich` and `email_validate` job types, EmailSource/EmailConfidence/EmailStatus enums, EnrichmentResult/ValidationResult interfaces
-- `app-lite/src/jobs/handlers/index.ts` — Added `handleEmailEnrich` (batch website crawling) and `handleEmailValidate` (batch validation) handlers; updated `handleLeadGen` to auto-set priority tiers and auto-enqueue enrichment
-- `app-lite/src/jobs/workers.ts` — Registered new handlers
-- `app-lite/src/routes/jobs.ts` — Added email_enrich/email_validate to ALLOWED_TRIGGERS
-- `app-lite/src/routes/scraper.ts` — Added POST /enrich, GET /enrich/stats, POST /validate endpoints; extended /results with hasEmail, emailStatus, priorityTier filters
-- `app-lite/public/index.html` — New action buttons (Enrich Emails, Validate Emails), enrichment stat cards (Emails Found, Valid, Outreach Ready, Priority Split), Priority/Email/Email Status table columns, new filter dropdowns, badge styles
-- `app-lite/tests/unit/handlers/lead-gen.test.ts` — Added mocks for queue and enricher modules
+### Test Updates
+- `app-lite/tests/unit/scraper/email-enricher.test.ts`
+  - Updated expectation: phone-only leads are `warm`.
+- `app-lite/tests/unit/handlers/lead-gen.test.ts`
+  - Updated mocked `computePriorityTier()` logic to match production behavior.
+
+### Documentation Updates
+- `docs/04-Lead-Generation-SOP.md`
+  - Added contact fallback rule for phone-only leads.
+- `docs/06-Outreach-Sales-SOP.md`
+  - Added channel selection rule: email-first by default, phone/SMS fallback when email is unavailable.
+- `docs/12-KPIs-Dashboard.md`
+  - Added phone fallback channel KPIs.
+- `docs/13-Risk-Register.md`
+  - Added risk item for email-only channel blind spot.
 
 ### Verification
 - `bun run typecheck` — 0 errors ✅
-- `bun run test` — 60/60 tests pass ✅ (4 test files)
+- `bun run test` — 60/60 tests pass ✅
 
-## What's In Progress
-Nothing — pipeline implementation is complete.
+## What’s In Progress
+- No active implementation in progress.
 
-## What's Blocked
-- **Resend API key** — needed for follow_up_1 handler (actual email sending)
-- **Cloudflare tokens** — needed for demo_build handler (site deployment)
+## What’s Blocked
+- **Resend API key** — required for production email sends in `follow_up_1`.
+- **Cloudflare tokens** — required for production deployment in `demo_build`.
 
 ## Where Next Agent Should Pick Up
-1. **Test the full pipeline end-to-end**: Run `bun run dev`, trigger a scrape, observe auto-enrichment + validation in the dashboard
-2. **Implement `follow_up_1` handler**: Uses Resend to send hook emails to outreach-ready leads (valid email + hot/warm tier)
-3. **Consider social/directory enrichment passes**: Add Facebook/LinkedIn scraping for leads where website pass found no email
-4. **Add email bounce tracking**: When follow_up_1 sends, track bounces via Resend webhooks to update email_status
-5. **Remaining stub handlers**: follow_up_2, demo_build, onboarding, monthly_report, churn_check, support_auto_reply, billing_retry, site_qa
+1. Implement channel-aware outreach execution in `follow_up_1`:
+   - Email path for leads with valid email.
+   - Phone/SMS fallback path for leads without email but with phone.
+2. Add interaction logging for phone/SMS outreach attempts and outcomes.
+3. Add KPI plumbing for phone fallback funnel (`sent`, `replied`, `interested`, `demo_requested`).
+4. Optional: add social/profile enrichment pass for leads with no email + no phone.
 
-## Current Pipeline Flow
-```
-Scrape (lead_gen) → Auto-triage (hot/warm/low) → Auto-enqueue enrichment
-→ Email Enrich (website crawl) → Auto-enqueue validation  
-→ Email Validate (syntax + MX) → Outreach Ready (valid + hot/warm)
-→ [follow_up_1 — TODO: needs Resend API key]
+## Current Pipeline Snapshot
+```text
+Scrape (lead_gen)
+  -> Tiering (hot/warm/low; phone-only now warm)
+  -> Email enrichment (email_enrich)
+  -> Email validation (email_validate)
+  -> Outreach segmentation:
+       - Email-ready (valid email + hot/warm)
+       - Phone fallback (no email + phone + hot/warm)
+       - Unreachable (no email + no phone)
 ```

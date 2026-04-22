@@ -50,6 +50,13 @@ Every lead record should capture:
 7. Agent prioritizes leads with reachable email and visible commercial intent.
 8. Human reviews scored list periodically for quality assurance.
 
+### Contact fallback rule (when email is missing)
+
+- If no email is found but a clear phone number exists, keep the lead as **phone fallback** instead of excluding it.
+- Default outreach still starts with email when available (2-step motion remains unchanged).
+- Phone fallback leads can be routed to a short call/SMS opener only when email is not available.
+- Track these separately from email-based outreach so channel performance can be measured.
+
 ## Exclusion rules
 
 Exclude leads if:

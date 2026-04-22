@@ -62,6 +62,13 @@ When a prospect replies interested, the agent builds a tailored demo using the n
 
 ## Recommended sequence
 
+### Channel selection rule
+
+- **Default:** email-first 2-step flow (hook email -> demo+pricing only after positive reply).
+- **Fallback:** if no valid email exists but a phone number exists, use a short phone/SMS opener with the same structure (one visible issue + one question, no demo link, no pricing).
+- Keep phone/SMS optional and low-pressure; do not force a call to progress a deal.
+- Track phone/SMS outcomes separately from email outcomes.
+
 ### Email 1 — Hook
 Purpose: show relevance, highlight one issue, ask if they want to see a better version.
 No demo. No link. Just one question.
