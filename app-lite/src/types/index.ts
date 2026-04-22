@@ -32,6 +32,8 @@ export type PriorityTier = (typeof PRIORITY_TIERS)[number]
 
 export const JOB_TYPES = [
   'lead_gen',
+  'email_enrich',
+  'email_validate',
   'follow_up_1',
   'follow_up_2',
   'demo_build',
@@ -43,6 +45,28 @@ export const JOB_TYPES = [
   'site_qa',
 ] as const
 export type JobType = (typeof JOB_TYPES)[number]
+
+export const EMAIL_SOURCES = ['mailto', 'contact_page', 'schema_org', 'footer', 'manual'] as const
+export type EmailSource = (typeof EMAIL_SOURCES)[number]
+
+export const EMAIL_CONFIDENCE = ['high', 'medium', 'low'] as const
+export type EmailConfidence = (typeof EMAIL_CONFIDENCE)[number]
+
+export const EMAIL_STATUSES = ['pending', 'valid', 'risky', 'invalid'] as const
+export type EmailStatus = (typeof EMAIL_STATUSES)[number]
+
+export interface EnrichmentResult {
+  email: string | null
+  source: EmailSource | null
+  confidence: EmailConfidence | null
+  pagesChecked: number
+  error?: string
+}
+
+export interface ValidationResult {
+  status: EmailStatus
+  reason: string
+}
 
 export const POLICY_ACTIONS = [
   'send_email',

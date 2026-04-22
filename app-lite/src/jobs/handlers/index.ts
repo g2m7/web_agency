@@ -1,5 +1,6 @@
 import type { DbClient } from '../../db'
 import type { ScheduledJob } from '../queue'
+import { enqueueJob } from '../queue'
 import {
   scrapeMultipleCities,
   parseCityState,
@@ -7,6 +8,8 @@ import {
   type ScrapedBusiness,
   type ScraperOptions,
 } from '../../scraper/google-maps'
+import { enrichEmailFromWebsite, computePriorityTier } from '../../scraper/email-enricher'
+import { validateEmail } from '../../scraper/email-validator'
 
 export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
   const config = await db.findGlobal({ slug: 'system-config' })
@@ -66,6 +69,7 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
     }
 
     try {
+      const tier = computePriorityTier(!!biz.website, !!biz.phone)
       await db.create({
         collection: 'leads',
         data: {
@@ -82,10 +86,15 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
           status: 'new',
           auditScore: null,
           auditData: null,
-          priorityTier: null,
+          priorityTier: tier,
           exclusionReason: null,
           source: 'google_maps',
           nicheCityKey,
+          emailSource: null,
+          emailConfidence: null,
+          emailStatus: 'pending',
+          enrichedAt: null,
+          enrichmentError: null,
         },
       })
       leadsCreated++
@@ -98,6 +107,15 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
     }
   }
 
+  // Auto-enqueue email enrichment if new leads were created
+  if (leadsCreated > 0) {
+    try {
+      await enqueueJob(db, 'email_enrich', { triggeredBy: 'lead_gen', jobId: job.id })
+    } catch {
+      // Non-fatal — enrichment can be triggered manually
+    }
+  }
+
   return {
     status: 'completed',
     niche,
@@ -107,6 +125,7 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
     leads_skipped: leadsSkipped,
     errors,
     job_id: job.id,
+    enrichment_queued: leadsCreated > 0,
   }
 }
 
@@ -283,5 +302,185 @@ export async function handleSiteQa(db: DbClient, job: ScheduledJob): Promise<Rec
     status: 'completed',
     deployment_id: deploymentId,
     message: 'QA check queued. Automated checks will verify mobile layout, links, forms, and data isolation.',
+  }
+}
+
+// ── Email Enrichment Handler ──────────────────────────────────
+
+export async function handleEmailEnrich(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
+  const batchSize = (job.data.batchSize as number) ?? 20
+  const signal = AbortSignal.timeout(Math.max(batchSize * 15_000, 120_000))
+
+  // Find all unenriched leads (email is null, has not been enriched yet)
+  const allLeads = await db.find({
+    collection: 'leads',
+    where: {
+      and: [
+        { status: { equals: 'new' } },
+      ],
+    },
+    limit: 200,
+    sort: '-createdAt',
+  })
+
+  // Filter to leads that still need enrichment and have a website
+  const candidates = allLeads.docs.filter((l: any) => {
+    const hasWebsite = l.websiteUrl || l.website_url
+    const alreadyEnriched = l.enrichedAt || l.enriched_at
+    const alreadyHasEmail = l.email
+    return hasWebsite && !alreadyEnriched && !alreadyHasEmail
+  })
+
+  // Sort by priority: hot > warm > low > null
+  const tierOrder: Record<string, number> = { hot: 0, warm: 1, low: 2 }
+  candidates.sort((a: any, b: any) => {
+    const ta = tierOrder[a.priorityTier ?? a.priority_tier] ?? 3
+    const tb = tierOrder[b.priorityTier ?? b.priority_tier] ?? 3
+    return ta - tb
+  })
+
+  const leads = candidates.slice(0, batchSize)
+  let processed = 0
+  let emailsFound = 0
+  const errors: string[] = []
+
+  for (const lead of leads) {
+    if (signal.aborted) break
+
+    const websiteUrl = lead.websiteUrl ?? lead.website_url
+    if (!websiteUrl) {
+      // No website — mark as enriched with no result
+      await db.update({
+        collection: 'leads',
+        id: String(lead.id),
+        data: {
+          enriched_at: new Date().toISOString(),
+          enrichment_error: 'No website URL available',
+        },
+      })
+      processed++
+      continue
+    }
+
+    try {
+      const result = await enrichEmailFromWebsite(websiteUrl, { signal })
+
+      const updateData: Record<string, unknown> = {
+        enriched_at: new Date().toISOString(),
+      }
+
+      if (result.email) {
+        updateData.email = result.email
+        updateData.email_source = result.source
+        updateData.email_confidence = result.confidence
+        updateData.email_status = 'pending' // will be validated in next step
+        emailsFound++
+      } else {
+        updateData.enrichment_error = result.error ?? `No email found (checked ${result.pagesChecked} pages)`
+      }
+
+      await db.update({
+        collection: 'leads',
+        id: String(lead.id),
+        data: updateData,
+      })
+      processed++
+    } catch (err: any) {
+      errors.push(`${lead.businessName ?? lead.business_name}: ${err.message}`)
+      await db.update({
+        collection: 'leads',
+        id: String(lead.id),
+        data: {
+          enriched_at: new Date().toISOString(),
+          enrichment_error: err.message,
+        },
+      })
+      processed++
+    }
+  }
+
+  // Auto-enqueue validation if emails were found
+  if (emailsFound > 0) {
+    try {
+      await enqueueJob(db, 'email_validate', { triggeredBy: 'email_enrich', jobId: job.id })
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  return {
+    status: 'completed',
+    processed,
+    emails_found: emailsFound,
+    candidates_found: candidates.length,
+    batch_size: batchSize,
+    errors,
+    job_id: job.id,
+    validation_queued: emailsFound > 0,
+  }
+}
+
+// ── Email Validation Handler ──────────────────────────────────
+
+export async function handleEmailValidate(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
+  const batchSize = (job.data.batchSize as number) ?? 50
+
+  // Find leads with emails that haven't been validated
+  const leads = await db.find({
+    collection: 'leads',
+    where: {
+      and: [
+        { email_status: { equals: 'pending' } },
+      ],
+    },
+    limit: batchSize,
+    sort: '-createdAt',
+  })
+
+  // Filter to only leads that actually have an email
+  const leadsWithEmail = leads.docs.filter((l: any) => l.email)
+
+  let validated = 0
+  let valid = 0
+  let risky = 0
+  let invalid = 0
+
+  for (const lead of leadsWithEmail) {
+    try {
+      const result = await validateEmail(lead.email)
+
+      await db.update({
+        collection: 'leads',
+        id: String(lead.id),
+        data: {
+          email_status: result.status,
+        },
+      })
+
+      validated++
+      if (result.status === 'valid') valid++
+      else if (result.status === 'risky') risky++
+      else if (result.status === 'invalid') invalid++
+    } catch (err: any) {
+      // Validation error — mark as risky rather than failing
+      await db.update({
+        collection: 'leads',
+        id: String(lead.id),
+        data: {
+          email_status: 'risky',
+        },
+      })
+      validated++
+      risky++
+    }
+  }
+
+  return {
+    status: 'completed',
+    validated,
+    valid,
+    risky,
+    invalid,
+    job_id: job.id,
   }
 }

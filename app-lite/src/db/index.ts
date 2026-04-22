@@ -123,6 +123,13 @@ const FIELD_MAP: Record<string, string> = {
   client_id: 'clientId',
   business_name: 'businessName',
   niche_city_key: 'nicheCityKey',
+  email_source: 'emailSource',
+  email_confidence: 'emailConfidence',
+  email_status: 'emailStatus',
+  enriched_at: 'enrichedAt',
+  enrichment_error: 'enrichmentError',
+  priority_tier: 'priorityTier',
+  website_url: 'websiteUrl',
 }
 
 const FIELD_MAP_REVERSE: Record<string, string> = {

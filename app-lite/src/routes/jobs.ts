@@ -46,7 +46,7 @@ jobRoutes.get('/policy/checks', async (c) => {
 })
 
 // Manually trigger a specific job
-const ALLOWED_TRIGGERS = ['lead_gen', 'churn_check', 'monthly_report', 'site_qa'] as const
+const ALLOWED_TRIGGERS = ['lead_gen', 'email_enrich', 'email_validate', 'churn_check', 'monthly_report', 'site_qa'] as const
 jobRoutes.post('/trigger', async (c) => {
   const db = getDb()
   const { jobType, data } = await c.req.json()

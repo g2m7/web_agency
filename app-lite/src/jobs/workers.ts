@@ -2,6 +2,8 @@ import type { DbClient } from '../db'
 import type { ScheduledJob } from './queue'
 import {
   handleLeadGen,
+  handleEmailEnrich,
+  handleEmailValidate,
   handleFollowUp1,
   handleFollowUp2,
   handleDemoBuild,
@@ -15,6 +17,8 @@ import {
 
 const handlers: Record<string, (db: DbClient, job: ScheduledJob) => Promise<Record<string, unknown>>> = {
   lead_gen: handleLeadGen,
+  email_enrich: handleEmailEnrich,
+  email_validate: handleEmailValidate,
   follow_up_1: handleFollowUp1,
   follow_up_2: handleFollowUp2,
   demo_build: handleDemoBuild,

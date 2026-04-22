@@ -47,6 +47,11 @@ export async function initializeDatabase() {
       exclusion_reason TEXT,
       source TEXT DEFAULT 'google_maps',
       niche_city_key TEXT NOT NULL UNIQUE,
+      email_source TEXT,
+      email_confidence TEXT,
+      email_status TEXT DEFAULT 'pending',
+      enriched_at TEXT,
+      enrichment_error TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -227,6 +232,30 @@ export async function initializeDatabase() {
   if (!existing) {
     sqlite.exec(`INSERT INTO system_config (id) VALUES (1)`)
   }
+
+  // Migrate existing databases: add enrichment columns if missing
+  const safeAddColumn = (table: string, col: string, type: string) => {
+    try {
+      sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`)
+    } catch {
+      // Column already exists — ignore
+    }
+  }
+  safeAddColumn('leads', 'email_source', 'TEXT')
+  safeAddColumn('leads', 'email_confidence', 'TEXT')
+  safeAddColumn('leads', 'email_status', "TEXT DEFAULT 'pending'")
+  safeAddColumn('leads', 'enriched_at', 'TEXT')
+  safeAddColumn('leads', 'enrichment_error', 'TEXT')
+
+  // Backfill priority_tier on existing leads
+  sqlite.exec(`
+    UPDATE leads SET priority_tier = CASE
+      WHEN website_url IS NOT NULL AND phone IS NOT NULL THEN 'hot'
+      WHEN website_url IS NOT NULL THEN 'warm'
+      ELSE 'low'
+    END
+    WHERE priority_tier IS NULL
+  `)
 
   sqlite.close()
   console.log(`Database initialized at ${dbPath}`)

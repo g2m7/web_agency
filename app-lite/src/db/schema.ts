@@ -35,6 +35,11 @@ export const leads = sqliteTable('leads', {
   exclusionReason: text('exclusion_reason'),
   source: text('source').default('google_maps'),
   nicheCityKey: text('niche_city_key').notNull().unique(),
+  emailSource: text('email_source'),
+  emailConfidence: text('email_confidence'),
+  emailStatus: text('email_status').default('pending'),
+  enrichedAt: text('enriched_at'),
+  enrichmentError: text('enrichment_error'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 })

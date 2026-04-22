@@ -269,6 +269,23 @@
     .badge-churned   { background: rgba(225,112,85,0.15); color: var(--red); }
     .badge-paused    { background: rgba(253,203,110,0.15); color: var(--yellow); }
 
+    /* Priority tier badges */
+    .badge-hot       { background: rgba(225,112,85,0.15); color: var(--red); }
+    .badge-warm      { background: rgba(253,203,110,0.15); color: var(--yellow); }
+    .badge-low       { background: rgba(122,122,143,0.15); color: var(--text-dim); }
+
+    /* Email status badges */
+    .badge-valid     { background: rgba(0,184,148,0.15); color: var(--green); }
+    .badge-risky     { background: rgba(243,156,18,0.15); color: var(--orange); }
+    .badge-invalid   { background: rgba(225,112,85,0.15); color: var(--red); }
+    .badge-pending   { background: rgba(116,185,255,0.15); color: var(--blue); }
+
+    /* Priority dot indicators */
+    .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+    .priority-dot-hot { background: var(--red); box-shadow: 0 0 4px var(--red); }
+    .priority-dot-warm { background: var(--yellow); box-shadow: 0 0 4px var(--yellow); }
+    .priority-dot-low { background: var(--text-dim); }
+
     /* ── Config panel ───────────────────── */
     .config-grid {
       display: grid;
@@ -631,10 +648,16 @@
         </div>
       </div>
 
-      <!-- Run Scraper -->
+      <!-- Run Scraper + Enrich + Validate -->
       <div class="action-bar">
         <button class="btn btn-accent" onclick="runScraper()" id="btn-run-scraper">
           <span class="spinner"></span> Run Scraper Now
+        </button>
+        <button class="btn" onclick="runEnrich()" id="btn-enrich" style="border-color:var(--green)">
+          <span class="spinner"></span> 📧 Enrich Emails
+        </button>
+        <button class="btn" onclick="runValidate()" id="btn-validate">
+          <span class="spinner"></span> ✅ Validate Emails
         </button>
         <button class="btn" onclick="refreshScraperView()">
           <span class="spinner"></span> Refresh
@@ -659,6 +682,27 @@
             <option value="contacted">Contacted</option>
             <option value="interested">Interested</option>
             <option value="excluded">Excluded</option>
+          </select>
+          <label>Priority</label>
+          <select id="sf-priority" onchange="refreshScraperResults()">
+            <option value="">Any</option>
+            <option value="hot">🔴 Hot</option>
+            <option value="warm">🟡 Warm</option>
+            <option value="low">⚪ Low</option>
+          </select>
+          <label>Email</label>
+          <select id="sf-email" onchange="refreshScraperResults()">
+            <option value="">Any</option>
+            <option value="true">Has email</option>
+            <option value="false">No email</option>
+          </select>
+          <label>Email Status</label>
+          <select id="sf-email-status" onchange="refreshScraperResults()">
+            <option value="">Any</option>
+            <option value="valid">✅ Valid</option>
+            <option value="risky">⚠️ Risky</option>
+            <option value="invalid">❌ Invalid</option>
+            <option value="pending">⏳ Pending</option>
           </select>
           <label>City</label>
           <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()">
@@ -1028,6 +1072,34 @@
       }
     }
 
+    async function runEnrich() {
+      const btn = document.getElementById('btn-enrich');
+      btn.classList.add('loading');
+      try {
+        await axios.post(API + '/api/scraper/enrich', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('✓ Email enrichment job queued', 'success');
+        setTimeout(refreshScraperView, 2000);
+      } catch (err) {
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function runValidate() {
+      const btn = document.getElementById('btn-validate');
+      btn.classList.add('loading');
+      try {
+        await axios.post(API + '/api/scraper/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('✓ Email validation job queued', 'success');
+        setTimeout(refreshScraperView, 2000);
+      } catch (err) {
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
     async function refreshScraperView() {
       await Promise.all([
         loadScraperConfig(),
@@ -1039,15 +1111,17 @@
 
     async function refreshScraperStats() {
       try {
-        const [leadsRes, jobsRes] = await Promise.all([
+        const [leadsRes, jobsRes, enrichRes] = await Promise.all([
           axios.get(API + '/api/scraper/results?limit=0', { headers }),
           axios.get(API + '/api/scraper/history?limit=100', { headers }),
+          axios.get(API + '/api/scraper/enrich/stats', { headers }).catch(() => ({ data: {} })),
         ]);
 
         const jobs = jobsRes.data.docs || [];
         const completed = jobs.filter(j => j.status === 'completed');
         const running = jobs.filter(j => j.status === 'running' || j.status === 'queued');
         const failed = jobs.filter(j => j.status === 'failed');
+        const es = enrichRes.data;
 
         let lastJobInfo = 'Never';
         if (completed.length > 0) {
@@ -1062,20 +1136,28 @@
             <span class="value">${leadsRes.data.totalDocs ?? 0}</span>
           </div>
           <div class="stat-card">
-            <span class="label">Scraper Runs</span>
-            <span class="value">${completed.length}</span>
+            <span class="label">Emails Found</span>
+            <span class="value" style="color:var(--green)">${es.withEmail ?? 0}</span>
+            <span class="sub">${es.enriched ?? 0} enriched</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Valid Emails</span>
+            <span class="value" style="color:var(--green)">${es.emailValid ?? 0}</span>
+            <span class="sub">${es.emailRisky ?? 0} risky, ${es.emailInvalid ?? 0} invalid</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Outreach Ready</span>
+            <span class="value" style="color:var(--accent)">${es.outreachReady ?? 0}</span>
+            <span class="sub">valid email + hot/warm</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Priority Split</span>
+            <span class="value" style="font-size:14px">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
           </div>
           <div class="stat-card">
             <span class="label">Running / Queued</span>
             <span class="value" style="color:var(--yellow)">${running.length}</span>
-          </div>
-          <div class="stat-card">
-            <span class="label">Failed</span>
-            <span class="value" style="color:var(--red)">${failed.length}</span>
-          </div>
-          <div class="stat-card">
-            <span class="label">Last Run</span>
-            <span class="value" style="font-size:14px">${lastJobInfo}</span>
+            <span class="sub">${completed.length} runs, ${failed.length} failed</span>
           </div>
         `;
       } catch (err) {
@@ -1090,11 +1172,17 @@
       const search = document.getElementById('sf-search').value.trim();
       const hasWebsite = document.getElementById('sf-website').value;
       const hasPhone = document.getElementById('sf-phone').value;
+      const hasEmail = document.getElementById('sf-email').value;
+      const emailStatus = document.getElementById('sf-email-status').value;
+      const priorityTier = document.getElementById('sf-priority').value;
       if (status) params.set('status', status);
       if (city) params.set('city', city);
       if (search) params.set('search', search);
       if (hasWebsite) params.set('hasWebsite', hasWebsite);
       if (hasPhone) params.set('hasPhone', hasPhone);
+      if (hasEmail) params.set('hasEmail', hasEmail);
+      if (emailStatus) params.set('emailStatus', emailStatus);
+      if (priorityTier) params.set('priorityTier', priorityTier);
       params.set('limit', '200');
 
       try {
@@ -1115,9 +1203,11 @@
             <tr>
               <th>Business</th>
               <th>City</th>
+              <th>Priority</th>
+              <th>Email</th>
+              <th>Email Status</th>
               <th>Phone</th>
               <th>Website</th>
-              <th>Rating</th>
               <th>Status</th>
               <th>Scraped</th>
             </tr>
@@ -1129,15 +1219,32 @@
               const state = l.state || '';
               const phone = l.phone;
               const website = l.websiteUrl || l.website_url;
-              const rating = l.auditScore != null ? l.auditScore : null;
+              const email = l.email;
+              const eStatus = l.emailStatus || l.email_status || 'pending';
+              const priority = l.priorityTier || l.priority_tier || '';
               const status = l.status || 'new';
               const created = l.createdAt || l.created_at;
+
+              const priorityHtml = priority
+                ? `<span class="priority-dot priority-dot-${priority}"></span><span class="badge badge-${priority}">${priority}</span>`
+                : '<span class="no-indicator">—</span>';
+
+              const emailHtml = email
+                ? `<span class="has-indicator" title="${email}" style="font-size:11px">${email.length > 22 ? email.substring(0, 22) + '…' : email}</span>`
+                : '<span class="no-indicator">—</span>';
+
+              const eStatusHtml = email
+                ? `<span class="badge badge-${eStatus}">${eStatus}</span>`
+                : '<span class="no-indicator">—</span>';
+
               return `<tr>
-                <td style="max-width:220px" title="${name}">${name}</td>
+                <td style="max-width:200px" title="${name}">${name}</td>
                 <td class="mono">${city}${state ? ', ' + state : ''}</td>
+                <td>${priorityHtml}</td>
+                <td class="mono" style="max-width:180px">${emailHtml}</td>
+                <td>${eStatusHtml}</td>
                 <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">—</span>'}</td>
-                <td class="mono" style="max-width:180px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 25) + '</span>' : '<span class="no-indicator">—</span>'}</td>
-                <td class="mono">${rating != null ? rating + '/10' : '—'}</td>
+                <td class="mono" style="max-width:160px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="no-indicator">—</span>'}</td>
                 <td>${badge(status)}</td>
                 <td class="mono" style="font-size:10px">${ago(created)}</td>
               </tr>`;
@@ -1160,6 +1267,9 @@
       document.getElementById('sf-search').value = '';
       document.getElementById('sf-website').value = '';
       document.getElementById('sf-phone').value = '';
+      document.getElementById('sf-email').value = '';
+      document.getElementById('sf-email-status').value = '';
+      document.getElementById('sf-priority').value = '';
       refreshScraperResults();
     }
 

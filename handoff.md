@@ -1,32 +1,51 @@
-# handoff.md
+# Handoff — Web Agency Platform
 
-## What was done (this session)
-- **Scraper → Frontend fully connected and verified end-to-end**
-- Fixed camelCase/snake_case field mismatch in `handleLeadGen`: handler read `config.active_cities` but `findGlobal` returns `config.activeCities`. Now reads both.
-- Added `app-lite/src/routes/scraper.ts`: dedicated scraper API routes
-  - `GET /api/scraper/config` — read niche, cities, proxy/delay settings from system-config
-  - `PATCH /api/scraper/config` — update scraper settings
-  - `POST /api/scraper/run` — queue a lead_gen job with optional niche/cities override
-  - `GET /api/scraper/history` — list lead_gen job history
-  - `GET /api/scraper/results` — filtered leads from google_maps source (status, city, search, hasWebsite, hasPhone)
-- Mounted scraper routes in `src/index.ts` at `/api/scraper`
-- Added manual job trigger endpoint: `POST /api/jobs/trigger` (allowed: lead_gen, churn_check, monthly_report, site_qa)
-- Built full dashboard UI (`public/index.html`):
-  - **Dashboard tab**: stats, pipeline bar, leads list with filters, jobs list, clients list, system config
-  - **Scraper tab**: config form (niche, cities, rate limits), "Run Scraper Now" button, results table, job history
-  - Light/dark mode with Inter font, 5s auto-refresh
-- **Live test passed**: scraped 20 real HVAC businesses from Austin, TX via Google Maps → stored in SQLite → visible in dashboard
+## Last Updated
+2026-04-22
 
-## What's in progress
-- Nothing actively blocked
+## What Was Done (This Session)
+Implemented the complete **Email Enrichment Pipeline** — the missing stage between Google Maps scraping and outreach.
 
-## What's blocked
-- 9 remaining stub handlers: follow_up_1, follow_up_2, demo_build, onboarding, monthly_report, churn_check, support_auto_reply, billing_retry, site_qa
-- Stub handlers return status messages only — need Resend API key for email handlers, Cloudflare token for deployment handlers
+### New Files
+- `app-lite/src/scraper/email-enricher.ts` — Website crawling engine: fetches homepage + contact/about pages, extracts emails from mailto links, JSON-LD schema.org, and body text, scores by confidence (high/medium/low)
+- `app-lite/src/scraper/email-validator.ts` — Email validation: syntax checks, role address detection (info@, admin@, etc.), disposable domain blocklist (~100 domains), MX record lookup via node:dns/promises
+- `app-lite/tests/unit/scraper/email-enricher.test.ts` — 22 tests for enricher
+- `app-lite/tests/unit/scraper/email-validator.test.ts` — 6 tests for validator
 
-## Where the next agent should pick up
-1. Implement `follow_up_1` handler (draft & send follow-up emails via Resend)
-2. Implement `demo_build` handler (generate demo site via Cloudflare Pages)
-3. Add pagination to leads/results endpoints for scaling beyond 200 leads
-4. Reduce worker poll interval from 30s to 5s in dev mode for faster feedback
-5. Add export functionality (CSV download) for scraped leads
+### Modified Files
+- `app-lite/src/db/schema.ts` — Added 5 new columns to leads table: emailSource, emailConfidence, emailStatus, enrichedAt, enrichmentError
+- `app-lite/src/db/migrate.ts` — Added new columns to CREATE TABLE + safe ALTER TABLE migration for existing databases
+- `app-lite/src/db/index.ts` — Added field mappings for new columns
+- `app-lite/src/types/index.ts` — Added `email_enrich` and `email_validate` job types, EmailSource/EmailConfidence/EmailStatus enums, EnrichmentResult/ValidationResult interfaces
+- `app-lite/src/jobs/handlers/index.ts` — Added `handleEmailEnrich` (batch website crawling) and `handleEmailValidate` (batch validation) handlers; updated `handleLeadGen` to auto-set priority tiers and auto-enqueue enrichment
+- `app-lite/src/jobs/workers.ts` — Registered new handlers
+- `app-lite/src/routes/jobs.ts` — Added email_enrich/email_validate to ALLOWED_TRIGGERS
+- `app-lite/src/routes/scraper.ts` — Added POST /enrich, GET /enrich/stats, POST /validate endpoints; extended /results with hasEmail, emailStatus, priorityTier filters
+- `app-lite/public/index.html` — New action buttons (Enrich Emails, Validate Emails), enrichment stat cards (Emails Found, Valid, Outreach Ready, Priority Split), Priority/Email/Email Status table columns, new filter dropdowns, badge styles
+- `app-lite/tests/unit/handlers/lead-gen.test.ts` — Added mocks for queue and enricher modules
+
+### Verification
+- `bun run typecheck` — 0 errors ✅
+- `bun run test` — 60/60 tests pass ✅ (4 test files)
+
+## What's In Progress
+Nothing — pipeline implementation is complete.
+
+## What's Blocked
+- **Resend API key** — needed for follow_up_1 handler (actual email sending)
+- **Cloudflare tokens** — needed for demo_build handler (site deployment)
+
+## Where Next Agent Should Pick Up
+1. **Test the full pipeline end-to-end**: Run `bun run dev`, trigger a scrape, observe auto-enrichment + validation in the dashboard
+2. **Implement `follow_up_1` handler**: Uses Resend to send hook emails to outreach-ready leads (valid email + hot/warm tier)
+3. **Consider social/directory enrichment passes**: Add Facebook/LinkedIn scraping for leads where website pass found no email
+4. **Add email bounce tracking**: When follow_up_1 sends, track bounces via Resend webhooks to update email_status
+5. **Remaining stub handlers**: follow_up_2, demo_build, onboarding, monthly_report, churn_check, support_auto_reply, billing_retry, site_qa
+
+## Current Pipeline Flow
+```
+Scrape (lead_gen) → Auto-triage (hot/warm/low) → Auto-enqueue enrichment
+→ Email Enrich (website crawl) → Auto-enqueue validation  
+→ Email Validate (syntax + MX) → Outreach Ready (valid + hot/warm)
+→ [follow_up_1 — TODO: needs Resend API key]
+```

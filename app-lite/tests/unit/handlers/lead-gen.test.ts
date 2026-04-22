@@ -21,6 +21,19 @@ vi.mock('../../../src/scraper/google-maps', () => ({
     `${niche.toLowerCase()}:${city.toLowerCase()}:${name.toLowerCase().trim()}`,
 }))
 
+vi.mock('../../../src/jobs/queue', () => ({
+  enqueueJob: vi.fn().mockResolvedValue({ id: 'enrich-job-1' }),
+}))
+
+vi.mock('../../../src/scraper/email-enricher', () => ({
+  enrichEmailFromWebsite: vi.fn(),
+  computePriorityTier: (hasWebsite: boolean, hasPhone: boolean) => {
+    if (hasWebsite && hasPhone) return 'hot'
+    if (hasWebsite) return 'warm'
+    return 'low'
+  },
+}))
+
 import { scrapeMultipleCities } from '../../../src/scraper/google-maps'
 const mockedScrapeMultiple = vi.mocked(scrapeMultipleCities)
 

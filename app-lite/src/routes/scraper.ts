@@ -81,6 +81,9 @@ scraperRoutes.get('/results', async (c) => {
   const search = c.req.query('search')
   const hasWebsite = c.req.query('hasWebsite')
   const hasPhone = c.req.query('hasPhone')
+  const hasEmail = c.req.query('hasEmail')
+  const emailStatus = c.req.query('emailStatus')
+  const priorityTier = c.req.query('priorityTier')
   const source = c.req.query('source') ?? 'google_maps'
   const limit = parseInt(c.req.query('limit') ?? '200', 10)
 
@@ -89,6 +92,8 @@ scraperRoutes.get('/results', async (c) => {
   if (city) conditions.push({ city: { contains: city } })
   if (status) conditions.push({ status: { equals: status } })
   if (search) conditions.push({ business_name: { contains: search } })
+  if (emailStatus) conditions.push({ email_status: { equals: emailStatus } })
+  if (priorityTier) conditions.push({ priority_tier: { equals: priorityTier } })
 
   const result = await db.find({
     collection: 'leads',
@@ -102,6 +107,92 @@ scraperRoutes.get('/results', async (c) => {
   if (hasWebsite === 'false') docs = docs.filter((l: any) => !l.websiteUrl && !l.website_url)
   if (hasPhone === 'true') docs = docs.filter((l: any) => l.phone)
   if (hasPhone === 'false') docs = docs.filter((l: any) => !l.phone)
+  if (hasEmail === 'true') docs = docs.filter((l: any) => l.email)
+  if (hasEmail === 'false') docs = docs.filter((l: any) => !l.email)
 
   return c.json({ totalDocs: result.totalDocs, docs })
+})
+
+// ── Enrichment endpoints ────────────────────────────────────────
+
+scraperRoutes.post('/enrich', async (c) => {
+  const db = getDb()
+  const body = await c.req.json().catch(() => ({})) as { batchSize?: number }
+
+  const job = await db.create({
+    collection: 'jobs',
+    data: {
+      job_type: 'email_enrich',
+      status: 'queued',
+      input_data: { batchSize: body.batchSize ?? 20, triggeredBy: 'manual' },
+      run_at: new Date().toISOString(),
+      max_attempts: 3,
+      attempts: 0,
+    },
+  })
+
+  return c.json({ queued: true, jobId: job.id, jobType: 'email_enrich' }, 201)
+})
+
+scraperRoutes.get('/enrich/stats', async (c) => {
+  const db = getDb()
+
+  const [allLeads, withEmail, pendingEmail, validEmail, riskyEmail, invalidEmail, hotLeads, warmLeads, lowLeads, enrichedLeads] =
+    await Promise.all([
+      db.find({ collection: 'leads', where: { source: { equals: 'google_maps' } }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }] }, limit: 5000 })
+        .then(r => ({ totalDocs: r.docs.filter((l: any) => l.email).length })),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'pending' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'valid' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'risky' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'invalid' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { priority_tier: { equals: 'hot' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { priority_tier: { equals: 'warm' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }, { priority_tier: { equals: 'low' } }] }, limit: 0 }),
+      db.find({ collection: 'leads', where: { and: [{ source: { equals: 'google_maps' } }] }, limit: 5000 })
+        .then(r => ({ totalDocs: r.docs.filter((l: any) => l.enrichedAt || l.enriched_at).length })),
+    ])
+
+  // Outreach ready: valid email + hot or warm priority
+  const outreachReady = await db.find({
+    collection: 'leads',
+    where: { and: [{ source: { equals: 'google_maps' } }, { email_status: { equals: 'valid' } }] },
+    limit: 5000,
+  }).then(r => r.docs.filter((l: any) => {
+    const tier = l.priorityTier ?? l.priority_tier
+    return tier === 'hot' || tier === 'warm'
+  }).length)
+
+  return c.json({
+    total: allLeads.totalDocs,
+    withEmail: withEmail.totalDocs,
+    enriched: enrichedLeads.totalDocs,
+    emailPending: pendingEmail.totalDocs,
+    emailValid: validEmail.totalDocs,
+    emailRisky: riskyEmail.totalDocs,
+    emailInvalid: invalidEmail.totalDocs,
+    hot: hotLeads.totalDocs,
+    warm: warmLeads.totalDocs,
+    low: lowLeads.totalDocs,
+    outreachReady,
+  })
+})
+
+scraperRoutes.post('/validate', async (c) => {
+  const db = getDb()
+  const body = await c.req.json().catch(() => ({})) as { batchSize?: number }
+
+  const job = await db.create({
+    collection: 'jobs',
+    data: {
+      job_type: 'email_validate',
+      status: 'queued',
+      input_data: { batchSize: body.batchSize ?? 50, triggeredBy: 'manual' },
+      run_at: new Date().toISOString(),
+      max_attempts: 3,
+      attempts: 0,
+    },
+  })
+
+  return c.json({ queued: true, jobId: job.id, jobType: 'email_validate' }, 201)
 })
