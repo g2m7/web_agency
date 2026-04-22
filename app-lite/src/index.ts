@@ -10,6 +10,7 @@ import { interactionRoutes } from './routes/interactions'
 import { deploymentRoutes } from './routes/deployments'
 import { jobRoutes } from './routes/jobs'
 import { configRoutes } from './routes/config'
+import { scraperRoutes } from './routes/scraper'
 import { dodoWebhook } from './routes/webhooks/dodo'
 import { resendWebhook } from './routes/webhooks/resend'
 import { cloudflareWebhook } from './routes/webhooks/cloudflare'
@@ -38,6 +39,7 @@ app.route('/api/interactions', interactionRoutes)
 app.route('/api/deployments', deploymentRoutes)
 app.route('/api/jobs', jobRoutes)
 app.route('/api/config', configRoutes)
+app.route('/api/scraper', scraperRoutes)
 
 // Webhooks (no API key — use their own verification)
 app.route('/webhooks/dodo', dodoWebhook)

@@ -10,8 +10,8 @@ import {
 
 export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
   const config = await db.findGlobal({ slug: 'system-config' })
-  const niche = config.active_niche ?? 'hvac'
-  const cities: string[] = config.active_cities ?? []
+  const niche = config.activeNiche ?? config.active_niche ?? 'hvac'
+  const cities: string[] = config.activeCities ?? config.active_cities ?? []
 
   const existingLeads = await db.find({ collection: 'leads', limit: 0 })
   const leadsBefore = existingLeads.totalDocs

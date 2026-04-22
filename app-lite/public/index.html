@@ -92,6 +92,30 @@
     }
     .header-meta span { font-family: var(--mono); }
 
+    /* ── Nav tabs ─────────────────────── */
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 32px;
+    }
+    .nav-tab {
+      padding: 12px 24px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
     /* ── Layout ─────────────────────────── */
     .dashboard {
       padding: 24px 32px;
@@ -101,6 +125,9 @@
       max-width: 1400px;
       margin: 0 auto;
     }
+
+    .view { display: none; }
+    .view.active { display: flex; flex-direction: column; gap: 20px; }
 
     /* ── Stats Row ──────────────────────── */
     .stats-row {
@@ -347,7 +374,7 @@
     .filter-bar select:focus, .filter-bar input:focus {
       border-color: var(--accent);
     }
-    .filter-bar input { min-width: 180px; }
+    .filter-bar input { min-width: 140px; }
     .filter-bar label {
       font-size: 11px;
       color: var(--text-dim);
@@ -376,6 +403,84 @@
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-left: 3px solid var(--green); }
     .toast.error { border-left: 3px solid var(--red); }
+
+    /* ── Scraper config form ─────────────── */
+    .scraper-config-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group.full-width { grid-column: 1 / -1; }
+    .form-group label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-group input, .form-group select {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 13px;
+      outline: none;
+    }
+    .form-group input:focus { border-color: var(--accent); }
+    .form-group small { font-size: 11px; color: var(--text-dim); }
+
+    /* ── Scraper results table ───────────── */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .results-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+      position: sticky;
+      top: 0;
+    }
+    .results-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    .results-table tr:hover td { background: var(--accent-glow); }
+    .results-table .mono { font-family: var(--mono); font-size: 11px; }
+    .has-indicator { color: var(--green); }
+    .no-indicator { color: var(--text-dim); }
+
+    /* ── Section header in scraper ───────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0;
+    }
+    .section-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -389,92 +494,205 @@
     </div>
   </div>
 
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="nav-tab" onclick="switchTab('scraper')">Scraper</div>
+  </div>
+
   <div class="dashboard">
-    <!-- Actions -->
-    <div class="action-bar">
-      <button class="btn btn-accent" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
-        <span class="spinner"></span> 🔍 Run Scraper
-      </button>
-      <button class="btn" onclick="triggerJob('churn_check')" id="btn-churn-check">
-        <span class="spinner"></span> 📉 Churn Check
-      </button>
-      <button class="btn" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
-        <span class="spinner"></span> 📊 Monthly Report
-      </button>
-    </div>
 
-    <!-- Stats -->
-    <div class="stats-row" id="stats-row"></div>
-
-    <!-- Pipeline bar -->
-    <div class="panel full-width" style="padding-top:16px">
-      <div class="panel-header"><h2>Lead Pipeline</h2></div>
-      <div style="padding: 16px 0 0;">
-        <div class="pipeline-bar" id="pipeline-bar"></div>
-        <div style="display:flex; gap:16px; padding: 0 20px 16px; flex-wrap:wrap;" id="pipeline-legend"></div>
+    <!-- ===================== DASHBOARD VIEW ===================== -->
+    <div id="view-dashboard" class="view active">
+      <!-- Actions -->
+      <div class="action-bar">
+        <button class="btn btn-accent" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
+          <span class="spinner"></span> Run Scraper
+        </button>
+        <button class="btn" onclick="triggerJob('churn_check')" id="btn-churn-check">
+          <span class="spinner"></span> Churn Check
+        </button>
+        <button class="btn" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
+          <span class="spinner"></span> Monthly Report
+        </button>
       </div>
-    </div>
 
-    <!-- Leads (full width with filters) -->
-    <div class="panel full-width">
-      <div class="panel-header">
-        <h2>Leads</h2>
-        <span class="count" id="lead-count">—</span>
-      </div>
-      <div class="filter-bar">
-        <label>Status</label>
-        <select id="f-status" onchange="refreshLeads()">
-          <option value="">All</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="interested">Interested</option>
-          <option value="demo_sent">Demo Sent</option>
-          <option value="closed_won">Won</option>
-          <option value="closed_lost">Lost</option>
-          <option value="excluded">Excluded</option>
-        </select>
-        <label>Niche</label>
-        <select id="f-niche" onchange="refreshLeads()">
-          <option value="">All</option>
-        </select>
-        <label>City</label>
-        <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()">
-        <label>Search</label>
-        <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()">
-        <button class="btn" onclick="clearFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">✕ Clear</button>
-      </div>
-      <div class="panel-body" id="leads-list" style="max-height:500px"></div>
-    </div>
+      <!-- Stats -->
+      <div class="stats-row" id="stats-row"></div>
 
-    <!-- Panels -->
-    <div class="panels">
-      <!-- Jobs -->
-      <div class="panel">
-        <div class="panel-header">
-          <h2>Jobs</h2>
-          <span class="count" id="job-count">—</span>
+      <!-- Pipeline bar -->
+      <div class="panel full-width" style="padding-top:16px">
+        <div class="panel-header"><h2>Lead Pipeline</h2></div>
+        <div style="padding: 16px 0 0;">
+          <div class="pipeline-bar" id="pipeline-bar"></div>
+          <div style="display:flex; gap:16px; padding: 0 20px 16px; flex-wrap:wrap;" id="pipeline-legend"></div>
         </div>
-        <div class="panel-body" id="jobs-list"></div>
       </div>
 
-      <!-- Clients -->
-      <div class="panel">
+      <!-- Leads (full width with filters) -->
+      <div class="panel full-width">
         <div class="panel-header">
-          <h2>Clients</h2>
-          <span class="count" id="client-count">—</span>
+          <h2>Leads</h2>
+          <span class="count" id="lead-count">—</span>
         </div>
-        <div class="panel-body" id="clients-list"></div>
+        <div class="filter-bar">
+          <label>Status</label>
+          <select id="f-status" onchange="refreshLeads()">
+            <option value="">All</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="interested">Interested</option>
+            <option value="demo_sent">Demo Sent</option>
+            <option value="closed_won">Won</option>
+            <option value="closed_lost">Lost</option>
+            <option value="excluded">Excluded</option>
+          </select>
+          <label>Niche</label>
+          <select id="f-niche" onchange="refreshLeads()">
+            <option value="">All</option>
+          </select>
+          <label>City</label>
+          <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()">
+          <label>Search</label>
+          <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()">
+          <button class="btn" onclick="clearFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">✕ Clear</button>
+        </div>
+        <div class="panel-body" id="leads-list" style="max-height:500px"></div>
       </div>
+
+      <!-- Panels -->
+      <div class="panels">
+        <!-- Jobs -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Jobs</h2>
+            <span class="count" id="job-count">—</span>
+          </div>
+          <div class="panel-body" id="jobs-list"></div>
+        </div>
+
+        <!-- Clients -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Clients</h2>
+            <span class="count" id="client-count">—</span>
+          </div>
+          <div class="panel-body" id="clients-list"></div>
+        </div>
+      </div>
+
+      <!-- System Config (full width) -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>System Config</h2>
+        </div>
+          <div class="panel-body" id="config-panel"></div>
+        </div>
+      </div>
+
+    <!-- ===================== SCRAPER VIEW ===================== -->
+    <div id="view-scraper" class="view">
+
+      <!-- Scraper Config -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>Scraper Config</h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn" onclick="loadScraperConfig()" style="font-size:11px;padding:5px 12px">Reset</button>
+            <button class="btn btn-accent" onclick="saveScraperConfig()" id="btn-scraper-save" style="font-size:11px;padding:5px 12px">Save Config</button>
+          </div>
+        </div>
+        <div class="scraper-config-form">
+          <div class="form-group">
+            <label>Active Niche</label>
+            <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist">
+            <small>Business category to search for</small>
+          </div>
+          <div class="form-group">
+            <label>Max Requests / Minute</label>
+            <input id="sc-rpm" type="number" min="1" max="30" placeholder="8">
+          </div>
+          <div class="form-group">
+            <label>Max Retries</label>
+            <input id="sc-retries" type="number" min="0" max="10" placeholder="3">
+          </div>
+          <div class="form-group">
+            <label>Delay Range (ms)</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="sc-delay-min" type="number" min="1000" placeholder="5000" style="width:100px">
+              <span style="color:var(--text-dim)">to</span>
+              <input id="sc-delay-max" type="number" min="1000" placeholder="12000" style="width:100px">
+            </div>
+            <small>Random delay between requests per city</small>
+          </div>
+          <div class="form-group full-width">
+            <label>Cities (one per line: "City, ST")</label>
+            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Run Scraper -->
+      <div class="action-bar">
+        <button class="btn btn-accent" onclick="runScraper()" id="btn-run-scraper">
+          <span class="spinner"></span> Run Scraper Now
+        </button>
+        <button class="btn" onclick="refreshScraperView()">
+          <span class="spinner"></span> Refresh
+        </button>
+        <span id="scraper-status-text" style="font-size:12px;color:var(--text-dim);font-family:var(--mono);margin-left:8px"></span>
+      </div>
+
+      <!-- Scraper Stats -->
+      <div class="stats-row" id="scraper-stats-row"></div>
+
+      <!-- Scraper Results -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>Scraped Leads</h2>
+          <span class="count" id="scraper-lead-count">—</span>
+        </div>
+        <div class="filter-bar">
+          <label>Status</label>
+          <select id="sf-status" onchange="refreshScraperResults()">
+            <option value="">All</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="interested">Interested</option>
+            <option value="excluded">Excluded</option>
+          </select>
+          <label>City</label>
+          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()">
+          <label>Search</label>
+          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()">
+          <label>Website</label>
+          <select id="sf-website" onchange="refreshScraperResults()">
+            <option value="">Any</option>
+            <option value="true">Has website</option>
+            <option value="false">No website</option>
+          </select>
+          <label>Phone</label>
+          <select id="sf-phone" onchange="refreshScraperResults()">
+            <option value="">Any</option>
+            <option value="true">Has phone</option>
+            <option value="false">No phone</option>
+          </select>
+          <button class="btn" onclick="clearScraperFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">✕ Clear</button>
+        </div>
+        <div class="panel-body" id="scraper-results-list" style="max-height:500px"></div>
+      </div>
+
+      <!-- Scraper Job History -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>Scraper Jobs</h2>
+          <span class="count" id="scraper-job-count">—</span>
+        </div>
+        <div class="panel-body" id="scraper-jobs-list" style="max-height:300px"></div>
+      </div>
+
     </div>
 
-    <!-- System Config (full width) -->
-    <div class="panel full-width">
-      <div class="panel-header">
-        <h2>System Config</h2>
-      </div>
-        <div class="panel-body" id="config-panel"></div>
-      </div>
-    </div>
+  </div>
   <div id="toast" class="toast"></div>
 
   <script>
@@ -484,6 +702,7 @@
     const startTime = Date.now();
     let knownNiches = new Set();
     let debounceTimer = null;
+    let scraperDebounceTimer = null;
 
     function ago(iso) {
       if (!iso) return '—';
@@ -515,7 +734,16 @@
       setTimeout(() => { t.className = 'toast'; }, 3000);
     }
 
-    // ── Trigger a job ──────────────────────────────────
+    // ── Tab switching ──────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.nav-tab:nth-child(${tab === 'dashboard' ? 1 : 2})`).classList.add('active');
+      document.getElementById(`view-${tab}`).classList.add('active');
+      if (tab === 'scraper') refreshScraperView();
+    }
+
+    // ── Trigger a job (dashboard) ──────────────────────
     async function triggerJob(jobType) {
       const btn = document.getElementById('btn-' + jobType.replace(/_/g, '-'));
       if (btn) btn.classList.add('loading');
@@ -530,7 +758,7 @@
       }
     }
 
-    // ── Filtered leads fetch ───────────────────────────
+    // ── Filtered leads fetch (dashboard) ───────────────
     async function refreshLeads() {
       const params = new URLSearchParams();
       const status = document.getElementById('f-status').value;
@@ -561,7 +789,6 @@
           `).join('');
         }
 
-        // Auto-populate niche dropdown
         leads.forEach(l => { if (l.niche) knownNiches.add(l.niche); });
         const nicheSelect = document.getElementById('f-niche');
         const currentNiche = nicheSelect.value;
@@ -598,7 +825,7 @@
       excluded: '#636e72',
     };
 
-    // ── Main refresh (stats, pipeline, jobs, clients, config) ──
+    // ── Main refresh (dashboard) ───────────────────────
     async function refresh() {
       try {
         const [allLeadsRes, clientsRes, jobsRes, configRes] = await Promise.all([
@@ -613,12 +840,10 @@
         const jobs = jobsRes.data.docs || [];
         const config = configRes.data;
 
-        // Header
         document.getElementById('phase').textContent = `Phase ${config.currentPhase || '—'}`;
         document.getElementById('uptime').textContent = uptime();
         document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString();
 
-        // Stats
         const statusCounts = {};
         allLeads.forEach(l => { statusCounts[l.status] = (statusCounts[l.status] || 0) + 1; });
 
@@ -677,7 +902,6 @@
         bar.innerHTML = barHtml;
         legend.innerHTML = legendHtml;
 
-        // Auto-populate niches from all leads
         allLeads.forEach(l => { if (l.niche) knownNiches.add(l.niche); });
 
         // Jobs list
@@ -724,11 +948,253 @@
           <div class="config-item"><span class="ck">Updated</span><span class="cv">${ago(config.updatedAt || config.updated_at)}</span></div>
         </div>`;
 
-        // Also refresh filtered leads panel
         await refreshLeads();
 
       } catch (err) {
         console.error('Refresh failed:', err);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ── SCRAPER VIEW ──────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════
+
+    async function loadScraperConfig() {
+      try {
+        const res = await axios.get(API + '/api/scraper/config', { headers });
+        const cfg = res.data;
+        document.getElementById('sc-niche').value = cfg.niche || '';
+        document.getElementById('sc-rpm').value = cfg.maxRequestsPerMinute || 8;
+        document.getElementById('sc-retries').value = cfg.maxRetries || 3;
+        const delay = cfg.interRequestDelayMs || [5000, 12000];
+        document.getElementById('sc-delay-min').value = delay[0];
+        document.getElementById('sc-delay-max').value = delay[1];
+        document.getElementById('sc-cities').value = (cfg.cities || []).join('\n');
+      } catch (err) {
+        showToast('Failed to load scraper config', 'error');
+      }
+    }
+
+    async function saveScraperConfig() {
+      const btn = document.getElementById('btn-scraper-save');
+      btn.classList.add('loading');
+      try {
+        const cities = document.getElementById('sc-cities').value
+          .split('\n')
+          .map(l => l.trim())
+          .filter(Boolean);
+        const data = {
+          niche: document.getElementById('sc-niche').value.trim() || 'hvac',
+          cities,
+          maxRequestsPerMinute: parseInt(document.getElementById('sc-rpm').value) || 8,
+          maxRetries: parseInt(document.getElementById('sc-retries').value) || 3,
+          interRequestDelayMs: [
+            parseInt(document.getElementById('sc-delay-min').value) || 5000,
+            parseInt(document.getElementById('sc-delay-max').value) || 12000,
+          ],
+        };
+        await axios.patch(API + '/api/scraper/config', data, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('✓ Scraper config saved', 'success');
+      } catch (err) {
+        showToast(`✗ Save failed: ${err.response?.data?.error || err.message}`, 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function runScraper() {
+      const btn = document.getElementById('btn-run-scraper');
+      btn.classList.add('loading');
+      document.getElementById('scraper-status-text').textContent = 'Queuing scraper...';
+      try {
+        const niche = document.getElementById('sc-niche').value.trim() || undefined;
+        const cities = document.getElementById('sc-cities').value.split('\n').map(l => l.trim()).filter(Boolean);
+        const payload = {};
+        if (niche) payload.niche = niche;
+        if (cities.length > 0) payload.cities = cities;
+
+        await axios.post(API + '/api/scraper/run', payload, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('✓ Scraper job queued', 'success');
+        document.getElementById('scraper-status-text').textContent = 'Job queued — monitoring...';
+        setTimeout(() => {
+          refreshScraperView();
+          document.getElementById('scraper-status-text').textContent = '';
+        }, 2000);
+      } catch (err) {
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        document.getElementById('scraper-status-text').textContent = '';
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function refreshScraperView() {
+      await Promise.all([
+        loadScraperConfig(),
+        refreshScraperResults(),
+        refreshScraperJobs(),
+        refreshScraperStats(),
+      ]);
+    }
+
+    async function refreshScraperStats() {
+      try {
+        const [leadsRes, jobsRes] = await Promise.all([
+          axios.get(API + '/api/scraper/results?limit=0', { headers }),
+          axios.get(API + '/api/scraper/history?limit=100', { headers }),
+        ]);
+
+        const jobs = jobsRes.data.docs || [];
+        const completed = jobs.filter(j => j.status === 'completed');
+        const running = jobs.filter(j => j.status === 'running' || j.status === 'queued');
+        const failed = jobs.filter(j => j.status === 'failed');
+
+        let lastJobInfo = 'Never';
+        if (completed.length > 0) {
+          const last = completed[0];
+          const output = last.outputData || last.output_data || {};
+          lastJobInfo = `${output.leads_created ?? '?'} created, ${output.leads_skipped ?? '?'} skipped`;
+        }
+
+        document.getElementById('scraper-stats-row').innerHTML = `
+          <div class="stat-card">
+            <span class="label">Scraped Leads</span>
+            <span class="value">${leadsRes.data.totalDocs ?? 0}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Scraper Runs</span>
+            <span class="value">${completed.length}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Running / Queued</span>
+            <span class="value" style="color:var(--yellow)">${running.length}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Failed</span>
+            <span class="value" style="color:var(--red)">${failed.length}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Last Run</span>
+            <span class="value" style="font-size:14px">${lastJobInfo}</span>
+          </div>
+        `;
+      } catch (err) {
+        console.error('Scraper stats error:', err);
+      }
+    }
+
+    async function refreshScraperResults() {
+      const params = new URLSearchParams();
+      const status = document.getElementById('sf-status').value;
+      const city = document.getElementById('sf-city').value.trim();
+      const search = document.getElementById('sf-search').value.trim();
+      const hasWebsite = document.getElementById('sf-website').value;
+      const hasPhone = document.getElementById('sf-phone').value;
+      if (status) params.set('status', status);
+      if (city) params.set('city', city);
+      if (search) params.set('search', search);
+      if (hasWebsite) params.set('hasWebsite', hasWebsite);
+      if (hasPhone) params.set('hasPhone', hasPhone);
+      params.set('limit', '200');
+
+      try {
+        const res = await axios.get(API + '/api/scraper/results?' + params.toString(), { headers });
+        const leads = res.data.docs || [];
+        const total = res.data.totalDocs ?? leads.length;
+
+        document.getElementById('scraper-lead-count').textContent = `${total} total`;
+        const list = document.getElementById('scraper-results-list');
+
+        if (leads.length === 0) {
+          list.innerHTML = '<div class="empty">No scraped leads match filters</div>';
+          return;
+        }
+
+        list.innerHTML = `<table class="results-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>City</th>
+              <th>Phone</th>
+              <th>Website</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th>Scraped</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${leads.map(l => {
+              const name = l.businessName || l.business_name || '—';
+              const city = l.city || '';
+              const state = l.state || '';
+              const phone = l.phone;
+              const website = l.websiteUrl || l.website_url;
+              const rating = l.auditScore != null ? l.auditScore : null;
+              const status = l.status || 'new';
+              const created = l.createdAt || l.created_at;
+              return `<tr>
+                <td style="max-width:220px" title="${name}">${name}</td>
+                <td class="mono">${city}${state ? ', ' + state : ''}</td>
+                <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">—</span>'}</td>
+                <td class="mono" style="max-width:180px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 25) + '</span>' : '<span class="no-indicator">—</span>'}</td>
+                <td class="mono">${rating != null ? rating + '/10' : '—'}</td>
+                <td>${badge(status)}</td>
+                <td class="mono" style="font-size:10px">${ago(created)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+      } catch (err) {
+        console.error('Scraper results error:', err);
+      }
+    }
+
+    function debounceScraperResults() {
+      clearTimeout(scraperDebounceTimer);
+      scraperDebounceTimer = setTimeout(refreshScraperResults, 300);
+    }
+
+    function clearScraperFilters() {
+      document.getElementById('sf-status').value = '';
+      document.getElementById('sf-city').value = '';
+      document.getElementById('sf-search').value = '';
+      document.getElementById('sf-website').value = '';
+      document.getElementById('sf-phone').value = '';
+      refreshScraperResults();
+    }
+
+    async function refreshScraperJobs() {
+      try {
+        const res = await axios.get(API + '/api/scraper/history?limit=30', { headers });
+        const jobs = res.data.docs || [];
+
+        document.getElementById('scraper-job-count').textContent = `${res.data.totalDocs ?? jobs.length} total`;
+        const list = document.getElementById('scraper-jobs-list');
+
+        if (jobs.length === 0) {
+          list.innerHTML = '<div class="empty">No scraper jobs yet</div>';
+          return;
+        }
+
+        list.innerHTML = jobs.map(j => {
+          const output = j.outputData || j.output_data || {};
+          const input = j.inputData || j.input_data || {};
+          const detail = j.status === 'completed'
+            ? `${output.leads_created ?? 0} created, ${output.leads_skipped ?? 0} skipped`
+            : j.status === 'failed'
+              ? (j.errorMessage || j.error_message || 'Unknown error')
+              : j.status === 'running'
+                ? 'In progress...'
+                : 'Waiting...';
+          return `<div class="row">
+            <span class="name">${input.niche ? input.niche + ' — ' : ''}${(input.cities || []).join(', ') || 'Default config'}</span>
+            <span class="meta">${detail}</span>
+            ${badge(j.status)}
+            <span class="time">${ago(j.updatedAt || j.updated_at)}</span>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        console.error('Scraper jobs error:', err);
       }
     }
 
@@ -749,10 +1215,14 @@
       document.getElementById('theme-toggle').textContent = theme === 'dark' ? '🌙' : '☀️';
     })();
 
-    // Initial load + poll every 5s
+    // Initial load + poll
     refresh();
-    setInterval(refresh, 5000);
+    setInterval(() => {
+      refresh();
+      if (document.getElementById('view-scraper').classList.contains('active')) {
+        refreshScraperView();
+      }
+    }, 5000);
   </script>
 </body>
 </html>
-

@@ -7,9 +7,13 @@ export const jobRoutes = new Hono()
 jobRoutes.get('/', async (c) => {
   const db = getDb()
   const status = c.req.query('status')
+  const jobType = c.req.query('jobType')
   const limit = parseInt(c.req.query('limit') ?? '50', 10)
 
-  const where = status ? { status: { equals: status } } : undefined
+  const conditions: any[] = []
+  if (status) conditions.push({ status: { equals: status } })
+  if (jobType) conditions.push({ job_type: { equals: jobType } })
+  const where = conditions.length > 0 ? { and: conditions } : undefined
   const result = await db.find({ collection: 'jobs', where, limit })
   return c.json(result)
 })
