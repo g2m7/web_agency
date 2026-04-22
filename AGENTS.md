@@ -43,9 +43,11 @@
 - **DbClient** (`app-lite/src/db/index.ts`): Abstraction over Drizzle that provides the data-access interface (find, findByID, create, update, delete, findGlobal, updateGlobal). Includes `createTestDb()` for in-memory test databases.
 - **State machine** (`app-lite/src/state-machine/`): `states.ts` defines valid transitions; `orchestrator.ts` wraps transitions with policy checks, pipeline event logging, and job scheduling.
 - **Policy engine** (`app-lite/src/policy/`): 12 rules in `rules/index.ts`, engine aggregates results. Returns allowed/blocked/requiresHumanApproval.
-- **Jobs** (`app-lite/src/jobs/`): DB-backed job queue with 10 handlers. `lead_gen` is real (Google Maps scraper). `scheduler.ts` handles event-triggered scheduling. `workers.ts` polls the jobs table.
+- **Jobs** (`app-lite/src/jobs/`): DB-backed job queue with 10 handlers. `lead_gen` is real (Google Maps scraper). `scheduler.ts` handles event-triggered scheduling. `workers.ts` polls the jobs table (30s interval).
 - **Scraper** (`app-lite/src/scraper/google-maps.ts`): Browser-mimicking fetch-based Google Maps scraper. Anti-detection headers, random delays, hex place ID parsing. No API keys.
-- **Routes** (`app-lite/src/routes/`): Hono REST API routes for leads, clients, interactions, deployments, jobs, config. API key auth middleware.
+- **Routes** (`app-lite/src/routes/`): Hono REST API routes for leads, clients, interactions, deployments, jobs, config, scraper. API key auth middleware.
+- **Scraper routes** (`app-lite/src/routes/scraper.ts`): GET/PATCH `/api/scraper/config`, POST `/api/scraper/run`, GET `/api/scraper/history`, GET `/api/scraper/results`. Manages scraper config and triggers lead_gen jobs.
+- **Dashboard** (`app-lite/public/index.html`): Real-time monitoring UI served at `/`. Two tabs: Dashboard (stats, pipeline, leads, jobs, clients) and Scraper (config, run, results, history). Light/dark mode, 5s auto-refresh.
 - **Webhooks** (`app-lite/src/routes/webhooks/`): Hono routes for Dodo, Resend, Cloudflare callbacks.
 - **Boundary**: If a dedicated CRM is used, treat CRM as sales engagement UI and this app as operational system of record; sync key lifecycle events only.
 
@@ -55,6 +57,7 @@
 - Keep payment-provider narrative consistent: validation stage uses Dodo/Polar merchant-of-record flow; Stripe is a later-stage migration option.
 - IDs are UUID strings — always use `String()` cast when passing to functions expecting `string`.
 - `db.find()` returns `{ totalDocs, docs }` — always null-check `docs[0]` before accessing properties.
+- **`db.findGlobal()` returns camelCase** (e.g. `activeNiche`, `activeCities`), but `updateGlobal` input uses snake_case keys (e.g. `active_niche`). When reading config in handlers, always read both: `config.activeNiche ?? config.active_niche`. This mismatch is a known Drizzle ORM mapping gap.
 - After editing source files, run `bun run typecheck` and `bun run test` from `app-lite/` to verify.
 - Do NOT edit `app/` — it is legacy. All work goes in `app-lite/`.
 
@@ -65,7 +68,8 @@
 - Policy rule changes -> also review `app-lite/src/policy/rules/index.ts` and related tests.
 - State machine transitions -> also review `app-lite/src/state-machine/states.ts`.
 - Database schema changes -> edit `app-lite/src/db/schema.ts` then run `bun run db:generate`.
-- Scraper changes -> also review `app-lite/tests/unit/scraper/google-maps.test.ts` and `app-lite/tests/unit/handlers/lead-gen.test.ts`.
+- Scraper changes -> also review `app-lite/tests/unit/scraper/google-maps.test.ts`, `app-lite/tests/unit/handlers/lead-gen.test.ts`, and `app-lite/src/routes/scraper.ts`.
+- Dashboard UI changes -> review `app-lite/public/index.html` (single-file dashboard with inline CSS/JS).
 
 ## Scope discipline for agent edits
 - Prefer small, surgical edits over broad rewrites; keep document structure and numbering stable unless the task requires restructuring.
