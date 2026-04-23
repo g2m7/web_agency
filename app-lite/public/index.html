@@ -754,6 +754,15 @@
     let knownNiches = new Set();
     let debounceTimer = null;
     let scraperDebounceTimer = null;
+    let configDirty = false;
+
+    // Mark config dirty when user edits any scraper config field
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('#sc-niche, #sc-rpm, #sc-retries, #sc-delay-min, #sc-delay-max, #sc-cities').forEach(el => {
+        el.addEventListener('input', () => { configDirty = true; });
+        el.addEventListener('change', () => { configDirty = true; });
+      });
+    });
 
     function ago(iso) {
       if (!iso) return '—';
@@ -1021,6 +1030,7 @@
         document.getElementById('sc-delay-min').value = delay[0];
         document.getElementById('sc-delay-max').value = delay[1];
         document.getElementById('sc-cities').value = (cfg.cities || []).join('\n');
+        configDirty = false;
       } catch (err) {
         showToast('Failed to load scraper config', 'error');
       }
@@ -1045,6 +1055,7 @@
           ],
         };
         await axios.patch(API + '/api/scraper/config', data, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        configDirty = false;
         showToast('✓ Scraper config saved', 'success');
       } catch (err) {
         showToast(`✗ Save failed: ${err.response?.data?.error || err.message}`, 'error');
@@ -1108,12 +1119,14 @@
     }
 
     async function refreshScraperView() {
-      await Promise.all([
-        loadScraperConfig(),
+      const tasks = [
         refreshScraperResults(),
         refreshScraperJobs(),
         refreshScraperStats(),
-      ]);
+      ];
+      // Only reload config form if the user hasn't made unsaved edits
+      if (!configDirty) tasks.push(loadScraperConfig());
+      await Promise.all(tasks);
     }
 
     async function refreshScraperStats() {

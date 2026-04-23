@@ -14,6 +14,68 @@ I can show you a cleaner version built with your own business info.
 
 Want me to send it over?
 
+## City-specialty hook variants
+
+Use these niche-specific angles instead of the generic template when the city+niche pair has a clear specialty pain point. Replace `{{specific_issue}}` with the niche-relevant issue.
+
+### Pool services
+
+Subject: {{business_name}} — quick site note
+
+Hi {{first_name}},
+
+Found {{business_name}} while looking at pool companies in {{city}}.
+
+Your site doesn't show your service area or a way to request a quote on mobile — that's probably costing you calls during pool season.
+
+I can show you a version that fixes that with your own business info.
+
+Want me to send it over?
+
+### Auto detailing
+
+Subject: Quick note about {{business_name}}
+
+Hi {{first_name}},
+
+Came across {{business_name}} while researching detailers in {{city}}.
+
+Your site loads slowly and the before/after gallery doesn't show on phones. That's the kind of thing that makes people tap the next result instead.
+
+I built a cleaner version using your actual business info.
+
+Want to see it?
+
+### Chiropractors / wellness
+
+Subject: {{business_name}} — website thought
+
+Hi {{first_name}},
+
+Noticed {{business_name}} while looking at chiropractors in {{city}}.
+
+Your site doesn't have online booking or a clear first-visit CTA — patients searching on their phone are likely bouncing.
+
+I put together a version with your info that fixes that.
+
+Worth a look?
+
+### Pet grooming
+
+Subject: Quick note for {{business_name}}
+
+Hi {{first_name}},
+
+Found {{business_name}} while checking groomers in {{city}}.
+
+Your site doesn't show pricing or an easy way to book on mobile. Pet owners searching in a hurry will call whoever makes it easiest.
+
+I made a version with your business info that adds those.
+
+Want me to send it over?
+
+> **Note:** Create new specialty variants as new city+niche pairs are approved. Keep the same structure: one specific, visible issue → offer to show a better version → single question close. No demo link, no pricing.
+
 ## Follow-up template 1
 
 Hi {{first_name}},
@@ -118,13 +180,12 @@ Here's your monthly site update:
 
 Before the agent contacts a lead, confirm:
 
-- Niche fit
-- City fit
-- Visible website issue
-- Reachable email
-- Business appears active
-- Hook email angle available
-- Package likely affordable
+- City+niche pair is approved (score ≥ 70, per `docs/22-Niche-Hunting-SOP.md`)
+- Visible website issue confirmed by audit rubric
+- Reachable email or phone (contactability verified)
+- Business appears active (recent reviews, open hours)
+- Hook email angle available (use specialty variant if one exists for this niche)
+- Package likely affordable for this niche's margins
 
 ## CAN-SPAM email footer (append to every outbound email)
 

@@ -70,6 +70,7 @@
 - Database schema changes -> edit `app-lite/src/db/schema.ts` then run `bun run db:generate`.
 - Scraper changes -> also review `app-lite/tests/unit/scraper/google-maps.test.ts`, `app-lite/tests/unit/handlers/lead-gen.test.ts`, and `app-lite/src/routes/scraper.ts`.
 - Dashboard UI changes -> review `app-lite/public/index.html` (single-file dashboard with inline CSS/JS).
+- Niche/city targeting edits -> also review `docs/22-Niche-Hunting-SOP.md`, `docs/03-ICP-Niches-Scoring.md`, `docs/12-KPIs-Dashboard.md`, `docs/15-Templates.md`, `data/niche-city-scorecard.csv`.
 
 ## Scope discipline for agent edits
 - Prefer small, surgical edits over broad rewrites; keep document structure and numbering stable unless the task requires restructuring.

@@ -22,6 +22,32 @@ Track weekly:
 - Phone/SMS opener sent
 - Phone/SMS reply rate
 
+## City+niche pair KPIs
+
+Track per approved city+niche pair (from `docs/22-Niche-Hunting-SOP.md`):
+
+- Pair score (0–100)
+- Maps density (business count)
+- Weak-site rate (% of sampled businesses with audit score ≥ 4)
+- Contactable rate (% with email or phone)
+- Leads scraped
+- Leads enriched (email found)
+- Leads validated (email deliverable)
+- Hook emails sent
+- Reply rate
+- Positive reply rate
+- Demos built
+- Demo-to-close rate
+- Clients closed
+- Sprint outcome (continue / pause / drop)
+
+Aggregate across pairs to identify:
+
+- Best-performing city (highest reply rate, most closes)
+- Best-performing niche (highest conversion, lowest churn)
+- Winning city+niche combinations worth doubling down on
+- Pairs to park or drop based on sprint results
+
 ## Funnel math
 
 Use this chain:
@@ -92,7 +118,9 @@ The business should reach internal confidence when:
 
 ## Weekly review questions
 
-- Which niche or city had the best reply rate?
+- Which city+niche pair had the best reply rate this sprint?
+- Which city+niche pairs should be continued, paused, or dropped?
+- Are any new candidate pairs ready for mini-validation scrape?
 - Which issue angle got the best response in hook emails?
 - How do phone/SMS fallback reply rates compare to email reply rates?
 - How many demos were requested vs how many emails sent?

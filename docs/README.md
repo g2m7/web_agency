@@ -34,6 +34,8 @@ This pack captures the full operating system for an AI-agent-operated website-re
 - `18-Documentation-Audit.md` — full cross-document audit: consistency checks, gaps, flaws, and priority fix list
 - `19-Application-Architecture.md` — concrete build spec: database schema, state machine, policy engine, idempotency, job queue, API endpoints, observability, automated evals, rollout phases
 - `20-Application-Build-Test-Guide.md` — A-to-Z instructions for taking the app scaffold to bootable, tested, production-viable: Docker setup, boot verification, seed data, handler implementation, webhook testing, policy verification, access control, observability, production readiness
+- `21-Deployment-Guide.md` — VPS setup, DNS, Nginx, SSL, first deploy, multi-domain config, backups
+- `22-Niche-Hunting-SOP.md` — Step 0 workflow: city+niche pair discovery, 100-point scoring model, search query library, go/no-go thresholds, outreach sprint cadence
 
 ## How to use this pack
 
@@ -49,6 +51,7 @@ This pack captures the full operating system for an AI-agent-operated website-re
 10. `19` is the build spec — database, state machine, policy engine, API, and observability. Read after `17` before writing any code.
 11. `20` is the implementation guide — Docker, boot, seed, handlers, webhooks, policy verification, production readiness. Read after `19` when ready to make the app bootable.
 12. `21` is the deployment guide — VPS setup, DNS, Nginx, SSL, first deploy, multi-domain config, backups. Read when the app is bootable locally and ready for production.
+13. `22` is the niche hunting SOP — read before starting any lead generation to ensure you're targeting scored, approved city+niche pairs.
 
 ## System boundary: Payload vs CRM
 
