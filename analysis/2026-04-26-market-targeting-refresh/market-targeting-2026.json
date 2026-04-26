@@ -1,0 +1,422 @@
+{
+  "generated_at": "2026-04-26",
+  "artifact_type": "market_targeting_refresh",
+  "confidence_note": "Scores and density bands are pre-validation research estimates and must be confirmed with a 30-lead mini-validation scrape before outreach.",
+  "summary": {
+    "recommended_first_three_pairs": [
+      "Phoenix, AZ + pool service",
+      "Charlotte, NC + tree service",
+      "Raleigh, NC + garage door repair"
+    ],
+    "recommended_live_pricing": {
+      "starter_monthly_usd": 79,
+      "growth_monthly_usd": 129,
+      "pro_monthly_usd": 249,
+      "default_close_plan": "growth",
+      "discount_policy": "no_discounts",
+      "launch_fee_policy": "waive_only_for_first_three_pilot_clients_then_standardize"
+    },
+    "most_missed_niche": "pressure washing",
+    "most_missed_setting": "outer-ring suburban service-area operators in fast-growth Sun Belt metros"
+  },
+  "market_context": {
+    "smb_website_adoption_pct": 83,
+    "smb_new_website_last_12_months_pct": 12,
+    "smb_website_investment_next_12_months_pct": 90,
+    "smb_redesign_priority_pct": 58,
+    "smb_speed_priority_pct": 53,
+    "smb_mobile_priority_pct": 45,
+    "consumer_ai_search_active_pct": 40,
+    "consumer_contact_info_hours_importance_pct": 85,
+    "consumer_local_search_directly_in_maps_pct": 20,
+    "consumer_always_read_reviews_pct": 41,
+    "consumer_visit_website_after_positive_reviews_pct": 54,
+    "consumer_expect_review_responses_pct": 89
+  },
+  "top_5": [
+    {
+      "rank": 1,
+      "city": "Phoenix",
+      "state": "AZ",
+      "metro": "Phoenix-Mesa-Chandler",
+      "niche": "pool service",
+      "confidence": "high",
+      "estimated_total_score": 87,
+      "expected_maps_density_band": "220-300",
+      "estimated_weak_site_pct": 60,
+      "estimated_contactability_pct": 88,
+      "growth_signal": "Phoenix-Mesa-Chandler added 59,065 residents from 2024 to 2025",
+      "why_it_fits": [
+        "hot-climate recurring service economics",
+        "clear service-area model",
+        "good phone/email publish rate",
+        "easy template fit for offers, pricing, testimonials, and booking"
+      ]
+    },
+    {
+      "rank": 2,
+      "city": "Charlotte",
+      "state": "NC",
+      "metro": "Charlotte-Concord-Gastonia",
+      "niche": "tree service",
+      "confidence": "high",
+      "estimated_total_score": 84,
+      "expected_maps_density_band": "120-180",
+      "estimated_weak_site_pct": 68,
+      "estimated_contactability_pct": 84,
+      "growth_signal": "Charlotte-Concord-Gastonia added 54,122 residents from 2024 to 2025",
+      "why_it_fits": [
+        "visible website weakness in owner-operator segment",
+        "before-and-after proof is easy to sell",
+        "storm and removal demand supports strong lead value",
+        "good fit for direct-response local landing pages"
+      ]
+    },
+    {
+      "rank": 3,
+      "city": "Raleigh",
+      "state": "NC",
+      "metro": "Raleigh-Cary",
+      "niche": "garage door repair",
+      "confidence": "high",
+      "estimated_total_score": 82,
+      "expected_maps_density_band": "70-110",
+      "estimated_weak_site_pct": 58,
+      "estimated_contactability_pct": 86,
+      "growth_signal": "Raleigh-Cary grew 2.4% from 2024 to 2025 and ranked top 10 U.S. metros by percent growth",
+      "why_it_fits": [
+        "high-intent emergency and repair demand",
+        "simple CTA structure",
+        "strong suburban housing footprint",
+        "good fit for fast demo generation"
+      ]
+    },
+    {
+      "rank": 4,
+      "city": "Jacksonville",
+      "state": "FL",
+      "metro": "Jacksonville",
+      "niche": "tree service",
+      "confidence": "high",
+      "estimated_total_score": 81,
+      "expected_maps_density_band": "110-160",
+      "estimated_weak_site_pct": 65,
+      "estimated_contactability_pct": 85,
+      "growth_signal": "Jacksonville city added 16,365 residents in the 2023-2024 city release",
+      "why_it_fits": [
+        "weather-exposed service demand",
+        "fragmented local operator base",
+        "strong photo and trust-signal upgrade opportunity",
+        "good balance of density and manageable competition"
+      ]
+    },
+    {
+      "rank": 5,
+      "city": "Orlando",
+      "state": "FL",
+      "metro": "Orlando-Kissimmee-Sanford",
+      "niche": "landscaping",
+      "confidence": "high",
+      "estimated_total_score": 79,
+      "expected_maps_density_band": "140-220",
+      "estimated_weak_site_pct": 55,
+      "estimated_contactability_pct": 86,
+      "growth_signal": "Orlando-Kissimmee-Sanford added 37,690 residents from 2024 to 2025",
+      "why_it_fits": [
+        "large recurring-service market",
+        "lots of service pages that can be standardized",
+        "healthy density without immediately forcing the hardest agency fights",
+        "strong fit for managed monthly updates"
+      ]
+    }
+  ],
+  "high_confidence_shortlist": [
+    {
+      "rank": 6,
+      "pair": "Tampa, FL + pool service",
+      "estimated_total_score": 79,
+      "confidence": "high",
+      "note": "Great niche economics and density; more competitive than Phoenix."
+    },
+    {
+      "rank": 7,
+      "pair": "Fort Worth, TX + tree service",
+      "estimated_total_score": 78,
+      "confidence": "high",
+      "note": "Outer-edge DFW growth supports suburban service-area operators."
+    },
+    {
+      "rank": 8,
+      "pair": "San Antonio, TX + tree service",
+      "estimated_total_score": 77,
+      "confidence": "high",
+      "note": "Large and still growing; solid owner-operator opportunity."
+    },
+    {
+      "rank": 9,
+      "pair": "Las Vegas, NV + pool service",
+      "estimated_total_score": 76,
+      "confidence": "high",
+      "note": "Climate fit is excellent; medium competition."
+    },
+    {
+      "rank": 10,
+      "pair": "Columbus, OH + garage door repair",
+      "estimated_total_score": 75,
+      "confidence": "high",
+      "note": "Useful non-Sun-Belt control market with direct-response demand."
+    }
+  ],
+  "expansion_watchlist": [
+    {
+      "rank": 11,
+      "pair": "Ocala, FL + pressure washing",
+      "estimated_total_score": 74,
+      "confidence": "medium",
+      "note": "Fastest-growing metro by percent growth; strong visual-service fit."
+    },
+    {
+      "rank": 12,
+      "pair": "Wilmington, NC + tree service",
+      "estimated_total_score": 73,
+      "confidence": "medium",
+      "note": "Fast-growth coastal metro with weather-driven service need."
+    },
+    {
+      "rank": 13,
+      "pair": "Lakeland, FL + pest control",
+      "estimated_total_score": 73,
+      "confidence": "medium",
+      "note": "Strong growth and recurring-service logic; watch franchise density."
+    },
+    {
+      "rank": 14,
+      "pair": "Huntsville, AL + garage door repair",
+      "estimated_total_score": 72,
+      "confidence": "medium",
+      "note": "Fast-growth suburban housing profile suits direct-response service pages."
+    },
+    {
+      "rank": 15,
+      "pair": "Spartanburg, SC + landscaping",
+      "estimated_total_score": 72,
+      "confidence": "medium",
+      "note": "Lower elite-agency pressure than major metros; worth mini-validating."
+    },
+    {
+      "rank": 16,
+      "pair": "Myrtle Beach, SC + pool service",
+      "estimated_total_score": 71,
+      "confidence": "medium",
+      "note": "Strong growth and pool economics; seasonality pushes it later."
+    }
+  ],
+  "pricing_recommendation": {
+    "positioning_label": "premium-budget managed website service",
+    "live_monthly_prices_usd": {
+      "starter": 79,
+      "growth": 129,
+      "pro": 249
+    },
+    "close_strategy": {
+      "lead_with_plan": "growth",
+      "target_mix": {
+        "starter_pct": "15-30",
+        "growth_pct": "55-70",
+        "pro_pct": "15-20"
+      }
+    },
+    "benchmarking": {
+      "wix_light_monthly_usd": 17.77,
+      "wix_core_monthly_usd": 29.77,
+      "durable_launch_monthly_usd": 25,
+      "durable_grow_monthly_usd": 99,
+      "godaddy_small_business_designer_one_time_from_usd": 640,
+      "godaddy_design_services_one_time_from_usd": 499,
+      "webfx_average_web_design_usd": "1000-30000+",
+      "webfx_average_local_seo_monthly_usd": "500-3000"
+    },
+    "do_not_do": [
+      "do_not_price_below_starter_79",
+      "do_not_discount",
+      "do_not_compete_with_diy_builder_sticker_prices",
+      "do_not_make_starter_the_default_pitch"
+    ]
+  },
+  "missing_niches_or_settings": [
+    {
+      "type": "niche",
+      "name": "pressure washing",
+      "reason": "Visual before-and-after niche with owner-operator density and easy repeatable templates.",
+      "market_signal": "IBISWorld reported 32,193 U.S. pressure washing businesses in 2024, up 5.2% year over year."
+    },
+    {
+      "type": "niche",
+      "name": "appliance repair",
+      "reason": "Service-area and urgent-intent niche with straightforward CTA structure.",
+      "market_signal": "IBISWorld reported 37,104 U.S. appliance repair businesses in 2025 and 37,453 in 2026."
+    },
+    {
+      "type": "niche",
+      "name": "selective pest control",
+      "reason": "Recurring-service niche with strong contactability and local conversion logic, but avoid franchise-heavy markets.",
+      "market_signal": "IBISWorld reported 33,197 U.S. pest-control businesses in 2025 and 34,076 in 2026."
+    },
+    {
+      "type": "setting",
+      "name": "outer-ring suburban counties in fast-growth metros",
+      "reason": "The latest Census release says the fastest-growing counties around large metros tended to be on the outer edges, especially in Texas."
+    },
+    {
+      "type": "micro_segment",
+      "name": "review-strong but site-weak businesses",
+      "reason": "Review-first behavior means the website is often the second trust check after Maps and reviews, not the first discovery asset."
+    }
+  ],
+  "material_trends": [
+    {
+      "trend": "AI builders now sell AI discoverability, not just site generation",
+      "signal": "Durable now advertises Advanced GEO and weekly AI visibility ranking.",
+      "impact": "Generic cheap website positioning becomes less defensible."
+    },
+    {
+      "trend": "Review-first and maps-first local behavior is strengthening",
+      "signal": "BrightLocal 2026 reported 41% always read reviews and 54% visit the website after positive reviews.",
+      "impact": "Site pitch must tie into reviews, trust, and conversion, not pages alone."
+    },
+    {
+      "trend": "Official Google Places products are more usable for scoring workflows",
+      "signal": "Places Aggregate API now supports counts and place IDs, while Places API New uses field-mask billing and Text Search caps at 60 results.",
+      "impact": "Plan a phased migration from scraping to official APIs for pair scoring and scale."
+    },
+    {
+      "trend": "Growth is concentrating in Southeast and Sun Belt outer edges",
+      "signal": "Census 2026 said many of the fastest-growing counties were along the Southeast coast and on outer metro edges.",
+      "impact": "Fast-growth suburban metros should be prioritized over prestige urban cores."
+    },
+    {
+      "trend": "Small businesses are already in redesign and update mode",
+      "signal": "Clutch 2026 reported 61% update weekly, 81% have redesigned before, and 90% plan site investment.",
+      "impact": "Recurring managed updates are a better pitch than one-time 'we'll build you a site' language."
+    }
+  ],
+  "sources": [
+    {
+      "publisher": "Clutch",
+      "title": "Small Business Websites in 2025: Growth, Gaps, and Where to Invest Next",
+      "date": "2026-04-23",
+      "url": "https://clutch.co/resources/state-of-small-business-websites-2025"
+    },
+    {
+      "publisher": "BrightLocal",
+      "title": "Consumer Search Behavior",
+      "date": "2025-04-29",
+      "url": "https://www.brightlocal.com/research/consumer-search-behavior/"
+    },
+    {
+      "publisher": "BrightLocal",
+      "title": "Local Consumer Review Survey 2026",
+      "date": "2026-02-11",
+      "url": "https://www.brightlocal.com/research/local-consumer-review-survey/"
+    },
+    {
+      "publisher": "U.S. Census Bureau",
+      "title": "Population Growth Reported Across Cities and Towns in All U.S. Regions",
+      "date": "2025-05-15",
+      "url": "https://www.census.gov/newsroom/press-releases/2025/vintage-2024-popest.html"
+    },
+    {
+      "publisher": "U.S. Census Bureau",
+      "title": "Slow Growth Impacts Nation's Largest Counties Hardest",
+      "date": "2026-03-26",
+      "url": "https://www.census.gov/newsroom/press-releases/2026/2025-popest-metro-micro-counties.html"
+    },
+    {
+      "publisher": "Google Business Profile Help",
+      "title": "Tips to improve your local ranking on Google",
+      "url": "https://support.google.com/business/answer/7091?hl=en"
+    },
+    {
+      "publisher": "Google Business Profile Help",
+      "title": "Understand business summaries on Google Maps",
+      "url": "https://support.google.com/business/answer/6088158?hl=en"
+    },
+    {
+      "publisher": "Google for Developers",
+      "title": "Places API Usage and Billing",
+      "url": "https://developers.google.com/maps/documentation/places/web-service/usage-and-billing"
+    },
+    {
+      "publisher": "Google for Developers",
+      "title": "Text Search (New)",
+      "url": "https://developers.google.com/maps/documentation/places/web-service/text-search"
+    },
+    {
+      "publisher": "Google for Developers",
+      "title": "Places Aggregate API Overview",
+      "url": "https://developers.google.com/maps/documentation/places-aggregate/overview"
+    },
+    {
+      "publisher": "Google for Developers",
+      "title": "Places Aggregate API Usage and Billing",
+      "url": "https://developers.google.com/maps/documentation/places-aggregate/usage-and-billing"
+    },
+    {
+      "publisher": "GoDaddy",
+      "title": "How much does a website cost in 2026?",
+      "date": "2026-02-27",
+      "url": "https://www.godaddy.com/resources/skills/how-much-does-a-website-cost"
+    },
+    {
+      "publisher": "WebFX",
+      "title": "Web Design Pricing: How Much Does Web Design Cost in 2026?",
+      "url": "https://www.webfx.com/web-design/pricing/"
+    },
+    {
+      "publisher": "WebFX",
+      "title": "How Much Does Local SEO Cost in 2026?",
+      "url": "https://www.webfx.com/local-seo/pricing/"
+    },
+    {
+      "publisher": "Durable",
+      "title": "Pricing",
+      "url": "https://durable.com/pricing"
+    },
+    {
+      "publisher": "Wix",
+      "title": "Pricing Information",
+      "url": "https://www.wix.com/plans"
+    },
+    {
+      "publisher": "SBA Office of Advocacy",
+      "title": "New Advocacy Report Shows the Number of Small Businesses in the U.S. Exceeds 36 million",
+      "date": "2025-06-30",
+      "url": "https://advocacy.sba.gov/2025/06/30/new-advocacy-report-shows-the-number-of-small-businesses-in-the-u-s-exceeds-36-million/"
+    },
+    {
+      "publisher": "IBISWorld",
+      "title": "Swimming Pool Cleaning Services in the US - Number of Businesses",
+      "url": "https://www.ibisworld.com/united-states/number-of-businesses/swimming-pool-cleaning-services/4832/"
+    },
+    {
+      "publisher": "IBISWorld",
+      "title": "Tree Trimming Services in the US - Number of Businesses",
+      "url": "https://www.ibisworld.com/united-states/number-of-businesses/tree-trimming-services/6064/"
+    },
+    {
+      "publisher": "IBISWorld",
+      "title": "Pest Control in the US - Number of Businesses",
+      "url": "https://www.ibisworld.com/united-states/number-of-businesses/pest-control/1495/"
+    },
+    {
+      "publisher": "IBISWorld",
+      "title": "Pressure Washing Services in the US - Number of Businesses",
+      "url": "https://www.ibisworld.com/united-states/number-of-businesses/pressure-washing-services/6538/"
+    },
+    {
+      "publisher": "IBISWorld",
+      "title": "Appliance Repair in the US - Number of Businesses",
+      "url": "https://www.ibisworld.com/united-states/number-of-businesses/appliance-repair/1710/"
+    }
+  ]
+}

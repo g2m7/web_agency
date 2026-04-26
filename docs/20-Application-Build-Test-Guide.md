@@ -1,6 +1,68 @@
 # Application Build & Test Guide
 
-Complete A-to-Z instructions for taking the `app/` scaffold from type-safe stubs to a bootable, tested, production-viable application. No step depends on a number — follow the sections in any order that makes sense, but all must be complete before calling the app "ready."
+Complete A-to-Z instructions for taking the active application from local validation to production-viable operations.
+
+> **Active implementation note (2026-04-25):** use `app-lite/` first. The older `app/` Payload sections below are legacy reference material and should not drive new implementation unless the project explicitly migrates back to Payload.
+
+---
+
+## Current App-Lite Verification Flow
+
+Run all commands from `app-lite/`.
+
+```bash
+bun install
+bun run typecheck
+bun run test
+bun run dev
+```
+
+The active stack is:
+
+- Bun runtime
+- Hono HTTP API
+- Drizzle ORM
+- SQLite database at `app-lite/data/agency.db`
+- DB-backed job queue in the `jobs` table
+- Single-file dashboard at `app-lite/public/index.html`
+
+Minimum acceptance before calling a code change complete:
+
+- `bun run typecheck` passes with zero errors.
+- `bun run test` passes.
+- Database startup runs `initializeDatabase()` without throwing.
+- Dashboard root `/` loads.
+- API requests under `/api/*` require `x-api-key`.
+
+## Phase Completion Validation Rule
+
+For restart-safe execution under `plans/`, phase completion now requires both automated verification and manual verification.
+
+- Every active phase file must contain:
+  - `Stage Entry Planning`
+  - `Required Tests`
+  - `Manual Verification`
+  - `Acceptance Criteria / Exit Gate`
+- Before closing a phase:
+  - all required automated tests must be green
+  - all user-specific manual checks for the affected flow must be ticked
+  - all feature-specific manual checks for the changed behavior must be ticked
+  - any skipped or blocked manual checks must be written into the track handoff and root `handoff.md`
+- When a new phase starts for the first time, refresh that phase against current requirements before implementation begins. Do not rely on the older global plan alone.
+
+Recurring jobs are disabled by default in local startup to avoid accidental scraping. Set `ENABLE_RECURRING_JOBS=true` when you intentionally want daily lead generation/monthly report/churn jobs enqueued. Set `ENABLE_WORKERS=false` when you only want to inspect API routes without processing queued jobs.
+
+### Active Step 0: City+Niche Pair Workflow
+
+The active app now implements the doc 22 market-selection loop:
+
+- `GET /api/scraper/pairs` — list scored city+niche pairs.
+- `POST /api/scraper/pairs` — score and upsert a pair from Maps density, weakness, contactability, competition, and revenue inputs.
+- `POST /api/scraper/pairs/:id/validate` — queue a 30-lead mini-validation scrape.
+- `POST /api/scraper/pairs/:id/decision` — apply go/no-go logic while preserving the first-three human review rule.
+- `POST /api/scraper/run` with `pairIds` — run lead generation for approved/scored pairs.
+
+The dashboard Scraper tab exposes the same flow: score pair → validate → decide → run.
 
 ---
 
@@ -285,10 +347,8 @@ Set up monitoring for:
 
 ## Known Gaps and Future Work
 
-- **Job handlers are stubs** — returning placeholder results. Must be replaced with real skill invocations once the AI skill layer is integrated.
-- **No email sending** — the Resend service exists but `pnpm dev` has never sent a real email.
-- **No real deployments** — the Cloudflare deploy service exists but has never pushed a real site.
-- **No AI skill integration** — the skill layer (outreach-sales, demo-builder, support) is documented in `docs/17-Agent-Platform-Decision.md` but not implemented in code.
-- **No authentication provider** — NextAuth route exists but is unconfigured. Payload's built-in auth works for the admin panel, but operator-facing auth needs configuration.
-- **No rate limiting** — webhook endpoints should have rate limiting in production.
-- **No CORS configuration** — API endpoints may need CORS headers depending on frontend architecture.
+- **External sends/deploys still require production credentials** — Resend and Cloudflare services exist, but production use is blocked until real keys, verified domains, and human approval workflows are configured.
+- **AI skill integration is not yet wired** — handlers now create deterministic drafts, records, scorecards, and QA metadata, but the documented AI skill layer still needs model-backed copywriting, website audit, demo content generation, and support classification.
+- **Google Maps source risk** — the current scraper is useful for validation but should be treated as a platform-risk dependency. Before scale, move to approved APIs, licensed providers, manual research, or another compliant lead source. See `docs/22-Niche-Hunting-SOP.md` section "Lead source compliance and scale path" for the approved replacement path and migration triggers.
+- **No operator auth UI** — internal APIs use an API key and the dashboard is local/operator-oriented. Production needs real operator authentication and tighter CORS/rate limits.
+- **No analytics integration** — monthly reports are recorded as drafts with placeholders until analytics and uptime data are connected.

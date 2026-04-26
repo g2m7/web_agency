@@ -104,6 +104,34 @@ Suggested prioritization:
 
 Start with one city+niche pair only. Build template depth, message sharpness, and proof inside that pair before expanding. Expansion should happen only after the business understands close rates, churn, support demands, and which feature bundle clients actually value.
 
+## First-wave priority niches from current market analysis
+
+The 2026 research pass points to the following as the best early candidates for validation:
+
+- Pool service
+- Tree service
+- Garage door repair
+- Landscaping
+- Selective pest control
+
+Why these rise to the top:
+
+- high enough lead value to support recurring pricing,
+- obvious service-area structure,
+- visibly weak websites in many markets,
+- contact information is usually published clearly,
+- niches map cleanly to repeatable templates.
+
+### First-wave de-priorities
+
+De-prioritize the obvious large categories for the first sprint:
+
+- HVAC
+- plumbing
+- roofing
+
+These are still valuable niches, but they tend to be more agency-saturated, more ad-saturated, and more franchise-heavy. They are better entered after message, delivery, and retention proof exists.
+
 ## Niche expansion rules
 
 Do not add a second city+niche pair until all of the following are true:

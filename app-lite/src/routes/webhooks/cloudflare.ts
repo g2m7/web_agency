@@ -19,8 +19,8 @@ cloudflareWebhook.post('/', async (c) => {
     const deployment = await db.findByID({ collection: 'deployments', id: deploymentId })
 
     const statusMap: Record<string, string> = {
-      success: 'live',
-      active: 'live',
+      success: 'deployed',
+      active: 'deployed',
       failure: 'failed',
     }
 
@@ -33,7 +33,7 @@ cloudflareWebhook.post('/', async (c) => {
       data: {
         status: newStatus,
         ...(previewUrl ? { preview_url: previewUrl } : {}),
-        ...(newStatus === 'live' ? { deployed_at: new Date().toISOString() } : {}),
+        ...(newStatus === 'deployed' ? { deployed_at: new Date().toISOString() } : {}),
       },
     })
 

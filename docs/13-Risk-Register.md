@@ -49,6 +49,10 @@ Make the hidden failure points visible before they become expensive. With an AI-
 - **Risk:** Prospects do not understand what is included.
 - **Mitigation:** Strict package definitions, consistent language in all agent emails.
 
+### 6b. Offer gets commoditized by AI builders
+- **Risk:** The business is perceived as interchangeable with Wix AI, Durable, Hostinger, or other low-cost builders, forcing price competition.
+- **Mitigation:** Sell niche-specific managed outcomes, not generic brochure sites. Lead with audit findings, local-service fit, conversion improvements, and ongoing management rather than page count alone.
+
 ## Sales Risks
 
 ### 7. Low reply rate on hook emails
@@ -77,6 +81,10 @@ Make the hidden failure points visible before they become expensive. With an AI-
 - **Risk:** Google Maps changes scraping rules, email provider rate-limits, AI provider raises prices or changes models.
 - **Mitigation:** Identify backup providers for each dependency, keep processes modular so swapping is possible.
 
+### 11b. Lead-source terms and data-use risk
+- **Risk:** Automated extraction from platforms such as Google Maps can violate provider terms or trigger blocking, even if technically possible.
+- **Mitigation:** Treat scraping as a validation-stage experiment only. Before scaling, prefer approved APIs, licensed lead data, manual research, or first-party/partner data sources. Keep source labels on every lead and preserve a fallback provider list.
+
 ## Payment Risks
 
 ### 12. Failed renewals
@@ -96,7 +104,7 @@ Make the hidden failure points visible before they become expensive. With an AI-
 ## Reputation Risks
 
 ### 16. Spam complaints from outreach
-- **Mitigation:** Personalized emails only, separate outreach domain, respect opt-outs immediately, monitor complaint rate.
+- **Mitigation:** Personalized emails only, separate outreach domain, authenticate DNS properly, respect opt-outs immediately, maintain a suppression list, include a valid postal address, and monitor complaint rate.
 
 ### 17. Delivering faster than quality allows
 - **Mitigation:** Human quality gate before every launch, launch checklist, controlled capacity during early validation.
@@ -118,4 +126,5 @@ Make the hidden failure points visible before they become expensive. With an AI-
 | P2 | AI cost scaling | Human | Monitor monthly |
 | P2 | Churn after month 1 | Agent (detection) + human (action) | Track and respond |
 | P2 | Platform dependency | Human | Identify backups now |
+| P2 | Lead-source terms and data-use risk | Human | Use validation limits; move to approved sources before scale |
 | P2 | Seasonal churn clustering | Human | Monitor by cohort; add to monthly review after 5+ clients |

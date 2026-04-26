@@ -197,6 +197,22 @@ After the sprint, decide:
 - **Pause**: reply rate 2–5%, no demo requests → park and revisit with a different hook angle.
 - **Drop**: reply rate < 2% or zero positive replies → move to next pair.
 
+## Current launch shortlist
+
+The current research-backed shortlist for first validation work is:
+
+1. `Phoenix, AZ + pool service`
+2. `Charlotte, NC + tree service`
+3. `Raleigh, NC + garage door repair`
+
+Second-wave candidates after those:
+
+- `Jacksonville, FL + tree service`
+- `Tampa, FL + pool service`
+- `Fort Worth, TX + tree service`
+
+Use these as starting points only. They do **not** bypass scoring, mini-validation, or the go/no-go thresholds below.
+
 ## Weekly cadence
 
 | Day | Activity |
@@ -236,6 +252,18 @@ Maintain a running scorecard at `data/niche-city-scorecard.csv` with one row per
 | notes | Free text |
 | evaluated_date | Date of last evaluation |
 
+## App workflow
+
+The active app (`app-lite/`) mirrors the scorecard workflow in the Scraper tab and API:
+
+- Score/upsert pair: `POST /api/scraper/pairs`
+- List pairs: `GET /api/scraper/pairs`
+- Mini-validation scrape: `POST /api/scraper/pairs/:id/validate`
+- Go/no-go decision: `POST /api/scraper/pairs/:id/decision`
+- Run lead generation by pair: `POST /api/scraper/run` with `pairIds`
+
+The first three go/no-go decisions should still be human-reviewed. After that, the system may apply the doc 22 thresholds automatically unless a human sets a stricter operating rule.
+
 ## Integration with existing workflows
 
 - This SOP feeds into `docs/04-Lead-Generation-SOP.md` — only approved pairs enter the lead generation pipeline.
@@ -249,3 +277,45 @@ Maintain a running scorecard at `data/niche-city-scorecard.csv` with one row per
 - Do not run more than 3 active outreach sprints simultaneously (focus beats breadth).
 - Do not re-evaluate a parked pair within 90 days unless market data materially changes.
 - Human reviews the first 3 go/no-go decisions before the agent operates autonomously on pair selection.
+
+## Lead source compliance and scale path
+
+### Current source: Google Maps scraping
+
+The active app uses a browser-mimicking Google Maps scraper (`app-lite/src/scraper/google-maps.ts`). This is acceptable for:
+
+- Validation-stage market research (scoring candidate pairs).
+- Mini-validation scrapes (30 leads per top pair).
+- Early outreach sprints (≤ 200 leads per pair).
+
+Google Maps scraping is a **platform-risk dependency**. It is not an approved source for sustained, high-volume lead generation. Rate limits, detection, and terms-of-service exposure make it unsuitable as the primary source beyond initial validation.
+
+### Approved replacement path for scale
+
+When the business moves from validation to sustained lead generation at scale, transition to one or more of the following compliant sources:
+
+1. **Google Places API (Official)** — Paid API with official terms. Provides structured business data including name, address, phone, website, and ratings. Cost is per-request but predictable and ToS-compliant. Best primary replacement for the current scraper.
+
+2. **Licensed data providers** — Services like Data Axel, Seamless.ai, Apollo.io, or BrightLocal provide business directories with contact enrichment under commercial licenses. Cost is subscription-based and scale-friendly.
+
+3. **Manual research (VA or operator)** — For high-value niches, a human researcher using public directories, association membership lists, and chamber-of-commerce databases produces the highest-quality leads with zero ToS risk.
+
+4. **Referral and inbound** — As the client base grows, referrals and inbound inquiries from live client sites become the lowest-cost, highest-conversion lead source. Track this in the pipeline KPIs.
+
+### Migration trigger
+
+Do not continue relying on the Google Maps scraper beyond:
+
+- 500+ leads scraped per month, or
+- 3+ consecutive outreach sprints on scraped data, or
+- any detection, blocking, or cease-and-desist signal.
+
+At that point, implement the Google Places API as the primary source and keep the scraper only for spot-check validation.
+
+### Blocker
+
+The migration path requires:
+
+- A Google Cloud account with billing enabled for Places API access.
+- Budget approval for API costs (approximately $17 per 1,000 requests at current pricing).
+- Engineering time to replace the scraper with an API-backed handler in `app-lite/src/jobs/handlers/`.

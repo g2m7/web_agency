@@ -55,6 +55,23 @@ export type EmailConfidence = (typeof EMAIL_CONFIDENCE)[number]
 export const EMAIL_STATUSES = ['pending', 'valid', 'risky', 'invalid'] as const
 export type EmailStatus = (typeof EMAIL_STATUSES)[number]
 
+export const NICHE_CITY_PAIR_STATUSES = [
+  'candidate',
+  'validated',
+  'approved',
+  'parked',
+  'dropped',
+] as const
+export type NicheCityPairStatus = (typeof NICHE_CITY_PAIR_STATUSES)[number]
+
+export interface NicheCityPairTarget {
+  id?: string
+  city: string
+  state: string
+  niche: string
+  maxResults?: number
+}
+
 export interface EnrichmentResult {
   email: string | null
   source: EmailSource | null
@@ -158,6 +175,11 @@ export interface SystemConfigValues {
   launch_approval_required: boolean
   active_niche: string
   active_cities: string[]
+  active_pairs: NicheCityPairTarget[]
+  scraper_proxies: Array<{ url: string; username?: string; password?: string }>
+  scraper_max_rpm: number
+  scraper_max_retries: number
+  scraper_delay_ms: [number, number]
   dodo_checkout_links: Record<PlanName, string>
   maintenance_mode: boolean
 }

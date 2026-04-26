@@ -1,9 +1,8 @@
 import { Hono } from 'hono'
 import { getDb } from '../../db'
 import { isAlreadyProcessed } from '../../services/idempotency'
-import { transitionLead } from '../../state-machine/orchestrator'
 import { transitionClient } from '../../state-machine/orchestrator'
-import type { LeadStatus, ClientStatus } from '../../types'
+import type { ClientStatus } from '../../types'
 import crypto from 'crypto'
 
 export const dodoWebhook = new Hono()
@@ -82,6 +81,31 @@ dodoWebhook.post('/', async (c) => {
       }
     } catch (err) {
       console.error('Dodo webhook payment failure handling error:', err)
+    }
+  }
+
+  // Handle cancellation
+  if (eventType === 'subscription.canceled' || eventType === 'subscription.cancelled') {
+    try {
+      const client = await db.findByID({ collection: 'clients', id: clientId })
+      if (client.status === 'active' || client.status === 'suspended') {
+        await transitionClient(db, clientId, client.status as ClientStatus, 'cancelled', {
+          triggeredBy: 'webhook:dodo',
+          skipPolicy: true,
+        })
+      } else {
+        await db.update({
+          collection: 'clients',
+          id: clientId,
+          data: {
+            status: 'cancelled',
+            cancelled_at: new Date().toISOString(),
+            cancellation_reason: body.data?.customer_cancellation_reason ?? body.cancellation_reason ?? 'payment_provider_cancellation',
+          },
+        })
+      }
+    } catch (err) {
+      console.error('Dodo webhook cancellation handling error:', err)
     }
   }
 

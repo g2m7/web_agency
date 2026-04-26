@@ -61,13 +61,22 @@ Locked-in prices for go-to-market. Ranges are preserved for future adjustment; t
 
 Price should be tested against niche quality, close rate, and churn. If a niche is highly commercial and lead value is high, price can rise within the allowable range or the range itself can be expanded with a docs update.
 
+Current recommendation from the 2026 market analysis:
+
+- Stay at the **top of the current range** during validation unless conversion data proves the market is more price-sensitive than expected.
+- Do **not** cut prices to compete with DIY builders or AI website builders. That is the wrong battlefield.
+
 ## Setup fee logic
 
 Default recommendation:
 
-- No setup fee for the earliest clients if the goal is proof of model.
+- Waive the setup / launch fee only for the earliest `<= 3` pilot clients if the goal is proof of model.
 - Introduce a setup fee only after the process is tight and case studies exist.
 - Use setup fees primarily to protect time when customization rises.
+
+Operational rule:
+
+- After the first pilot batch, the launch fee should be treated as standard, not optional. The business is already priced below managed-service market rates; permanently waiving the fee weakens unit economics for little strategic benefit.
 
 ## Scope boundaries
 

@@ -18,6 +18,10 @@ Primary sources:
 - Review platforms when relevant
 - Business social profiles if website is missing
 
+### Source compliance rule
+
+Use scraping only for controlled validation batches. Before scaling a source, confirm that the acquisition method is permitted by the source's terms or replace it with an approved API, licensed provider, manual research, or first-party/partner data. Every lead must keep its `source` label so risky sources can be isolated or purged later.
+
 ## Lead data fields
 
 Every lead record should capture:
@@ -41,7 +45,7 @@ Every lead record should capture:
 
 ## Prospecting process
 
-1. Pick one niche and one city.
+1. Pick one approved city+niche pair from the scorecard.
 2. Agent searches listings via Google Maps scraping or approved automation.
 3. Agent opens each listing and site.
 4. Agent applies the audit rubric and scores automatically.

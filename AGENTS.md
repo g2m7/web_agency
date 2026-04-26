@@ -7,12 +7,43 @@
 - Maintain `handoff.md` in the repo root. Read it at the start of every prompt execution before doing anything else.
 - Every session must end by updating `handoff.md` with: what was done, what's in progress, what's blocked, and where the next agent should pick up.
 
+## Planning lane rule
+- This repo now uses restart-safe execution lanes under `plans/`.
+- Start every new work session with `.agents/workflows/open-track.md`.
+- Default session entry command: `/open-track`
+- Default session close command: `/close`
+- Allowed track slugs: `foundation`, `outreach-demo`, `client-ops`
+- If the user names a track, open that track. Otherwise use the single `ACTIVE` track from `plans/MASTER_CHECKLIST.md`.
+- Track files are execution control, not business authority. If a lane file conflicts with `docs/`, fix the lane file.
+
+## Phase entry planning rule
+- When a phase becomes active for the first time after the previous phase closes, do not start implementation immediately.
+- First run `.agents/workflows/refresh-active-phase.md`.
+- That workflow must refresh the active phase against current docs, current code, current blockers, and the latest user request.
+- Every active phase file must contain a `Stage Entry Planning` checklist. Once that checklist is completed and ticked for that phase, do not repeat it unless scope changes materially.
+- If scope changes materially mid-phase, reopen the planning step in that phase file, refresh the phase, and record the change in the handoff or decision log.
+
+## Test gate rule
+- Do not proceed with new work on a track until the required tests for the current or previously touched phase are green, or explicitly logged as blockers in that track's `HANDOFF.md`.
+- Default verification for this repo is:
+  - `cd app-lite && bun run typecheck`
+  - `cd app-lite && bun run test`
+- If a phase file names additional targeted tests, those are mandatory closure criteria.
+- Never close a phase while required tests are failing, unknown, or skipped without being written into the handoff.
+- End every session with `/close` so both the active track handoff and root `handoff.md` are updated for the next session.
+
+## Manual validation gate rule
+- Every phase file must contain a `Manual Verification` checklist with user-specific and feature-specific checks for that phase.
+- These manual checks must be written as tickable items in the phase file itself.
+- A phase cannot move to the next phase until all `Manual Verification` items are checked or explicitly logged as blockers in the handoff.
+- Record manual verification results in both the active track handoff and root `handoff.md`.
+
 ## What this repo is
 - AI-agent-operated web agency: business documentation in `docs/` + application layer in `app-lite/`.
 - `docs/` — SOPs, pricing, templates, risk register, KPIs, architecture spec (`docs/19-Application-Architecture.md`).
 - `app/` — **Legacy**. Next.js 16 + Payload CMS 3.83 + PostgreSQL. Retained for reference only; do not edit.
 - `app-lite/` — **Active codebase**. Bun + Hono + Drizzle ORM + SQLite. Zero external CMS dependency. Same architecture, lighter stack.
-- Application status: `app-lite` has type-safe code, real lead_gen handler with Google Maps scraper, 9 stub handlers remaining.
+- Application status: `app-lite` has type-safe code, city+niche pair scoring/validation, real lead_gen/email enrichment/email validation, and deterministic draft/QA handlers. Production email sends and Cloudflare deploys still require credentials and human gates.
 
 ## Tooling commands (run inside `app-lite/`)
 - `bun install` — install dependencies
@@ -26,6 +57,7 @@
 ## Canonical sources (read first)
 - `handoff.md` — current state, in-progress work, blockers. Read first.
 - `docs/README.md` for document map and intended read order.
+- `plans/README.md` and `plans/MASTER_CHECKLIST.md` for active execution tracks and phase order.
 - `docs/19-Application-Architecture.md` for the build spec — database schema, state machine, policy engine, API endpoints.
 - `docs/06-Outreach-Sales-SOP.md`, `docs/08-Delivery-Operations-SOP.md`, `docs/10-Payments-Billing-SOP.md`, `docs/14-Implementation-Roadmap.md`, `docs/15-Templates.md` for operational rules most likely to be broken by edits.
 

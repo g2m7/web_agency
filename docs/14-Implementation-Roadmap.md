@@ -9,6 +9,14 @@
 - Finalize hook email templates (2-step motion)
 - Define agent guardrails and approval gates
 
+Default launch shortlist from the 2026 market analysis:
+
+- `Phoenix, AZ + pool service`
+- `Charlotte, NC + tree service`
+- `Raleigh, NC + garage door repair`
+
+These are starting hypotheses, not automatic approvals. Each pair still needs to pass the mini-validation and go/no-go thresholds in `docs/22-Niche-Hunting-SOP.md`.
+
 ## Phase 2: Agent foundation
 
 - Set up Dodo Payments with subscription checkout links

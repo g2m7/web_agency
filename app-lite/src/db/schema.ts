@@ -19,6 +19,7 @@ export const operators = sqliteTable('operators', {
 
 export const leads = sqliteTable('leads', {
   id: text('id').primaryKey(),
+  pairId: text('pair_id'),
   businessName: text('business_name').notNull(),
   niche: text('niche').notNull(),
   city: text('city').notNull(),
@@ -40,6 +41,39 @@ export const leads = sqliteTable('leads', {
   emailStatus: text('email_status').default('pending'),
   enrichedAt: text('enriched_at'),
   enrichmentError: text('enrichment_error'),
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+  updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
+})
+
+// ─── Niche + City Pairs ─────────────────────────────────────
+
+export const nicheCityPairs = sqliteTable('niche_city_pairs', {
+  id: text('id').primaryKey(),
+  uniqueKey: text('unique_key').notNull().unique(),
+  city: text('city').notNull(),
+  state: text('state').notNull(),
+  niche: text('niche').notNull(),
+  mapsCount: integer('maps_count').default(0),
+  reviewVelocity: integer('review_velocity').default(0),
+  adCount: integer('ad_count').default(0),
+  agencyPages: integer('agency_pages').default(0),
+  weakSitePct: integer('weak_site_pct').default(0),
+  contactablePct: integer('contactable_pct').default(0),
+  economicSignal: text('economic_signal').default('flat'),
+  demandScore: integer('demand_score').default(0),
+  competitionScore: integer('competition_score').default(0),
+  weaknessScore: integer('weakness_score').default(0),
+  contactScore: integer('contact_score').default(0),
+  revenueScore: integer('revenue_score').default(0),
+  totalScore: integer('total_score').default(0),
+  status: text('status').default('candidate').notNull(),
+  sprintStart: text('sprint_start'),
+  sprintReplyRate: integer('sprint_reply_rate'),
+  sprintResult: text('sprint_result'),
+  notes: text('notes'),
+  evaluatedDate: text('evaluated_date'),
+  validationData: text('validation_data', { mode: 'json' }),
+  lastScrapeJobId: text('last_scrape_job_id'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 })
@@ -117,6 +151,7 @@ export const clientInteractions = sqliteTable('client_interactions', {
 export const deployments = sqliteTable('deployments', {
   id: text('id').primaryKey(),
   clientId: text('client_id').notNull(),
+  leadId: text('lead_id'),
   type: text('type').notNull(),
   status: text('status').notNull(),
   templateVersion: text('template_version'),
@@ -228,6 +263,11 @@ export const systemConfig = sqliteTable('system_config', {
   launchApprovalRequired: integer('launch_approval_required', { mode: 'boolean' }).default(true).notNull(),
   activeNiche: text('active_niche').default('hvac').notNull(),
   activeCities: text('active_cities', { mode: 'json' }).default('["Austin, TX"]').notNull(),
+  activePairs: text('active_pairs', { mode: 'json' }).default('[]').notNull(),
+  scraperProxies: text('scraper_proxies', { mode: 'json' }).default('[]').notNull(),
+  scraperMaxRpm: integer('scraper_max_rpm').default(8).notNull(),
+  scraperMaxRetries: integer('scraper_max_retries').default(3).notNull(),
+  scraperDelayMs: text('scraper_delay_ms', { mode: 'json' }).default('[5000,12000]').notNull(),
   dodoCheckoutLinks: text('dodo_checkout_links', { mode: 'json' }).default('{}'),
   maintenanceMode: integer('maintenance_mode', { mode: 'boolean' }).default(false),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),

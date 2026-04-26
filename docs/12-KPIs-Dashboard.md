@@ -41,6 +41,8 @@ Track per approved city+niche pair (from `docs/22-Niche-Hunting-SOP.md`):
 - Clients closed
 - Sprint outcome (continue / pause / drop)
 
+In `app-lite/`, the Scraper tab is the operational home for this scorecard: pair score, validation status, mini-validation job, and approved-pair lead generation are managed from the same screen.
+
 Aggregate across pairs to identify:
 
 - Best-performing city (highest reply rate, most closes)
@@ -112,9 +114,14 @@ The business should reach internal confidence when:
 - The agent's prospecting list consistently produces obviously weak sites
 - Agent-written hook emails are getting real replies (target: >5% reply rate)
 - Agent-built demos are converting interested prospects (target: >30% demo-to-close)
+- Early lead-to-paid conversion from validated outbound leads reaches roughly 0.2%–0.5%
 - Launches are happening without chaos (target: <30 min human review per launch)
 - Clients remain after the first renewal cycle
 - Agent error rate is below 5% on customer-facing interactions
+
+Interpretation rule:
+
+- If the business contacts ~1,000 validated leads and lands fewer than 2 paid clients, treat that as a targeting, messaging, or deliverability problem first rather than a reason to lower prices immediately.
 
 ## Weekly review questions
 

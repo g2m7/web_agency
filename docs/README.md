@@ -53,9 +53,10 @@ This pack captures the full operating system for an AI-agent-operated website-re
 12. `21` is the deployment guide — VPS setup, DNS, Nginx, SSL, first deploy, multi-domain config, backups. Read when the app is bootable locally and ready for production.
 13. `22` is the niche hunting SOP — read before starting any lead generation to ensure you're targeting scored, approved city+niche pairs.
 
-## System boundary: Payload vs CRM
+## System boundary: app-lite vs CRM
 
-- Payload CMS (in `app/`) is the internal operations system of record: workflow execution, policy checks, state transitions, webhooks, jobs, and audit trail.
+- `app-lite/` is the active internal operations system of record: workflow execution, policy checks, state transitions, webhooks, jobs, scraper operations, scorecards, and audit trail.
+- `app/` is legacy Payload/Next.js reference material only. Do not edit it for active implementation work unless a migration back to Payload is explicitly chosen.
 - A CRM, if added later, should be treated as sales engagement UI (pipeline management, rep workflows), not as the operational source of truth.
 - If both are used, sync key lifecycle events only (for example: lead qualified, demo sent, paid, onboarded, cancelled) to avoid data drift.
 

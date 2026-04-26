@@ -35,7 +35,7 @@ vi.mock('../../../src/scraper/email-enricher', () => ({
 }))
 
 import { scrapeMultipleCities } from '../../../src/scraper/google-maps'
-const mockedScrapeMultiple = vi.mocked(scrapeMultipleCities)
+let mockedScrapeMultiple = vi.mocked(scrapeMultipleCities)
 
 const MOCK_BUSINESSES: ScrapedBusiness[] = [
   {
@@ -95,6 +95,7 @@ function singleCityResult(city: string, state: string, businesses: ScrapedBusine
 describe('handleLeadGen', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockedScrapeMultiple = vi.mocked(scrapeMultipleCities)
   })
 
   it('reads SystemConfig for niche and cities', async () => {
@@ -173,6 +174,31 @@ describe('handleLeadGen', () => {
 
     expect(mockedScrapeMultiple).toHaveBeenCalledTimes(1)
     expect(result.leads_created).toBe(2)
+  })
+
+  it('uses explicit city+niche pair targets when supplied', async () => {
+    const db = mockDb()
+    mockedScrapeMultiple.mockResolvedValueOnce(singleCityResult('Tampa', 'FL', [MOCK_BUSINESSES[0]!]))
+
+    const result = await handleLeadGen(db, mockJob({
+      pairs: [{ id: 'pair-1', niche: 'pool services', city: 'Tampa', state: 'FL' }],
+    }))
+
+    expect(mockedScrapeMultiple).toHaveBeenCalledWith(
+      'pool services',
+      [expect.objectContaining({ city: 'Tampa', state: 'FL' })],
+      expect.any(Object),
+    )
+    expect(result.leads_created).toBe(1)
+    expect(db.create).toHaveBeenCalledWith({
+      collection: 'leads',
+      data: expect.objectContaining({
+        pair_id: 'pair-1',
+        niche: 'pool services',
+        city: 'Tampa',
+        state: 'FL',
+      }),
+    })
   })
 
   it('handles unique constraint violation as skip', async () => {

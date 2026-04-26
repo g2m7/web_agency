@@ -17,6 +17,7 @@ import { cloudflareWebhook } from './routes/webhooks/cloudflare'
 import { initializeDatabase } from './db/migrate'
 
 const app = new Hono()
+let server: ReturnType<typeof Bun.serve> | null = null
 
 // ── Middleware ───────────────────────────────────────────────
 app.use('*', logger())
@@ -66,8 +67,22 @@ async function main() {
 
   // Start job workers
   const db = getDb()
-  await startRecurringJobs(db)
-  await startWorkers(db)
+  if (process.env.ENABLE_RECURRING_JOBS === 'true') {
+    await startRecurringJobs(db)
+  } else {
+    console.log('Recurring jobs disabled (set ENABLE_RECURRING_JOBS=true to enable)')
+  }
+
+  if (process.env.ENABLE_WORKERS === 'false') {
+    console.log('Job workers disabled (ENABLE_WORKERS=false)')
+  } else {
+    await startWorkers(db)
+  }
+
+  server = Bun.serve({
+    port,
+    fetch: app.fetch,
+  })
 
   console.log(`Server running on http://localhost:${port}`)
 }
@@ -81,17 +96,16 @@ main().catch((err) => {
 process.on('SIGINT', async () => {
   console.log('\nShutting down...')
   await stopWorkers()
+  server?.stop()
   disconnectDb()
   process.exit(0)
 })
 
 process.on('SIGTERM', async () => {
   await stopWorkers()
+  server?.stop()
   disconnectDb()
   process.exit(0)
 })
 
-export default {
-  port,
-  fetch: app.fetch,
-}
+export { app }

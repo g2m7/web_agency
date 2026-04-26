@@ -280,6 +280,74 @@
     .badge-invalid   { background: rgba(225,112,85,0.15); color: var(--red); }
     .badge-pending   { background: rgba(116,185,255,0.15); color: var(--blue); }
 
+    .badge-candidate  { background: rgba(116,185,255,0.15); color: var(--blue); }
+    .badge-validated  { background: rgba(243,156,18,0.15); color: var(--orange); }
+    .badge-approved   { background: rgba(0,184,148,0.15); color: var(--green); }
+    .badge-parked     { background: rgba(253,203,110,0.15); color: var(--yellow); }
+    .badge-dropped    { background: rgba(225,112,85,0.15); color: var(--red); }
+
+    .threshold-tag {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      font-family: var(--mono);
+      white-space: nowrap;
+      margin: 1px;
+    }
+    .threshold-tag-fail { background: rgba(225,112,85,0.2); color: var(--red); }
+    .threshold-tag-pass { background: rgba(0,184,148,0.15); color: var(--green); }
+
+    .review-flag { font-size: 10px; font-weight: 600; font-family: var(--mono); }
+    .review-flag-required { color: var(--yellow); }
+    .review-flag-done { color: var(--green); }
+
+    .sub-scores {
+      display: flex;
+      gap: 2px;
+      font-size: 9px;
+      font-family: var(--mono);
+      margin-top: 2px;
+    }
+    .sub-scores span {
+      padding: 1px 3px;
+      border-radius: 2px;
+      background: var(--surface-2);
+    }
+
+    .validation-compare {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-top: 6px;
+      font-size: 11px;
+    }
+    .validation-compare table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .validation-compare th {
+      text-align: left;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      padding: 2px 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .validation-compare td {
+      padding: 3px 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .delta-positive { color: var(--green); }
+    .delta-negative { color: var(--red); }
+    .delta-neutral { color: var(--text-dim); }
+
     /* Priority dot indicators */
     .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
     .priority-dot-hot { background: var(--red); box-shadow: 0 0 4px var(--red); }
@@ -648,10 +716,63 @@
         </div>
       </div>
 
+      <!-- City + Niche Pair Scorecard -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>City + Niche Scorecard</h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn" onclick="refreshPairScorecard()" style="font-size:11px;padding:5px 12px">Refresh</button>
+            <button class="btn btn-accent" onclick="savePairScore()" id="btn-pair-save" style="font-size:11px;padding:5px 12px">Score Pair</button>
+          </div>
+        </div>
+        <div class="scraper-config-form">
+          <div class="form-group">
+            <label>Niche</label>
+            <input id="pair-niche" type="text" placeholder="pool services">
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input id="pair-city" type="text" placeholder="Tampa, FL">
+          </div>
+          <div class="form-group">
+            <label>Maps Count</label>
+            <input id="pair-maps" type="number" min="0" placeholder="50">
+          </div>
+          <div class="form-group">
+            <label>Weak Site %</label>
+            <input id="pair-weak" type="number" min="0" max="100" placeholder="65">
+          </div>
+          <div class="form-group">
+            <label>Contactable %</label>
+            <input id="pair-contact" type="number" min="0" max="100" placeholder="70">
+          </div>
+          <div class="form-group">
+            <label>Ads</label>
+            <input id="pair-ads" type="number" min="0" placeholder="1">
+          </div>
+          <div class="form-group">
+            <label>Agency Pages</label>
+            <input id="pair-agencies" type="number" min="0" placeholder="1">
+          </div>
+          <div class="form-group">
+            <label>Economic Signal</label>
+            <select id="pair-economic">
+              <option value="growth">growth</option>
+              <option value="flat">flat</option>
+              <option value="shrinking">shrinking</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body" id="pair-scorecard-list" style="max-height:360px"></div>
+      </div>
+
       <!-- Run Scraper + Enrich + Validate -->
       <div class="action-bar">
         <button class="btn btn-accent" onclick="runScraper()" id="btn-run-scraper">
           <span class="spinner"></span> Run Scraper Now
+        </button>
+        <button class="btn" onclick="runApprovedPairs()" id="btn-run-pairs">
+          <span class="spinner"></span> Run Approved Pairs
         </button>
         <button class="btn" onclick="runEnrich()" id="btn-enrich" style="border-color:var(--green)">
           <span class="spinner"></span> 📧 Enrich Emails
@@ -726,6 +847,10 @@
             <option value="">Any</option>
             <option value="true">Has phone</option>
             <option value="false">No phone</option>
+          </select>
+          <label>Pair</label>
+          <select id="sf-pair" onchange="refreshScraperResults()">
+            <option value="">Any</option>
           </select>
           <button class="btn" onclick="clearScraperFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">✕ Clear</button>
         </div>
@@ -1064,6 +1189,201 @@
       }
     }
 
+    function deltaClass(d) {
+      if (d > 0) return 'delta-positive';
+      if (d < 0) return 'delta-negative';
+      return 'delta-neutral';
+    }
+    function deltaFmt(d) {
+      if (d > 0) return '+' + d;
+      return String(d);
+    }
+
+    async function refreshPairScorecard() {
+      try {
+        const res = await axios.get(API + '/api/scraper/pairs?limit=100', { headers });
+        const pairs = res.data.docs || [];
+        const list = document.getElementById('pair-scorecard-list');
+
+        if (pairs.length === 0) {
+          list.innerHTML = '<div class="empty">No city+niche pairs scored yet</div>';
+          return;
+        }
+
+        list.innerHTML = `<table class="results-table">
+          <thead>
+            <tr>
+              <th>Pair</th>
+              <th>Score</th>
+              <th>Thresholds</th>
+              <th>Status</th>
+              <th>Validation</th>
+              <th>Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pairs.map(p => {
+              const id = p.id;
+              const score = p.totalScore ?? p.total_score ?? 0;
+              const demand = p.demandScore ?? p.demand_score ?? 0;
+              const competition = p.competitionScore ?? p.competition_score ?? 0;
+              const weakness = p.weaknessScore ?? p.weakness_score ?? 0;
+              const contact = p.contactScore ?? p.contact_score ?? 0;
+              const revenue = p.revenueScore ?? p.revenue_score ?? 0;
+              const updated = p.updatedAt || p.updated_at;
+              const location = `${p.city || ''}${p.state ? ', ' + p.state : ''}`;
+              const vd = p.validationData ?? p.validation_data ?? {};
+              const reasons = vd.threshold_reasons ?? vd.thresholdReasons ?? [];
+              const recommended = vd.recommended_status ?? vd.recommendedStatus ?? '';
+              const humanRequired = vd.human_review_required ?? vd.humanReviewRequired ?? false;
+              const queuedAt = vd.queued_at ?? vd.queuedAt;
+              const decidedAt = vd.decided_at ?? vd.decidedAt;
+              const decidedBy = vd.decided_by ?? vd.decidedBy ?? '';
+              const reasonsHtml = reasons.length === 0
+                ? '<span class="threshold-tag threshold-tag-pass">all pass</span>'
+                : reasons.map(r => '<span class="threshold-tag threshold-tag-fail">' + r.replace(/_/g, ' ') + '</span>').join('');
+              const reviewHtml = humanRequired
+                ? '<span class="review-flag review-flag-required">&#9888; Review needed</span>'
+                : decidedAt
+                  ? '<span class="review-flag review-flag-done">&#10003; ' + decidedBy + '</span>'
+                  : '';
+              const validationHtml = queuedAt
+                ? '<span class="mono" style="font-size:10px">Queued ' + ago(queuedAt) + '</span>'
+                : '<span style="color:var(--text-dim);font-size:10px">Not run</span>';
+              const validatedAt = vd.validated_at ?? vd.validatedAt;
+              const eMaps = vd.estimated_maps_count ?? vd.estimatedMapsCount;
+              const eContact = vd.estimated_contactable_pct ?? vd.estimatedContactablePct;
+              const eWeak = vd.estimated_weak_site_pct ?? vd.estimatedWeakSitePct;
+              const eScore = vd.estimated_total_score ?? vd.estimatedTotalScore;
+              const vMaps = vd.validated_maps_count ?? vd.validatedMapsCount;
+              const vContact = vd.validated_contactable_pct ?? vd.validatedContactablePct;
+              const vWeak = vd.validated_weak_site_pct ?? vd.validatedWeakSitePct;
+              const vScore = score;
+              const hasComparison = validatedAt && eMaps !== undefined;
+              const compareHtml = hasComparison
+                ? '<div class="validation-compare">' +
+                    '<table>' +
+                      '<tr><th>Metric</th><th>Est.</th><th>Real</th><th>Delta</th></tr>' +
+                      '<tr><td>Maps</td><td>' + eMaps + '</td><td>' + vMaps + '</td><td class="' + deltaClass(vMaps - eMaps) + '">' + deltaFmt(vMaps - eMaps) + '</td></tr>' +
+                      '<tr><td>Contact %</td><td>' + eContact + '%</td><td>' + vContact + '%</td><td class="' + deltaClass(vContact - eContact) + '">' + deltaFmt(vContact - eContact) + '%</td></tr>' +
+                      '<tr><td>Weak %</td><td>' + eWeak + '%</td><td>' + vWeak + '%</td><td class="' + deltaClass(vWeak - eWeak) + '">' + deltaFmt(vWeak - eWeak) + '%</td></tr>' +
+                      '<tr><td>Score</td><td>' + eScore + '</td><td>' + vScore + '</td><td class="' + deltaClass(vScore - eScore) + '">' + deltaFmt(vScore - eScore) + '</td></tr>' +
+                    '</table>' +
+                    '<div style="margin-top:4px;font-size:9px;color:var(--text-dim)">Validated ' + ago(validatedAt) + '</div>' +
+                  '</div>'
+                : validationHtml;
+              const recommendedHtml = recommended && recommended !== (p.status || 'candidate')
+                ? '<br><span style="font-size:9px;color:var(--text-dim)">Rec: ' + recommended + '</span>'
+                : '';
+              return '<tr>' +
+                '<td><span class="name">' + (p.niche || '') + '</span><br><span class="meta">' + location + '</span></td>' +
+                '<td>' +
+                  '<span class="mono" style="font-size:14px;color:' + (score >= 70 ? 'var(--green)' : 'var(--yellow)') + '">' + score + '</span>' +
+                  '<div class="sub-scores">' +
+                    '<span title="Demand">D:' + demand + '</span>' +
+                    '<span title="Competition">C:' + competition + '</span>' +
+                    '<span title="Weakness">W:' + weakness + '</span>' +
+                    '<span title="Contact">Co:' + contact + '</span>' +
+                    '<span title="Revenue">R:' + revenue + '</span>' +
+                  '</div>' +
+                '</td>' +
+                '<td>' + reasonsHtml + '</td>' +
+                '<td>' + badge(p.status || 'candidate') + recommendedHtml + '<br>' + reviewHtml + '</td>' +
+                '<td>' + (hasComparison ? compareHtml : validationHtml) + '</td>' +
+                '<td class="mono" style="font-size:10px">' + ago(updated) + '</td>' +
+                '<td style="white-space:nowrap">' +
+                  '<button class="btn" onclick="validatePair(\'' + id + '\')" style="font-size:10px;padding:4px 8px">Validate</button>' +
+                  '<button class="btn" onclick="decidePair(\'' + id + '\')" style="font-size:10px;padding:4px 8px">Decide</button>' +
+                  '<button class="btn" onclick="runPair(\'' + id + '\')" style="font-size:10px;padding:4px 8px">Run</button>' +
+                '</td>' +
+              '</tr>';
+            }).join('')}
+          </tbody>
+        </table>`;
+      } catch (err) {
+        console.error('Pair scorecard error:', err);
+      }
+    }
+
+    async function savePairScore() {
+      const btn = document.getElementById('btn-pair-save');
+      btn.classList.add('loading');
+      try {
+        const payload = {
+          niche: document.getElementById('pair-niche').value.trim(),
+          city: document.getElementById('pair-city').value.trim(),
+          mapsCount: parseInt(document.getElementById('pair-maps').value) || 0,
+          weakSitePct: parseInt(document.getElementById('pair-weak').value) || 0,
+          contactablePct: parseInt(document.getElementById('pair-contact').value) || 0,
+          adCount: parseInt(document.getElementById('pair-ads').value) || 0,
+          agencyPages: parseInt(document.getElementById('pair-agencies').value) || 0,
+          economicSignal: document.getElementById('pair-economic').value,
+        };
+        if (!payload.niche || !payload.city) {
+          showToast('Niche and city are required', 'error');
+          return;
+        }
+        await axios.post(API + '/api/scraper/pairs', payload, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('Pair scored', 'success');
+        await refreshPairScorecard();
+      } catch (err) {
+        showToast(`Pair score failed: ${err.response?.data?.error || err.message}`, 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function validatePair(id) {
+      try {
+        await axios.post(API + `/api/scraper/pairs/${id}/validate`, {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('Mini-validation queued', 'success');
+        setTimeout(refreshScraperView, 2000);
+      } catch (err) {
+        showToast(`Validation failed: ${err.response?.data?.error || err.message}`, 'error');
+      }
+    }
+
+    async function decidePair(id) {
+      try {
+        const res = await axios.post(API + `/api/scraper/pairs/${id}/decision`, { humanApproved: true, decidedBy: 'operator' }, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast(`Pair ${res.data.status}`, 'success');
+        await refreshPairScorecard();
+      } catch (err) {
+        showToast(`Decision failed: ${err.response?.data?.error || err.message}`, 'error');
+      }
+    }
+
+    async function runPair(id) {
+      try {
+        await axios.post(API + '/api/scraper/run', { pairIds: [id] }, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('Pair scraper queued', 'success');
+        setTimeout(refreshScraperView, 2000);
+      } catch (err) {
+        showToast(`Run failed: ${err.response?.data?.error || err.message}`, 'error');
+      }
+    }
+
+    async function runApprovedPairs() {
+      const btn = document.getElementById('btn-run-pairs');
+      btn.classList.add('loading');
+      try {
+        const res = await axios.get(API + '/api/scraper/pairs?status=approved&limit=100', { headers });
+        const pairIds = (res.data.docs || []).map(p => p.id);
+        if (pairIds.length === 0) {
+          showToast('No approved pairs to run', 'error');
+          return;
+        }
+        await axios.post(API + '/api/scraper/run', { pairIds }, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast(`Queued ${pairIds.length} approved pair(s)`, 'success');
+        setTimeout(refreshScraperView, 2000);
+      } catch (err) {
+        showToast(`Run failed: ${err.response?.data?.error || err.message}`, 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
     async function runScraper() {
       const btn = document.getElementById('btn-run-scraper');
       btn.classList.add('loading');
@@ -1120,9 +1440,11 @@
 
     async function refreshScraperView() {
       const tasks = [
+        refreshPairScorecard(),
         refreshScraperResults(),
         refreshScraperJobs(),
         refreshScraperStats(),
+        loadPairFilter(),
       ];
       // Only reload config form if the user hasn't made unsaved edits
       if (!configDirty) tasks.push(loadScraperConfig());
@@ -1185,6 +1507,11 @@
             <span class="value" style="font-size:14px">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
           </div>
           <div class="stat-card">
+            <span class="label">Approved Pairs</span>
+            <span class="value" style="color:var(--green)">${es.approvedPairs ?? 0}</span>
+            <span class="sub">${es.validatedPairs ?? 0} awaiting decision</span>
+          </div>
+          <div class="stat-card">
             <span class="label">Running / Queued</span>
             <span class="value" style="color:var(--yellow)">${running.length}</span>
             <span class="sub">${completed.length} runs, ${failed.length} failed</span>
@@ -1206,6 +1533,7 @@
       const contactMode = document.getElementById('sf-contact-mode').value;
       const emailStatus = document.getElementById('sf-email-status').value;
       const priorityTier = document.getElementById('sf-priority').value;
+      const pairId = document.getElementById('sf-pair').value;
       if (status) params.set('status', status);
       if (city) params.set('city', city);
       if (search) params.set('search', search);
@@ -1215,6 +1543,7 @@
       if (contactMode) params.set('contactMode', contactMode);
       if (emailStatus) params.set('emailStatus', emailStatus);
       if (priorityTier) params.set('priorityTier', priorityTier);
+      if (pairId) params.set('pairId', pairId);
       params.set('limit', '200');
 
       try {
@@ -1312,7 +1641,25 @@
       document.getElementById('sf-contact-mode').value = '';
       document.getElementById('sf-email-status').value = '';
       document.getElementById('sf-priority').value = '';
+      document.getElementById('sf-pair').value = '';
       refreshScraperResults();
+    }
+
+    async function loadPairFilter() {
+      try {
+        const res = await axios.get(API + '/api/scraper/pairs?limit=100', { headers });
+        const pairs = res.data.docs || [];
+        const select = document.getElementById('sf-pair');
+        const current = select.value;
+        const opts = ['<option value="">Any pair</option>'];
+        pairs.forEach(p => {
+          const label = (p.niche || '') + ' — ' + (p.city || '') + (p.state ? ', ' + p.state : '');
+          opts.push('<option value="' + p.id + '"' + (p.id === current ? ' selected' : '') + '>' + label + '</option>');
+        });
+        select.innerHTML = opts.join('');
+      } catch (err) {
+        console.error('Pair filter load error:', err);
+      }
     }
 
     async function refreshScraperJobs() {

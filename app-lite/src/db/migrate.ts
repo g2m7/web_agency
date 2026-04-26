@@ -31,6 +31,7 @@ export async function initializeDatabase() {
 
     CREATE TABLE IF NOT EXISTS leads (
       id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+      pair_id TEXT,
       business_name TEXT NOT NULL,
       niche TEXT NOT NULL,
       city TEXT NOT NULL,
@@ -52,6 +53,37 @@ export async function initializeDatabase() {
       email_status TEXT DEFAULT 'pending',
       enriched_at TEXT,
       enrichment_error TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS niche_city_pairs (
+      id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+      unique_key TEXT NOT NULL UNIQUE,
+      city TEXT NOT NULL,
+      state TEXT NOT NULL,
+      niche TEXT NOT NULL,
+      maps_count INTEGER DEFAULT 0,
+      review_velocity INTEGER DEFAULT 0,
+      ad_count INTEGER DEFAULT 0,
+      agency_pages INTEGER DEFAULT 0,
+      weak_site_pct INTEGER DEFAULT 0,
+      contactable_pct INTEGER DEFAULT 0,
+      economic_signal TEXT DEFAULT 'flat',
+      demand_score INTEGER DEFAULT 0,
+      competition_score INTEGER DEFAULT 0,
+      weakness_score INTEGER DEFAULT 0,
+      contact_score INTEGER DEFAULT 0,
+      revenue_score INTEGER DEFAULT 0,
+      total_score INTEGER DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'candidate',
+      sprint_start TEXT,
+      sprint_reply_rate INTEGER,
+      sprint_result TEXT,
+      notes TEXT,
+      evaluated_date TEXT,
+      validation_data TEXT,
+      last_scrape_job_id TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -121,6 +153,7 @@ export async function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS deployments (
       id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
       client_id TEXT NOT NULL,
+      lead_id TEXT,
       type TEXT NOT NULL,
       status TEXT NOT NULL,
       template_version TEXT,
@@ -220,6 +253,11 @@ export async function initializeDatabase() {
       launch_approval_required INTEGER NOT NULL DEFAULT 1,
       active_niche TEXT NOT NULL DEFAULT 'hvac',
       active_cities TEXT NOT NULL DEFAULT '["Austin, TX"]',
+      active_pairs TEXT NOT NULL DEFAULT '[]',
+      scraper_proxies TEXT NOT NULL DEFAULT '[]',
+      scraper_max_rpm INTEGER NOT NULL DEFAULT 8,
+      scraper_max_retries INTEGER NOT NULL DEFAULT 3,
+      scraper_delay_ms TEXT NOT NULL DEFAULT '[5000,12000]',
       dodo_checkout_links TEXT DEFAULT '{}',
       maintenance_mode INTEGER DEFAULT 0,
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -246,6 +284,13 @@ export async function initializeDatabase() {
   safeAddColumn('leads', 'email_status', "TEXT DEFAULT 'pending'")
   safeAddColumn('leads', 'enriched_at', 'TEXT')
   safeAddColumn('leads', 'enrichment_error', 'TEXT')
+  safeAddColumn('leads', 'pair_id', 'TEXT')
+  safeAddColumn('deployments', 'lead_id', 'TEXT')
+  safeAddColumn('system_config', 'active_pairs', "TEXT NOT NULL DEFAULT '[]'")
+  safeAddColumn('system_config', 'scraper_proxies', "TEXT NOT NULL DEFAULT '[]'")
+  safeAddColumn('system_config', 'scraper_max_rpm', 'INTEGER NOT NULL DEFAULT 8')
+  safeAddColumn('system_config', 'scraper_max_retries', 'INTEGER NOT NULL DEFAULT 3')
+  safeAddColumn('system_config', 'scraper_delay_ms', "TEXT NOT NULL DEFAULT '[5000,12000]'")
 
   // Backfill priority_tier on existing leads
   sqlite.exec(`

@@ -8,7 +8,9 @@ This document defines the concrete build specification for the application layer
 
 **Relationship to doc 17:** Doc 17 defines the 7 workflow specs, phased autonomy, and guardrails. This document defines the software system that enforces and executes those specs.
 
-**System boundary:** Payload is the internal operations system of record (execution, policy enforcement, workflow state, and audit trail). If a CRM is added, use it as a sales engagement interface and sync only key lifecycle events to avoid duplicate sources of truth.
+**Active implementation note (2026-04-25):** `app-lite/` is the active codebase. It uses Bun + Hono + Drizzle ORM + SQLite for the validation-stage operating system. The older `app/` Payload/Next.js implementation is retained for reference only. The target architecture below still defines the invariants to preserve, but implementation decisions should follow `app-lite/` unless a deliberate migration is opened.
+
+**System boundary:** `app-lite/` is the internal operations system of record (execution, policy enforcement, workflow state, scorecards, and audit trail). If a CRM is added, use it as a sales engagement interface and sync only key lifecycle events to avoid duplicate sources of truth.
 
 ---
 
@@ -51,7 +53,9 @@ This document defines the concrete build specification for the application layer
 
 ### Database: PostgreSQL
 
-**Decision:** PostgreSQL from day one. Not SQLite.
+**Target-scale decision:** PostgreSQL when concurrent webhook volume, multi-operator access, or hosted production reliability requires it.
+
+**Validation-stage implementation:** SQLite in `app-lite/`, accessed through `bun:sqlite` and Drizzle ORM. This keeps the first operating system lightweight while preserving a DbClient abstraction that can be migrated later.
 
 **Rationale:**
 - Payment webhooks arrive concurrently — PostgreSQL handles row-level locking natively
@@ -60,13 +64,12 @@ This document defines the concrete build specification for the application layer
 - If this business works, you'll outgrow SQLite within months; the migration cost isn't worth the initial simplicity
 - Hosted options (Supabase, Neon, Railway) remove ops burden
 
-### API Server: Node.js + Express + TypeScript
+### API Server: Bun + Hono + TypeScript
 
 **Rationale:**
-- Matches the skill on the backend-dev-guidelines skill already installed
+- Matches the active `app-lite/` implementation and keeps boot time/ops overhead low
 - TypeScript enforces the strict I/O contracts between orchestrator and skills
-- Express is battle-tested; no framework risk
-- Easy to deploy on Railway or Fly.io
+- Hono keeps the API surface small and portable for VPS, container, or edge-adjacent deployment
 
 ### Email: Resend
 
@@ -78,12 +81,14 @@ This document defines the concrete build specification for the application layer
 
 ### Job Queue: BullMQ + Redis
 
-**Rationale:**
+**Target-scale rationale:**
 - Handles scheduled jobs (follow-up emails, daily lead-gen, monthly reports)
 - Built-in retry with exponential backoff
 - Job deduplication via ID — prevents double-sends
 - Dead letter queue for failed jobs that need human attention
 - Observable via Bull Board UI
+
+**Validation-stage implementation:** `app-lite/` uses a DB-backed jobs table and a polling worker. This is sufficient for early validation and avoids Redis until queue volume or concurrency proves it is needed.
 
 ### Site Deployment: Cloudflare Pages
 
@@ -114,6 +119,7 @@ Every entity has `created_at`, `updated_at`, and a UUID primary key. Every state
 ```
 leads
 ├── id                  UUID PK
+├── pair_id             UUID FK → niche_city_pairs (nullable during legacy/manual imports)
 ├── business_name       TEXT NOT NULL
 ├── niche               TEXT NOT NULL
 ├── city                TEXT NOT NULL
@@ -133,6 +139,40 @@ leads
 ├── created_at          TIMESTAMPTZ
 ├── updated_at          TIMESTAMPTZ
 └── UNIQUE(niche_city_key)
+```
+
+#### `niche_city_pairs`
+
+Step 0 scorecard from doc 22. A pair is the unit of market selection; lead generation should run against approved pairs, not unscored global niches.
+
+```
+niche_city_pairs
+├── id                  UUID PK
+├── unique_key          TEXT UNIQUE ("pool-services:tampa:fl")
+├── city                TEXT NOT NULL
+├── state               TEXT NOT NULL
+├── niche               TEXT NOT NULL
+├── maps_count          INTEGER
+├── review_velocity     INTEGER
+├── ad_count            INTEGER
+├── agency_pages        INTEGER
+├── weak_site_pct       INTEGER (0-100)
+├── contactable_pct     INTEGER (0-100)
+├── economic_signal     TEXT (growth, flat, shrinking)
+├── demand_score        INTEGER (0-25)
+├── competition_score   INTEGER (0-20)
+├── weakness_score      INTEGER (0-25)
+├── contact_score       INTEGER (0-15)
+├── revenue_score       INTEGER (0-15)
+├── total_score         INTEGER (0-100)
+├── status              TEXT (candidate, validated, approved, parked, dropped)
+├── sprint_start        TIMESTAMPTZ
+├── sprint_reply_rate   INTEGER
+├── sprint_result       TEXT (continue, pause, drop)
+├── validation_data     JSONB
+├── last_scrape_job_id  UUID FK → jobs
+├── created_at          TIMESTAMPTZ
+└── updated_at          TIMESTAMPTZ
 ```
 
 #### `pipeline_events`

@@ -549,7 +549,8 @@ export async function scrapeGoogleMaps(
     session.requestTimestamps.push(session.lastRequestTime)
 
     const jsonStr = await fetchWithRetry(url, fetchFn, session, options)
-    return parseSearchResults(jsonStr)
+    const businesses = parseSearchResults(jsonStr)
+    return typeof options.maxResults === 'number' ? businesses.slice(0, options.maxResults) : businesses
   } catch (err: any) {
     if (err.name === 'AbortError') throw err
     throw err
@@ -582,7 +583,10 @@ export async function scrapeMultipleCities(
 
       const jsonStr = await fetchWithRetry(url, fetchFn, session, options)
       const businesses = parseSearchResults(jsonStr)
-      results.set(`${city}, ${state}`, businesses)
+      results.set(
+        `${city}, ${state}`,
+        typeof options.maxResults === 'number' ? businesses.slice(0, options.maxResults) : businesses,
+      )
     } catch (err: any) {
       if (err.name === 'AbortError') throw err
       results.set(`${city}, ${state}`, [])
