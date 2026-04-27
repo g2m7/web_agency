@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agency Engine — Dashboard</title>
+  <title>Agency Engine â€” Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
       padding: 0;
     }
 
-    /* ── Header ─────────────────────────── */
+    /* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -92,7 +92,7 @@
     }
     .header-meta span { font-family: var(--mono); }
 
-    /* ── Nav tabs ─────────────────────── */
+    /* â”€â”€ Nav tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .nav-tabs {
       display: flex;
       gap: 0;
@@ -116,7 +116,7 @@
       border-bottom-color: var(--accent);
     }
 
-    /* ── Layout ─────────────────────────── */
+    /* â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .dashboard {
       padding: 24px 32px;
       display: flex;
@@ -129,7 +129,7 @@
     .view { display: none; }
     .view.active { display: flex; flex-direction: column; gap: 20px; }
 
-    /* ── Stats Row ──────────────────────── */
+    /* â”€â”€ Stats Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -162,7 +162,7 @@
       color: var(--text-dim);
     }
 
-    /* ── Panels ─────────────────────────── */
+    /* â”€â”€ Panels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .panels {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -205,7 +205,7 @@
     .panel-body::-webkit-scrollbar-track { background: transparent; }
     .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* ── Table rows ─────────────────────── */
+    /* â”€â”€ Table rows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .row {
       display: flex;
       align-items: center;
@@ -238,7 +238,7 @@
       text-align: right;
     }
 
-    /* ── Badges ─────────────────────────── */
+    /* â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .badge {
       display: inline-block;
       padding: 2px 8px;
@@ -280,13 +280,28 @@
     .badge-invalid   { background: rgba(225,112,85,0.15); color: var(--red); }
     .badge-pending   { background: rgba(116,185,255,0.15); color: var(--blue); }
 
+    /* Niche pair status badges */
+    .badge-candidate  { background: rgba(116,185,255,0.15); color: var(--blue); }
+    .badge-scored     { background: rgba(253,203,110,0.15); color: var(--yellow); }
+    .badge-validated  { background: rgba(108,92,231,0.15); color: var(--accent); }
+    .badge-approved   { background: rgba(0,184,148,0.15); color: var(--green); }
+    .badge-parked     { background: rgba(122,122,143,0.15); color: var(--text-dim); }
+    .badge-dropped    { background: rgba(225,112,85,0.15); color: var(--red); }
+
+    /* Score bar */
+    .score-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--surface-2); width: 100px; }
+    .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .score-high { background: var(--green); }
+    .score-mid { background: var(--yellow); }
+    .score-low { background: var(--red); }
+
     /* Priority dot indicators */
     .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
     .priority-dot-hot { background: var(--red); box-shadow: 0 0 4px var(--red); }
     .priority-dot-warm { background: var(--yellow); box-shadow: 0 0 4px var(--yellow); }
     .priority-dot-low { background: var(--text-dim); }
 
-    /* ── Config panel ───────────────────── */
+    /* â”€â”€ Config panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .config-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -303,7 +318,7 @@
     .config-item .ck { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
     .config-item .cv { font-size: 14px; font-family: var(--mono); font-weight: 500; }
 
-    /* ── Empty state ─────────────────────── */
+    /* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .empty {
       padding: 40px 20px;
       text-align: center;
@@ -311,10 +326,10 @@
       font-size: 13px;
     }
 
-    /* ── Full-width panel ────────────────── */
+    /* â”€â”€ Full-width panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .full-width { grid-column: 1 / -1; }
 
-    /* ── Pipeline bar ────────────────────── */
+    /* â”€â”€ Pipeline bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .pipeline-bar {
       display: flex;
       height: 6px;
@@ -328,7 +343,7 @@
       transition: width 0.5s ease;
     }
 
-    /* ── Action bar ──────────────────────── */
+    /* â”€â”€ Action bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .action-bar {
       display: flex;
       gap: 8px;
@@ -369,7 +384,7 @@
     .btn.loading { opacity: 0.7; pointer-events: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Filter bar ──────────────────────── */
+    /* â”€â”€ Filter bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .filter-bar {
       display: flex;
       gap: 8px;
@@ -399,7 +414,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* ── Toast ───────────────────────────── */
+    /* â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -421,7 +436,7 @@
     .toast.success { border-left: 3px solid var(--green); }
     .toast.error { border-left: 3px solid var(--red); }
 
-    /* ── Scraper config form ─────────────── */
+    /* â”€â”€ Scraper config form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .scraper-config-form {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -453,7 +468,7 @@
     .form-group input:focus { border-color: var(--accent); }
     .form-group small { font-size: 11px; color: var(--text-dim); }
 
-    /* ── Scraper results table ───────────── */
+    /* â”€â”€ Scraper results table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .results-table {
       width: 100%;
       border-collapse: collapse;
@@ -484,7 +499,7 @@
     .has-indicator { color: var(--green); }
     .no-indicator { color: var(--text-dim); }
 
-    /* ── Section header in scraper ───────── */
+    /* â”€â”€ Section header in scraper â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .section-header {
       display: flex;
       align-items: center;
@@ -504,16 +519,17 @@
   <div class="header">
     <h1><span class="dot"></span> Agency Engine</h1>
     <div class="header-meta">
-      <span id="phase">Phase —</span>
-      <span id="uptime">—</span>
-      <span id="last-refresh">—</span>
-      <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:12px">🌙</button>
+      <span id="phase">Phase â€”</span>
+      <span id="uptime">â€”</span>
+      <span id="last-refresh">â€”</span>
+      <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:12px">ðŸŒ™</button>
     </div>
   </div>
 
   <div class="nav-tabs">
-    <div class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</div>
-    <div class="nav-tab" onclick="switchTab('scraper')">Scraper</div>
+    <div class="nav-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="nav-tab" data-tab="niches" onclick="switchTab('niches')">Niches</div>
+    <div class="nav-tab" data-tab="scraper" onclick="switchTab('scraper')">Scraper</div>
   </div>
 
   <div class="dashboard">
@@ -549,7 +565,7 @@
       <div class="panel full-width">
         <div class="panel-header">
           <h2>Leads</h2>
-          <span class="count" id="lead-count">—</span>
+          <span class="count" id="lead-count">â€”</span>
         </div>
         <div class="filter-bar">
           <label>Status</label>
@@ -571,7 +587,7 @@
           <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()">
           <label>Search</label>
           <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()">
-          <button class="btn" onclick="clearFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">✕ Clear</button>
+          <button class="btn" onclick="clearFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">âœ• Clear</button>
         </div>
         <div class="panel-body" id="leads-list" style="max-height:500px"></div>
       </div>
@@ -582,7 +598,7 @@
         <div class="panel">
           <div class="panel-header">
             <h2>Jobs</h2>
-            <span class="count" id="job-count">—</span>
+            <span class="count" id="job-count">â€”</span>
           </div>
           <div class="panel-body" id="jobs-list"></div>
         </div>
@@ -591,7 +607,7 @@
         <div class="panel">
           <div class="panel-header">
             <h2>Clients</h2>
-            <span class="count" id="client-count">—</span>
+            <span class="count" id="client-count">â€”</span>
           </div>
           <div class="panel-body" id="clients-list"></div>
         </div>
@@ -654,10 +670,10 @@
           <span class="spinner"></span> Run Scraper Now
         </button>
         <button class="btn" onclick="runEnrich()" id="btn-enrich" style="border-color:var(--green)">
-          <span class="spinner"></span> 📧 Enrich Emails
+          <span class="spinner"></span> ðŸ“§ Enrich Emails
         </button>
         <button class="btn" onclick="runValidate()" id="btn-validate">
-          <span class="spinner"></span> ✅ Validate Emails
+          <span class="spinner"></span> âœ… Validate Emails
         </button>
         <button class="btn" onclick="refreshScraperView()">
           <span class="spinner"></span> Refresh
@@ -672,7 +688,7 @@
       <div class="panel full-width">
         <div class="panel-header">
           <h2>Scraped Leads</h2>
-          <span class="count" id="scraper-lead-count">—</span>
+          <span class="count" id="scraper-lead-count">â€”</span>
         </div>
         <div class="filter-bar">
           <label>Status</label>
@@ -686,9 +702,9 @@
           <label>Priority</label>
           <select id="sf-priority" onchange="refreshScraperResults()">
             <option value="">Any</option>
-            <option value="hot">🔴 Hot</option>
-            <option value="warm">🟡 Warm</option>
-            <option value="low">⚪ Low</option>
+            <option value="hot">ðŸ”´ Hot</option>
+            <option value="warm">ðŸŸ¡ Warm</option>
+            <option value="low">âšª Low</option>
           </select>
           <label>Email</label>
           <select id="sf-email" onchange="refreshScraperResults()">
@@ -706,10 +722,10 @@
           <label>Email Status</label>
           <select id="sf-email-status" onchange="refreshScraperResults()">
             <option value="">Any</option>
-            <option value="valid">✅ Valid</option>
-            <option value="risky">⚠️ Risky</option>
-            <option value="invalid">❌ Invalid</option>
-            <option value="pending">⏳ Pending</option>
+            <option value="valid">âœ… Valid</option>
+            <option value="risky">âš ï¸ Risky</option>
+            <option value="invalid">âŒ Invalid</option>
+            <option value="pending">â³ Pending</option>
           </select>
           <label>City</label>
           <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()">
@@ -727,7 +743,7 @@
             <option value="true">Has phone</option>
             <option value="false">No phone</option>
           </select>
-          <button class="btn" onclick="clearScraperFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">✕ Clear</button>
+          <button class="btn" onclick="clearScraperFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">âœ• Clear</button>
         </div>
         <div class="panel-body" id="scraper-results-list" style="max-height:500px"></div>
       </div>
@@ -736,9 +752,122 @@
       <div class="panel full-width">
         <div class="panel-header">
           <h2>Scraper Jobs</h2>
-          <span class="count" id="scraper-job-count">—</span>
+          <span class="count" id="scraper-job-count">â€”</span>
         </div>
         <div class="panel-body" id="scraper-jobs-list" style="max-height:300px"></div>
+      </div>
+
+    </div>
+
+    <!-- ===================== NICHES VIEW ===================== -->
+    <div id="view-niches" class="view">
+
+      <!-- Niche Stats -->
+      <div class="stats-row" id="niche-stats-row"></div>
+
+      <!-- Add Pair Form -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>Add City + Niche Pair</h2>
+        </div>
+        <div class="scraper-config-form">
+          <div class="form-group">
+            <label>Niche</label>
+            <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal">
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input id="np-city" type="text" placeholder="e.g. Tampa">
+          </div>
+          <div class="form-group">
+            <label>State</label>
+            <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label>Maps Count</label>
+            <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps">
+          </div>
+          <div class="form-group">
+            <label>Review Velocity</label>
+            <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months">
+          </div>
+          <div class="form-group">
+            <label>Ad Count</label>
+            <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page">
+          </div>
+          <div class="form-group">
+            <label>Agency Pages</label>
+            <input id="np-agency" type="number" min="0" placeholder="Agency listing pages">
+          </div>
+          <div class="form-group">
+            <label>Weak Site %</label>
+            <input id="np-weak" type="number" min="0" max="100" placeholder="0â€“100">
+          </div>
+          <div class="form-group">
+            <label>Contactable %</label>
+            <input id="np-contact" type="number" min="0" max="100" placeholder="0â€“100">
+          </div>
+          <div class="form-group">
+            <label>Economic Signal</label>
+            <select id="np-econ">
+              <option value="growth">Growth</option>
+              <option value="flat" selected>Flat</option>
+              <option value="shrinking">Shrinking</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Revenue Estimate</label>
+            <select id="np-revenue">
+              <option value="high">High</option>
+              <option value="moderate" selected>Moderate</option>
+              <option value="low">Low</option>
+              <option value="very_low">Very Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <input id="np-notes" type="text" placeholder="Optional notes">
+          </div>
+          <div class="form-group" style="align-self:end">
+            <button class="btn btn-accent" onclick="addNichePair()" id="btn-add-pair">
+              <span class="spinner"></span> Add & Score
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pair Listing -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>City + Niche Pairs</h2>
+          <span class="count" id="niche-pair-count">â€”</span>
+        </div>
+        <div class="filter-bar">
+          <label>Status</label>
+          <select id="nf-status" onchange="refreshNichePairs()">
+            <option value="">All</option>
+            <option value="candidate">Candidate</option>
+            <option value="scored">Scored</option>
+            <option value="validated">Validated</option>
+            <option value="approved">Approved</option>
+            <option value="parked">Parked</option>
+            <option value="dropped">Dropped</option>
+          </select>
+          <label>Niche</label>
+          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()">
+          <label>City</label>
+          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()">
+          <button class="btn" onclick="clearNicheFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">âœ• Clear</button>
+        </div>
+        <div class="panel-body" id="niche-pairs-list" style="max-height:600px"></div>
+      </div>
+
+      <!-- Top Pairs -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>Top Scoring Pairs</h2>
+        </div>
+        <div class="panel-body" id="niche-top-pairs" style="max-height:400px"></div>
       </div>
 
     </div>
@@ -765,7 +894,7 @@
     });
 
     function ago(iso) {
-      if (!iso) return '—';
+      if (!iso) return 'â€”';
       const diff = Date.now() - new Date(iso).getTime();
       if (diff < 60000) return Math.floor(diff / 1000) + 's ago';
       if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
@@ -794,31 +923,32 @@
       setTimeout(() => { t.className = 'toast'; }, 3000);
     }
 
-    // ── Tab switching ──────────────────────────────────
+    // â”€â”€ Tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function switchTab(tab) {
       document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-      document.querySelector(`.nav-tab:nth-child(${tab === 'dashboard' ? 1 : 2})`).classList.add('active');
+      document.querySelector(`.nav-tab[data-tab="${tab}"]`).classList.add('active');
       document.getElementById(`view-${tab}`).classList.add('active');
       if (tab === 'scraper') refreshScraperView();
+      if (tab === 'niches') refreshNichesView();
     }
 
-    // ── Trigger a job (dashboard) ──────────────────────
+    // â”€â”€ Trigger a job (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function triggerJob(jobType) {
       const btn = document.getElementById('btn-' + jobType.replace(/_/g, '-'));
       if (btn) btn.classList.add('loading');
       try {
         await axios.post(API + '/api/jobs/trigger', { jobType }, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast(`✓ ${jobType.replace(/_/g, ' ')} queued`, 'success');
+        showToast(`âœ“ ${jobType.replace(/_/g, ' ')} queued`, 'success');
         setTimeout(refresh, 1000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         if (btn) setTimeout(() => btn.classList.remove('loading'), 500);
       }
     }
 
-    // ── Filtered leads fetch (dashboard) ───────────────
+    // â”€â”€ Filtered leads fetch (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function refreshLeads() {
       const params = new URLSearchParams();
       const status = document.getElementById('f-status').value;
@@ -841,8 +971,8 @@
         } else {
           list.innerHTML = leads.map(l => `
             <div class="row">
-              <span class="name">${l.businessName || l.business_name || '—'}</span>
-              <span class="meta">${l.niche || ''} · ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
+              <span class="name">${l.businessName || l.business_name || 'â€”'}</span>
+              <span class="meta">${l.niche || ''} Â· ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
               ${badge(l.status)}
               <span class="time">${ago(l.createdAt || l.created_at)}</span>
             </div>
@@ -885,7 +1015,7 @@
       excluded: '#636e72',
     };
 
-    // ── Main refresh (dashboard) ───────────────────────
+    // â”€â”€ Main refresh (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function refresh() {
       try {
         const [allLeadsRes, clientsRes, jobsRes, configRes] = await Promise.all([
@@ -900,7 +1030,7 @@
         const jobs = jobsRes.data.docs || [];
         const config = configRes.data;
 
-        document.getElementById('phase').textContent = `Phase ${config.currentPhase || '—'}`;
+        document.getElementById('phase').textContent = `Phase ${config.currentPhase || 'â€”'}`;
         document.getElementById('uptime').textContent = uptime();
         document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString();
 
@@ -972,7 +1102,7 @@
         } else {
           jobsList.innerHTML = jobs.slice(0, 30).map(j => `
             <div class="row">
-              <span class="name">${(j.jobType || j.job_type || '—').replace(/_/g, ' ')}</span>
+              <span class="name">${(j.jobType || j.job_type || 'â€”').replace(/_/g, ' ')}</span>
               ${badge(j.status)}
               <span class="time">${ago(j.updatedAt || j.updated_at)}</span>
             </div>
@@ -987,8 +1117,8 @@
         } else {
           clientsList.innerHTML = clients.slice(0, 20).map(c => `
             <div class="row">
-              <span class="name">${c.businessName || c.business_name || '—'}</span>
-              <span class="meta">${c.plan || '—'}</span>
+              <span class="name">${c.businessName || c.business_name || 'â€”'}</span>
+              <span class="meta">${c.plan || 'â€”'}</span>
               ${badge(c.status)}
               <span class="time">${ago(c.createdAt || c.created_at)}</span>
             </div>
@@ -998,13 +1128,13 @@
         // Config panel
         const configPanel = document.getElementById('config-panel');
         configPanel.innerHTML = `<div class="config-grid">
-          <div class="config-item"><span class="ck">Phase</span><span class="cv">${config.currentPhase ?? '—'}</span></div>
-          <div class="config-item"><span class="ck">Niche</span><span class="cv">${config.activeNiche ?? '—'}</span></div>
-          <div class="config-item"><span class="ck">Cities</span><span class="cv">${(config.activeCities || []).join(', ') || '—'}</span></div>
-          <div class="config-item"><span class="ck">Maintenance</span><span class="cv">${config.maintenanceMode ? '🔴 ON' : '🟢 OFF'}</span></div>
-          <div class="config-item"><span class="ck">Email Approval</span><span class="cv">${config.emailApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="config-item"><span class="ck">Demo Approval</span><span class="cv">${config.demoApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="config-item"><span class="ck">Launch Approval</span><span class="cv">${config.launchApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="config-item"><span class="ck">Phase</span><span class="cv">${config.currentPhase ?? 'â€”'}</span></div>
+          <div class="config-item"><span class="ck">Niche</span><span class="cv">${config.activeNiche ?? 'â€”'}</span></div>
+          <div class="config-item"><span class="ck">Cities</span><span class="cv">${(config.activeCities || []).join(', ') || 'â€”'}</span></div>
+          <div class="config-item"><span class="ck">Maintenance</span><span class="cv">${config.maintenanceMode ? 'ðŸ”´ ON' : 'ðŸŸ¢ OFF'}</span></div>
+          <div class="config-item"><span class="ck">Email Approval</span><span class="cv">${config.emailApprovalRequired ? 'âœ“ Required' : 'âœ— Auto'}</span></div>
+          <div class="config-item"><span class="ck">Demo Approval</span><span class="cv">${config.demoApprovalRequired ? 'âœ“ Required' : 'âœ— Auto'}</span></div>
+          <div class="config-item"><span class="ck">Launch Approval</span><span class="cv">${config.launchApprovalRequired ? 'âœ“ Required' : 'âœ— Auto'}</span></div>
           <div class="config-item"><span class="ck">Updated</span><span class="cv">${ago(config.updatedAt || config.updated_at)}</span></div>
         </div>`;
 
@@ -1015,9 +1145,9 @@
       }
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // ── SCRAPER VIEW ──────────────────────────────────────────
-    // ═══════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // â”€â”€ SCRAPER VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     async function loadScraperConfig() {
       try {
@@ -1056,9 +1186,9 @@
         };
         await axios.patch(API + '/api/scraper/config', data, { headers: { ...headers, 'Content-Type': 'application/json' } });
         configDirty = false;
-        showToast('✓ Scraper config saved', 'success');
+        showToast('âœ“ Scraper config saved', 'success');
       } catch (err) {
-        showToast(`✗ Save failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`âœ— Save failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1076,14 +1206,14 @@
         if (cities.length > 0) payload.cities = cities;
 
         await axios.post(API + '/api/scraper/run', payload, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Scraper job queued', 'success');
-        document.getElementById('scraper-status-text').textContent = 'Job queued — monitoring...';
+        showToast('âœ“ Scraper job queued', 'success');
+        document.getElementById('scraper-status-text').textContent = 'Job queued â€” monitoring...';
         setTimeout(() => {
           refreshScraperView();
           document.getElementById('scraper-status-text').textContent = '';
         }, 2000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
         document.getElementById('scraper-status-text').textContent = '';
       } finally {
         btn.classList.remove('loading');
@@ -1095,10 +1225,10 @@
       btn.classList.add('loading');
       try {
         await axios.post(API + '/api/scraper/enrich', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Email enrichment job queued', 'success');
+        showToast('âœ“ Email enrichment job queued', 'success');
         setTimeout(refreshScraperView, 2000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1109,10 +1239,10 @@
       btn.classList.add('loading');
       try {
         await axios.post(API + '/api/scraper/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Email validation job queued', 'success');
+        showToast('âœ“ Email validation job queued', 'success');
         setTimeout(refreshScraperView, 2000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1182,7 +1312,7 @@
           </div>
           <div class="stat-card">
             <span class="label">Priority Split</span>
-            <span class="value" style="font-size:14px">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
+            <span class="value" style="font-size:14px">ðŸ”´${es.hot ?? 0} ðŸŸ¡${es.warm ?? 0} âšª${es.low ?? 0}</span>
           </div>
           <div class="stat-card">
             <span class="label">Running / Queued</span>
@@ -1247,7 +1377,7 @@
           </thead>
           <tbody>
             ${leads.map(l => {
-              const name = l.businessName || l.business_name || '—';
+              const name = l.businessName || l.business_name || 'â€”';
               const city = l.city || '';
               const state = l.state || '';
               const phone = l.phone;
@@ -1261,15 +1391,15 @@
 
               const priorityHtml = priority
                 ? `<span class="priority-dot priority-dot-${priority}"></span><span class="badge badge-${priority}">${priority}</span>`
-                : '<span class="no-indicator">—</span>';
+                : '<span class="no-indicator">â€”</span>';
 
               const emailHtml = email
-                ? `<span class="has-indicator" title="${email}" style="font-size:11px">${email.length > 22 ? email.substring(0, 22) + '…' : email}</span>`
-                : '<span class="no-indicator">—</span>';
+                ? `<span class="has-indicator" title="${email}" style="font-size:11px">${email.length > 22 ? email.substring(0, 22) + 'â€¦' : email}</span>`
+                : '<span class="no-indicator">â€”</span>';
 
               const eStatusHtml = email
                 ? `<span class="badge badge-${eStatus}">${eStatus}</span>`
-                : '<span class="no-indicator">—</span>';
+                : '<span class="no-indicator">â€”</span>';
 
               const contactModeHtml = contactMode === 'email'
                 ? '<span class="badge badge-valid">email</span>'
@@ -1284,8 +1414,8 @@
                 <td>${contactModeHtml}</td>
                 <td class="mono" style="max-width:180px">${emailHtml}</td>
                 <td>${eStatusHtml}</td>
-                <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">—</span>'}</td>
-                <td class="mono" style="max-width:160px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="no-indicator">—</span>'}</td>
+                <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">â€”</span>'}</td>
+                <td class="mono" style="max-width:160px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="no-indicator">â€”</span>'}</td>
                 <td>${badge(status)}</td>
                 <td class="mono" style="font-size:10px">${ago(created)}</td>
               </tr>`;
@@ -1351,7 +1481,7 @@
             detail = 'Waiting...';
           }
           return `<div class="row">
-            <span class="name">${jobType.replace(/_/g, ' ')}${input.niche ? ' — ' + input.niche : ''}${(input.cities || []).length ? ' — ' + input.cities.join(', ') : ''}</span>
+            <span class="name">${jobType.replace(/_/g, ' ')}${input.niche ? ' â€” ' + input.niche : ''}${(input.cities || []).length ? ' â€” ' + input.cities.join(', ') : ''}</span>
             <span class="meta">${detail}</span>
             ${badge(j.status)}
             <span class="time">${ago(j.updatedAt || j.updated_at)}</span>
@@ -1362,6 +1492,237 @@
       }
     }
 
+    // â”€â”€ NICHES TAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    let nicheDebounceTimer = null;
+
+    function debounceNiches() {
+      clearTimeout(nicheDebounceTimer);
+      nicheDebounceTimer = setTimeout(refreshNichePairs, 300);
+    }
+
+    function clearNicheFilters() {
+      document.getElementById('nf-status').value = '';
+      document.getElementById('nf-niche').value = '';
+      document.getElementById('nf-city').value = '';
+      refreshNichePairs();
+    }
+
+    function scoreBarHTML(score) {
+      if (score == null || score === 0) return '<span class="meta">â€”</span>';
+      const cls = score >= 70 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
+      return `<div style="display:flex;align-items:center;gap:8px">
+        <div class="score-bar"><div class="score-bar-fill ${cls}" style="width:${score}%"></div></div>
+        <span class="meta" style="font-weight:600">${score}</span>
+      </div>`;
+    }
+
+    async function refreshNichesView() {
+      await Promise.all([refreshNicheStats(), refreshNichePairs()]);
+    }
+
+    async function refreshNicheStats() {
+      try {
+        const r = await axios.get(API + '/api/niches/stats', { headers });
+        const s = r.data;
+        const row = document.getElementById('niche-stats-row');
+        row.innerHTML = `
+          <div class="stat-card"><span class="label">Total Pairs</span><span class="value">${s.total}</span></div>
+          <div class="stat-card"><span class="label">Candidates</span><span class="value" style="color:var(--blue)">${s.byStatus.candidate}</span></div>
+          <div class="stat-card"><span class="label">Scored</span><span class="value" style="color:var(--yellow)">${s.byStatus.scored}</span></div>
+          <div class="stat-card"><span class="label">Validated</span><span class="value" style="color:var(--accent)">${s.byStatus.validated}</span></div>
+          <div class="stat-card"><span class="label">Approved</span><span class="value" style="color:var(--green)">${s.byStatus.approved}/3</span></div>
+          <div class="stat-card"><span class="label">Parked</span><span class="value">${s.byStatus.parked}</span></div>
+        `;
+
+        // Top pairs
+        const topEl = document.getElementById('niche-top-pairs');
+        if (s.topPairs && s.topPairs.length > 0) {
+          topEl.innerHTML = `<table class="results-table">
+            <thead><tr>
+              <th>Niche</th><th>City</th><th>Score</th><th>Status</th>
+              <th>Demand</th><th>Competition</th><th>Weakness</th><th>Contact</th><th>Revenue</th>
+            </tr></thead>
+            <tbody>${s.topPairs.map(p => `<tr>
+              <td>${p.niche}</td>
+              <td>${p.city}, ${p.state}</td>
+              <td>${scoreBarHTML(p.totalScore ?? p.total_score)}</td>
+              <td>${badge(p.status)}</td>
+              <td class="mono">${p.demandScore ?? p.demand_score ?? 'â€”'}</td>
+              <td class="mono">${p.competitionScore ?? p.competition_score ?? 'â€”'}</td>
+              <td class="mono">${p.weaknessScore ?? p.weakness_score ?? 'â€”'}</td>
+              <td class="mono">${p.contactScore ?? p.contact_score ?? 'â€”'}</td>
+              <td class="mono">${p.revenueScore ?? p.revenue_score ?? 'â€”'}</td>
+            </tr>`).join('')}</tbody>
+          </table>`;
+        } else {
+          topEl.innerHTML = '<div class="empty">No scored pairs yet</div>';
+        }
+      } catch (err) {
+        console.error('Niche stats error:', err);
+      }
+    }
+
+    async function refreshNichePairs() {
+      try {
+        const params = new URLSearchParams();
+        const status = document.getElementById('nf-status').value;
+        const niche = document.getElementById('nf-niche').value.trim();
+        const city = document.getElementById('nf-city').value.trim();
+        if (status) params.set('status', status);
+        if (niche) params.set('niche', niche);
+        if (city) params.set('city', city);
+        params.set('limit', '50');
+
+        const r = await axios.get(API + '/api/niches?' + params.toString(), { headers });
+        const list = document.getElementById('niche-pairs-list');
+        document.getElementById('niche-pair-count').textContent = r.data.totalDocs + ' pairs';
+
+        if (!r.data.docs || r.data.docs.length === 0) {
+          list.innerHTML = '<div class="empty">No pairs found. Add one above.</div>';
+          return;
+        }
+
+        list.innerHTML = `<table class="results-table">
+          <thead><tr>
+            <th>Niche</th><th>City</th><th>Score</th><th>Status</th>
+            <th>Maps</th><th>Weak%</th><th>Contact%</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody>${r.data.docs.map(p => {
+            const id = p.id;
+            const score = p.totalScore ?? p.total_score;
+            const st = p.status;
+            const maps = p.mapsCount ?? p.maps_count ?? 'â€”';
+            const weak = p.weakSitePct ?? p.weak_site_pct ?? 'â€”';
+            const contact = p.contactablePct ?? p.contactable_pct ?? 'â€”';
+
+            let actions = '';
+            if (st === 'candidate' || st === 'scored') {
+              actions += `<button class="btn" onclick="scorePair('${id}')" style="font-size:10px;padding:3px 8px">Score</button> `;
+            }
+            if (st === 'scored' || st === 'candidate') {
+              actions += `<button class="btn" onclick="validatePair('${id}')" style="font-size:10px;padding:3px 8px">Validate</button> `;
+            }
+            if (st === 'validated' || st === 'scored') {
+              actions += `<button class="btn btn-accent" onclick="decidePair('${id}')" style="font-size:10px;padding:3px 8px">Go/No-Go</button> `;
+            }
+            if (st !== 'approved') {
+              actions += `<button class="btn" onclick="deletePair('${id}')" style="font-size:10px;padding:3px 8px;color:var(--red)">âœ•</button>`;
+            }
+
+            return `<tr>
+              <td>${p.niche}</td>
+              <td>${p.city}, ${p.state}</td>
+              <td>${scoreBarHTML(score)}</td>
+              <td>${badge(st)}</td>
+              <td class="mono">${maps}</td>
+              <td class="mono">${weak}${weak !== 'â€”' ? '%' : ''}</td>
+              <td class="mono">${contact}${contact !== 'â€”' ? '%' : ''}</td>
+              <td>${actions}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>`;
+      } catch (err) {
+        console.error('Niche pairs error:', err);
+      }
+    }
+
+    async function addNichePair() {
+      const btn = document.getElementById('btn-add-pair');
+      btn.classList.add('loading');
+      try {
+        const body = {
+          niche: document.getElementById('np-niche').value.trim(),
+          city: document.getElementById('np-city').value.trim(),
+          state: document.getElementById('np-state').value.trim().toUpperCase(),
+          mapsCount: parseInt(document.getElementById('np-maps').value) || null,
+          reviewVelocity: parseInt(document.getElementById('np-velocity').value) || null,
+          adCount: parseInt(document.getElementById('np-ads').value) || null,
+          agencyPages: parseInt(document.getElementById('np-agency').value) || null,
+          weakSitePct: parseInt(document.getElementById('np-weak').value) || null,
+          contactablePct: parseInt(document.getElementById('np-contact').value) || null,
+          economicSignal: document.getElementById('np-econ').value,
+          revenueEstimate: document.getElementById('np-revenue').value,
+          notes: document.getElementById('np-notes').value.trim() || null,
+        };
+
+        if (!body.niche || !body.city || !body.state) {
+          showToast('Niche, city, and state are required', 'error');
+          return;
+        }
+
+        const r = await axios.post(API + '/api/niches', body, { headers: { ...headers, 'Content-Type': 'application/json' } });
+
+        // Auto-score if raw data was provided
+        if (body.mapsCount) {
+          await axios.patch(API + '/api/niches/' + r.data.id + '/score', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        }
+
+        // Clear form
+        ['np-niche', 'np-city', 'np-state', 'np-maps', 'np-velocity', 'np-ads', 'np-agency', 'np-weak', 'np-contact', 'np-notes'].forEach(id => {
+          document.getElementById(id).value = '';
+        });
+
+        showToast('âœ“ Pair added' + (body.mapsCount ? ' & scored' : ''), 'success');
+        refreshNichesView();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function scorePair(id) {
+      try {
+        const r = await axios.patch(API + '/api/niches/' + id + '/score', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        const total = r.data.scores?.totalScore ?? r.data.total_score ?? '?';
+        showToast(`âœ“ Scored: ${total}/100`, 'success');
+        refreshNichesView();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      }
+    }
+
+    async function validatePair(id) {
+      try {
+        await axios.post(API + '/api/niches/' + id + '/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('âœ“ Validation job queued â€” check back in 2 minutes', 'success');
+        refreshNichesView();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      }
+    }
+
+    async function decidePair(id) {
+      try {
+        const r = await axios.patch(API + '/api/niches/' + id + '/decide', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        const decision = r.data.decision;
+        const reasons = r.data.reasons || [];
+        if (decision === 'approved') {
+          showToast('âœ“ APPROVED â€” Sprint started!', 'success');
+        } else if (decision === 'blocked') {
+          showToast('âš  ' + reasons[0], 'error');
+        } else {
+          showToast('âš  PARKED â€” ' + reasons.join('; '), 'error');
+        }
+        refreshNichesView();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      }
+    }
+
+    async function deletePair(id) {
+      if (!confirm('Delete this pair?')) return;
+      try {
+        await axios.delete(API + '/api/niches/' + id, { headers });
+        showToast('âœ“ Pair deleted', 'success');
+        refreshNichesView();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      }
+    }
+
     // Theme toggle
     function toggleTheme() {
       const html = document.documentElement;
@@ -1369,14 +1730,14 @@
       const next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
-      document.getElementById('theme-toggle').textContent = next === 'dark' ? '🌙' : '☀️';
+      document.getElementById('theme-toggle').textContent = next === 'dark' ? 'ðŸŒ™' : 'â˜€ï¸';
     }
     (function initTheme() {
       const saved = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const theme = saved || (prefersDark ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', theme);
-      document.getElementById('theme-toggle').textContent = theme === 'dark' ? '🌙' : '☀️';
+      document.getElementById('theme-toggle').textContent = theme === 'dark' ? 'ðŸŒ™' : 'â˜€ï¸';
     })();
 
     // Initial load + poll
@@ -1386,7 +1747,11 @@
       if (document.getElementById('view-scraper').classList.contains('active')) {
         refreshScraperView();
       }
+      if (document.getElementById('view-niches').classList.contains('active')) {
+        refreshNichesView();
+      }
     }, 5000);
   </script>
+
 </body>
 </html>

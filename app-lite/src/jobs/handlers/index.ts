@@ -10,6 +10,7 @@ import {
 } from '../../scraper/google-maps'
 import { enrichEmailFromWebsite, computePriorityTier } from '../../scraper/email-enricher'
 import { validateEmail } from '../../scraper/email-validator'
+import { scoreNichePair, type NicheRawData } from '../../scraper/niche-scorer'
 
 export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
   const config = await db.findGlobal({ slug: 'system-config' })
@@ -481,6 +482,204 @@ export async function handleEmailValidate(db: DbClient, job: ScheduledJob): Prom
     valid,
     risky,
     invalid,
+    job_id: job.id,
+  }
+}
+
+// ── Niche Score Handler ───────────────────────────────────────
+
+export async function handleNicheScore(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
+  const pairId = job.data.nicheCityPairId as string
+  if (!pairId) {
+    return { status: 'skipped', reason: 'No nicheCityPairId provided' }
+  }
+
+  let pair: any
+  try {
+    pair = await db.findByID({ collection: 'niche-city-pairs', id: pairId })
+  } catch {
+    return { status: 'skipped', reason: 'Pair not found' }
+  }
+
+  const rawData: NicheRawData = {
+    mapsCount: pair.mapsCount ?? pair.maps_count ?? 0,
+    reviewVelocity: pair.reviewVelocity ?? pair.review_velocity ?? 0,
+    adCount: pair.adCount ?? pair.ad_count ?? 0,
+    agencyPages: pair.agencyPages ?? pair.agency_pages ?? 0,
+    weakSitePct: pair.weakSitePct ?? pair.weak_site_pct ?? 0,
+    contactablePct: pair.contactablePct ?? pair.contactable_pct ?? 0,
+    economicSignal: pair.economicSignal ?? pair.economic_signal ?? 'flat',
+    revenueEstimate: pair.revenueEstimate ?? pair.revenue_estimate ?? 'moderate',
+  }
+
+  const scores = scoreNichePair(rawData)
+
+  await db.update({
+    collection: 'niche-city-pairs',
+    id: pairId,
+    data: {
+      demand_score: scores.demandScore,
+      competition_score: scores.competitionScore,
+      weakness_score: scores.weaknessScore,
+      contact_score: scores.contactScore,
+      revenue_score: scores.revenueScore,
+      total_score: scores.totalScore,
+      status: 'scored',
+      evaluated_at: new Date().toISOString(),
+    },
+  })
+
+  return {
+    status: 'completed',
+    pair_id: pairId,
+    scores,
+    job_id: job.id,
+  }
+}
+
+// ── Niche Validate Handler (Mini-Validation Scrape) ───────────
+
+export async function handleNicheValidate(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
+  const pairId = job.data.nicheCityPairId as string
+  if (!pairId) {
+    return { status: 'skipped', reason: 'No nicheCityPairId provided' }
+  }
+
+  let pair: any
+  try {
+    pair = await db.findByID({ collection: 'niche-city-pairs', id: pairId })
+  } catch {
+    return { status: 'skipped', reason: 'Pair not found' }
+  }
+
+  const city = pair.city
+  const state = pair.state
+  const niche = pair.niche
+
+  // Run a limited 30-lead scrape for this pair
+  const scraperOptions: ScraperOptions = {
+    signal: AbortSignal.timeout(120_000),
+    maxRequestsPerMinute: 8,
+    maxRetries: 3,
+    retryBaseDelayMs: 4000,
+    interRequestDelayMs: [5000, 12000],
+  }
+
+  let allBusinesses: Array<{ biz: ScrapedBusiness }> = []
+  const errors: string[] = []
+
+  try {
+    const results = await scrapeMultipleCities(niche, [{ city, state }], scraperOptions)
+    for (const [_key, businesses] of results) {
+      for (const biz of businesses.slice(0, 30)) {
+        allBusinesses.push({ biz })
+      }
+    }
+  } catch (err: any) {
+    if (err.name !== 'AbortError') {
+      errors.push(`validation scrape: ${err.message}`)
+    }
+  }
+
+  // Insert scraped leads, tagged with pair ID
+  let leadsCreated = 0
+  let leadsSkipped = 0
+
+  for (const { biz } of allBusinesses) {
+    const nicheCityKey = buildNicheCityKey(niche, city, biz.name)
+
+    const existing = await db.find({
+      collection: 'leads',
+      where: { niche_city_key: { equals: nicheCityKey } },
+      limit: 1,
+    })
+
+    if (existing.totalDocs > 0) {
+      leadsSkipped++
+      continue
+    }
+
+    try {
+      const tier = computePriorityTier(!!biz.website, !!biz.phone)
+      await db.create({
+        collection: 'leads',
+        data: {
+          id: crypto.randomUUID(),
+          businessName: biz.name,
+          niche,
+          city,
+          state,
+          websiteUrl: biz.website ?? null,
+          googleMapsUrl: biz.mapsUrl,
+          email: null,
+          phone: biz.phone ?? null,
+          decisionMaker: null,
+          status: 'new',
+          auditScore: null,
+          auditData: null,
+          priorityTier: tier,
+          exclusionReason: null,
+          source: 'google_maps',
+          nicheCityKey,
+          nicheCityPairId: pairId,
+          emailSource: null,
+          emailConfidence: null,
+          emailStatus: 'pending',
+          enrichedAt: null,
+          enrichmentError: null,
+        },
+      })
+      leadsCreated++
+    } catch (err: any) {
+      if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
+        leadsSkipped++
+      } else {
+        errors.push(`insert ${biz.name}: ${err.message}`)
+      }
+    }
+  }
+
+  // Compute actual metrics from leads tied to this pair
+  const pairLeads = await db.find({
+    collection: 'leads',
+    where: { niche_city_pair_id: { equals: pairId } },
+    limit: 200,
+  })
+
+  const total = pairLeads.docs.length
+  const contactable = pairLeads.docs.filter((l: any) => l.email || l.phone).length
+  const withWebsite = pairLeads.docs.filter((l: any) => l.websiteUrl || l.website_url).length
+  // For weakness, approximate: leads without a website are "weak", leads with website need audit
+  // In mini-validation, use the proxy: no website = definitely weak, has website but no strong signals = weak
+  const weakCount = pairLeads.docs.filter((l: any) => !(l.websiteUrl || l.website_url)).length
+
+  const contactablePct = total > 0 ? Math.round((contactable / total) * 100) : 0
+  const weakPct = total > 0 ? Math.round((weakCount / total) * 100) : 0
+
+  // Update pair with validation results
+  await db.update({
+    collection: 'niche-city-pairs',
+    id: pairId,
+    data: {
+      status: 'validated',
+      validation_leads: total,
+      validation_contactable_pct: contactablePct,
+      validation_weak_pct: weakPct,
+      evaluated_at: new Date().toISOString(),
+    },
+  })
+
+  return {
+    status: 'completed',
+    pair_id: pairId,
+    leads_created: leadsCreated,
+    leads_skipped: leadsSkipped,
+    validation: {
+      totalLeads: total,
+      contactablePct,
+      weakPct,
+    },
+    errors,
     job_id: job.id,
   }
 }

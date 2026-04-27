@@ -13,12 +13,16 @@ import {
   handleSupportAutoReply,
   handleBillingRetry,
   handleSiteQa,
+  handleNicheScore,
+  handleNicheValidate,
 } from './handlers/index'
 
 const handlers: Record<string, (db: DbClient, job: ScheduledJob) => Promise<Record<string, unknown>>> = {
   lead_gen: handleLeadGen,
   email_enrich: handleEmailEnrich,
   email_validate: handleEmailValidate,
+  niche_score: handleNicheScore,
+  niche_validate: handleNicheValidate,
   follow_up_1: handleFollowUp1,
   follow_up_2: handleFollowUp2,
   demo_build: handleDemoBuild,

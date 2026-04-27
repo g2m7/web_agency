@@ -30,10 +30,32 @@ export type PlanName = (typeof PLAN_NAMES)[number]
 export const PRIORITY_TIERS = ['hot', 'warm', 'low'] as const
 export type PriorityTier = (typeof PRIORITY_TIERS)[number]
 
+// ─── Niche City Pair Types ───────────────────────────────────
+
+export const NICHE_CITY_PAIR_STATUSES = [
+  'candidate',
+  'scored',
+  'validated',
+  'approved',
+  'parked',
+  'dropped',
+] as const
+export type NicheCityPairStatus = (typeof NICHE_CITY_PAIR_STATUSES)[number]
+
+export const ECONOMIC_SIGNALS = ['growth', 'flat', 'shrinking'] as const
+export type EconomicSignal = (typeof ECONOMIC_SIGNALS)[number]
+
+export const SPRINT_RESULTS = ['continue', 'pause', 'drop'] as const
+export type SprintResult = (typeof SPRINT_RESULTS)[number]
+
+// ─── Job Types ──────────────────────────────────────────────
+
 export const JOB_TYPES = [
   'lead_gen',
   'email_enrich',
   'email_validate',
+  'niche_score',
+  'niche_validate',
   'follow_up_1',
   'follow_up_2',
   'demo_build',

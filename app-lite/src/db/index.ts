@@ -35,6 +35,7 @@ const tables: Record<string, any> = {
   'pipeline-events': schema.pipelineEvents,
   'skill-versions': schema.skillVersions,
   operators: schema.operators,
+  'niche-city-pairs': schema.nicheCityPairs,
 }
 
 function getTable(collection: string) {
@@ -123,6 +124,7 @@ const FIELD_MAP: Record<string, string> = {
   client_id: 'clientId',
   business_name: 'businessName',
   niche_city_key: 'nicheCityKey',
+  niche_city_pair_id: 'nicheCityPairId',
   email_source: 'emailSource',
   email_confidence: 'emailConfidence',
   email_status: 'emailStatus',
@@ -130,6 +132,27 @@ const FIELD_MAP: Record<string, string> = {
   enrichment_error: 'enrichmentError',
   priority_tier: 'priorityTier',
   website_url: 'websiteUrl',
+  maps_count: 'mapsCount',
+  review_velocity: 'reviewVelocity',
+  ad_count: 'adCount',
+  agency_pages: 'agencyPages',
+  weak_site_pct: 'weakSitePct',
+  contactable_pct: 'contactablePct',
+  economic_signal: 'economicSignal',
+  revenue_estimate: 'revenueEstimate',
+  demand_score: 'demandScore',
+  competition_score: 'competitionScore',
+  weakness_score: 'weaknessScore',
+  contact_score: 'contactScore',
+  revenue_score: 'revenueScore',
+  total_score: 'totalScore',
+  validation_leads: 'validationLeads',
+  validation_contactable_pct: 'validationContactablePct',
+  validation_weak_pct: 'validationWeakPct',
+  sprint_start: 'sprintStart',
+  sprint_reply_rate: 'sprintReplyRate',
+  sprint_result: 'sprintResult',
+  evaluated_at: 'evaluatedAt',
 }
 
 const FIELD_MAP_REVERSE: Record<string, string> = {

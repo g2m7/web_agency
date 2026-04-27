@@ -11,6 +11,7 @@ import { deploymentRoutes } from './routes/deployments'
 import { jobRoutes } from './routes/jobs'
 import { configRoutes } from './routes/config'
 import { scraperRoutes } from './routes/scraper'
+import { nicheRoutes } from './routes/niches'
 import { dodoWebhook } from './routes/webhooks/dodo'
 import { resendWebhook } from './routes/webhooks/resend'
 import { cloudflareWebhook } from './routes/webhooks/cloudflare'
@@ -40,6 +41,7 @@ app.route('/api/deployments', deploymentRoutes)
 app.route('/api/jobs', jobRoutes)
 app.route('/api/config', configRoutes)
 app.route('/api/scraper', scraperRoutes)
+app.route('/api/niches', nicheRoutes)
 
 // Webhooks (no API key — use their own verification)
 app.route('/webhooks/dodo', dodoWebhook)

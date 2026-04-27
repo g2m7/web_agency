@@ -257,6 +257,44 @@ export async function initializeDatabase() {
     WHERE priority_tier IS NULL
   `)
 
+  // ── Niche City Pairs table ──────────────────────────────────
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS niche_city_pairs (
+      id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+      city TEXT NOT NULL,
+      state TEXT NOT NULL,
+      niche TEXT NOT NULL,
+      maps_count INTEGER,
+      review_velocity INTEGER,
+      ad_count INTEGER,
+      agency_pages INTEGER,
+      weak_site_pct INTEGER,
+      contactable_pct INTEGER,
+      economic_signal TEXT,
+      revenue_estimate TEXT,
+      demand_score INTEGER,
+      competition_score INTEGER,
+      weakness_score INTEGER,
+      contact_score INTEGER,
+      revenue_score INTEGER,
+      total_score INTEGER,
+      status TEXT NOT NULL DEFAULT 'candidate',
+      validation_leads INTEGER,
+      validation_contactable_pct INTEGER,
+      validation_weak_pct INTEGER,
+      sprint_start TEXT,
+      sprint_reply_rate INTEGER,
+      sprint_result TEXT,
+      notes TEXT,
+      evaluated_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `)
+
+  // Add pair FK to leads table
+  safeAddColumn('leads', 'niche_city_pair_id', 'TEXT')
+
   sqlite.close()
   console.log(`Database initialized at ${dbPath}`)
 }

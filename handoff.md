@@ -1,46 +1,38 @@
 # Handoff — Web Agency Platform
 
 ## Last Updated
-2026-04-22
+2026-04-23
 
 ## What Was Done (This Session)
-Created the Niche & City Hunting SOP and updated all cross-referenced documentation.
+Assessed current implementation stage, validated app-lite health, and added a canonical end-to-end workflow document.
 
 ### Documentation Changes
-- `docs/22-Niche-Hunting-SOP.md` [NEW]
-  - Step 0 workflow for city+niche pair discovery.
-  - Data sources: Maps density, SERP/ads, website weakness rate, contactability, economic signals.
-  - Repeatable search query library (discovery, competition, weakness sampling).
-  - 100-point scoring model: demand (25), competition inverse (20), weakness (25), contactability (15), revenue potential (15).
-  - Mini-validation scrape: top 3 pairs per city, 30 leads each.
-  - Go/no-go thresholds: score ≥ 70, contactable ≥ 60%, weak-site ≥ 50%, density ≥ 20.
-  - 2-week outreach sprint cadence with continue/pause/drop outcomes.
-  - Weekly cadence: Mon review → Tue scoring → Wed validation → Thu decisions → Fri launch.
-  - Guardrails: max 3 concurrent sprints, 90-day re-evaluation minimum, human reviews first 3 decisions.
-- `docs/03-ICP-Niches-Scoring.md` [UPDATED]
-  - Shifted from global niche scoring to city+niche pair scoring.
-  - Added 100-point scoring dimensions table with references to doc 22.
-  - Added go/no-go thresholds and scorecard artifact reference.
-  - Added illustrative city+niche scorecard table.
-  - Added candidate niche library (non-obvious specialties beyond HVAC/plumbing/roofing).
-  - Updated expansion rules to use city+niche pairs.
-- `docs/12-KPIs-Dashboard.md` [UPDATED]
-  - Added city+niche pair KPIs section: per-pair funnel metrics and aggregation guidance.
-  - Updated weekly review questions to reference city+niche sprints.
-- `docs/15-Templates.md` [UPDATED]
-  - Added city-specialty hook email variants (pool services, auto detailing, chiropractors, pet grooming).
-  - Updated discovery checklist to require city+niche pair approval from doc 22.
+- `docs/23-Full-Workflow.md` [NEW]
+  - Added one canonical end-to-end workflow map (Step 0 through Step 8).
+  - Added state machine mapping (lead and client paths).
+  - Added policy/human-gate checkpoints and job trigger map.
+  - Added source map to deep-dive SOP and architecture docs.
 - `docs/README.md` [UPDATED]
-  - Added doc 22 to folder map and reading instructions.
-- `data/niche-city-scorecard.csv` [NEW]
-  - Operational CSV with headers for tracking evaluated city+niche pairs.
+  - Added doc 23 to folder map and reading order guidance.
 
-### No Code Changes
-This session was documentation-only. No app-lite source files were modified.
+### Validation Run
+- Ran `bun run typecheck` in `app-lite/` -> passed.
+- Ran `bun run test` in `app-lite/` -> 4 test files, 60 tests, all passed.
+
+### Stage Snapshot (from app-lite runtime data)
+- Current phase: 2 (Agent foundation).
+- Human gates configured on (email/demo/launch required).
+- Active targeting config: niche `laundry`, cities `Kansas City, MO` and `Arlington, TX`.
+- Records: 81 leads, 0 clients, 153 jobs.
+
+### Code Changes
+- No source code changes in `app-lite/src/`.
+- This session changed documentation only.
 
 ## What's In Progress
 - City+niche targeting is fully documented but not yet implemented in the application.
 - Scraper config currently runs one global niche across all cities — needs to support per-city niche configuration.
+- Core workflow is now documented in one place (`docs/23-Full-Workflow.md`), but application behavior still needs parity with Step 0 city+niche orchestration.
 
 ## What's Blocked
 - **Resend API key** — required for production email sends in `follow_up_1`.
@@ -66,6 +58,9 @@ This session was documentation-only. No app-lite source files were modified.
 3. Add interaction logging for phone/SMS outreach attempts and outcomes.
 4. Add KPI plumbing for phone fallback funnel (`sent`, `replied`, `interested`, `demo_requested`).
 5. Optional: add social/profile enrichment pass for leads with no email + no phone.
+
+6. Documentation consistency follow-up (recommended):
+   - Reconcile `docs/19-Application-Architecture.md` platform language (PostgreSQL/Express/BullMQ) with active `app-lite` stack (SQLite/Hono/DB-backed queue), or add explicit "legacy architecture vs app-lite architecture" note to prevent confusion.
 
 ## Current Pipeline Snapshot
 ```text
