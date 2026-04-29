@@ -6,43 +6,27 @@
   <title>Agency Engine â€” Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root, [data-theme="dark"] {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --surface-2: #1a1a26;
-      --border: #2a2a3a;
-      --text: #e4e4ef;
-      --text-dim: #7a7a8f;
-      --accent: #6c5ce7;
-      --accent-glow: rgba(108, 92, 231, 0.15);
-      --green: #00b894;
-      --yellow: #fdcb6e;
-      --red: #e17055;
-      --blue: #74b9ff;
-      --orange: #f39c12;
+    :root {
+      --bg: #111412;
+      --surface: #161a17;
+      --surface-2: #1d211e;
+      --border: #2c322d;
+      --text: #c8cdc9;
+      --text-dim: #6b736c;
+      --accent: #d4a54a;
+      --accent-glow: rgba(212, 165, 74, 0.08);
+      --green: #5a8a4a;
+      --yellow: #c9a84e;
+      --red: #b05040;
+      --blue: #5a7e96;
+      --orange: #b07830;
       --font: 'Inter', system-ui, -apple-system, sans-serif;
-      --mono: 'JetBrains Mono', 'Consolas', monospace;
-    }
-
-    [data-theme="light"] {
-      --bg: #f4f5f7;
-      --surface: #ffffff;
-      --surface-2: #f0f1f3;
-      --border: #e0e1e6;
-      --text: #1a1a2e;
-      --text-dim: #6b6b80;
-      --accent: #6c5ce7;
-      --accent-glow: rgba(108, 92, 231, 0.08);
-      --green: #00a884;
-      --yellow: #e6a817;
-      --red: #d63031;
-      --blue: #3b82f6;
-      --orange: #e67e22;
+      --mono: 'Inter', system-ui, sans-serif;
     }
 
     body {
@@ -138,7 +122,7 @@
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 3px;
       padding: 16px 20px;
       display: flex;
       flex-direction: column;
@@ -175,8 +159,9 @@
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 3px;
       overflow: hidden;
+      box-shadow: inset 0 1px 6px rgba(0,0,0,0.35);
     }
     .panel-header {
       padding: 14px 20px;
@@ -242,7 +227,7 @@
     .badge {
       display: inline-block;
       padding: 2px 8px;
-      border-radius: 4px;
+      border-radius: 2px;
       font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
@@ -354,7 +339,7 @@
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 16px;
-      border-radius: 6px;
+      border-radius: 3px;
       cursor: pointer;
       font-family: var(--font);
       font-size: 13px;
@@ -398,7 +383,7 @@
       border: 1px solid var(--border);
       color: var(--text);
       padding: 6px 10px;
-      border-radius: 6px;
+      border-radius: 3px;
       font-family: var(--font);
       font-size: 12px;
       outline: none;
@@ -423,7 +408,7 @@
       border: 1px solid var(--border);
       color: var(--text);
       padding: 12px 20px;
-      border-radius: 8px;
+      border-radius: 3px;
       font-size: 13px;
       font-family: var(--font);
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
@@ -460,7 +445,7 @@
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 12px;
-      border-radius: 6px;
+      border-radius: 3px;
       font-family: var(--mono);
       font-size: 13px;
       outline: none;
@@ -523,7 +508,7 @@
       <span id="phase">Phase —</span>
       <span id="uptime">—</span>
       <span id="last-refresh">—</span>
-      <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:12px">🌙</button>
+
     </div>
   </div>
 
@@ -655,11 +640,11 @@
           </div>
           <div class="form-group full-width">
             <label>Priority Cities (one per line: "City, ST")</label>
-            <textarea id="dc-priority-cities" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+            <textarea id="dc-priority-cities" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:3px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
           </div>
           <div class="form-group full-width">
             <label>Exclude Niches (one per line)</label>
-            <textarea id="dc-exclude-niches" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+            <textarea id="dc-exclude-niches" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:3px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
           </div>
         </div>
       </div>
@@ -725,7 +710,7 @@
           </div>
           <div class="form-group full-width">
             <label>Cities (one per line: "City, ST")</label>
-            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:3px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
           </div>
         </div>
       </div>
@@ -1871,64 +1856,63 @@
       try {
         const res = await axios.get(API + '/api/niches/discover/stats', { headers });
         const s = res.data;
-        
-        document.getElementById('discovery-stats-row').innerHTML = \`
+
+        document.getElementById('discovery-stats-row').innerHTML = `
           <div class="stat-card">
             <span class="label">Status</span>
-            <span class="value" style="color:var(--accent)">\${s.config?.enabled ? 'Active' : 'Paused'}</span>
-            <span class="sub">\${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
+            <span class="value" style="color:var(--accent)">${s.config?.enabled ? 'Active' : 'Paused'}</span>
+            <span class="sub">${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
           </div>
           <div class="stat-card">
             <span class="label">Total Probed</span>
-            <span class="value">\${s.totalCandidate}</span>
+            <span class="value">${s.totalCandidate}</span>
             <span class="sub">candidate pairs found</span>
           </div>
           <div class="stat-card">
             <span class="label">Scored</span>
-            <span class="value" style="color:var(--yellow)">\${s.totalScored}</span>
+            <span class="value" style="color:var(--yellow)">${s.totalScored}</span>
           </div>
           <div class="stat-card">
             <span class="label">Validated</span>
-            <span class="value" style="color:var(--blue)">\${s.totalValidated}</span>
+            <span class="value" style="color:var(--blue)">${s.totalValidated}</span>
           </div>
           <div class="stat-card">
             <span class="label">Approved</span>
-            <span class="value" style="color:var(--green)">\${s.totalApproved}</span>
+            <span class="value" style="color:var(--green)">${s.totalApproved}</span>
             <span class="sub">ready for campaigns</span>
           </div>
           <div class="stat-card">
             <span class="label">Parked/Dropped</span>
-            <span class="value" style="color:var(--text-dim)">\${s.totalParked} / \${s.totalDropped}</span>
+            <span class="value" style="color:var(--text-dim)">${s.totalParked} / ${s.totalDropped}</span>
           </div>
           <div class="stat-card">
             <span class="label">Last Run</span>
-            <span class="value" style="font-size:14px">\${ago(s.config?.lastRun)}</span>
+            <span class="value" style="font-size:14px">${ago(s.config?.lastRun)}</span>
           </div>
-        \`;
+        `;
 
-        // Funnel bar
         const funnelStatuses = ['candidate', 'scored', 'validated', 'approved'];
         const funnelCounts = [s.totalCandidate, s.totalScored, s.totalValidated, s.totalApproved];
         const funnelColors = ['#74b9ff', '#fdcb6e', '#3b82f6', '#00b894'];
-        
+
         const total = funnelCounts.reduce((a, b) => a + b, 0) || 1;
         const bar = document.getElementById('discovery-funnel-bar');
         const legend = document.getElementById('discovery-funnel-legend');
-        
+
         let barHtml = '';
         let legendHtml = '';
-        
+
         funnelStatuses.forEach((status, i) => {
           const c = funnelCounts[i] || 0;
           if (c > 0) {
-            barHtml += \`<div style="width:\${(c/total)*100}%;background:\${funnelColors[i]}" title="\${status}: \${c}"></div>\`;
+            barHtml += `<div style="width:${(c/total)*100}%;background:${funnelColors[i]}" title="${status}: ${c}"></div>`;
           }
-          legendHtml += \`<span style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px">
-            <span style="width:8px;height:8px;border-radius:2px;background:\${funnelColors[i]};display:inline-block"></span>
-            \${status} (\${c})
-          </span>\`;
+          legendHtml += `<span style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px">
+            <span style="width:8px;height:8px;border-radius:2px;background:${funnelColors[i]};display:inline-block"></span>
+            ${status} (${c})
+          </span>`;
         });
-        
+
         bar.innerHTML = barHtml;
         legend.innerHTML = legendHtml;
 
@@ -1937,22 +1921,7 @@
       }
     }
 
-    // Theme toggle
-    function toggleTheme() {
-      const html = document.documentElement;
-      const current = html.getAttribute('data-theme') || 'dark';
-      const next = current === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      document.getElementById('theme-toggle').textContent = next === 'dark' ? 'ðŸŒ™' : 'â˜€ï¸';
-    }
-    (function initTheme() {
-      const saved = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = saved || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-      document.getElementById('theme-toggle').textContent = theme === 'dark' ? 'ðŸŒ™' : 'â˜€ï¸';
-    })();
+    document.documentElement.setAttribute('data-theme', 'dark');
 
     // Initial load + poll
     refresh();
