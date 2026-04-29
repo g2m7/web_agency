@@ -3,154 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agency Engine — System Documentation</title>
+<title>UNSC-OGM // SYSTEM DOCS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root,[data-theme="dark"]{
-  --bg:#0a0a0f;--surface:#12121a;--surface-2:#1a1a26;--surface-3:#222233;
-  --border:#2a2a3a;--text:#e4e4ef;--text-dim:#7a7a8f;--text-bright:#fff;
-  --accent:#6c5ce7;--accent-2:#a29bfe;--accent-glow:rgba(108,92,231,0.12);
-  --green:#00b894;--yellow:#fdcb6e;--red:#e17055;--blue:#74b9ff;--orange:#f39c12;--pink:#fd79a8;
-  --font:'Inter',system-ui,-apple-system,sans-serif;--mono:'JetBrains Mono','Consolas',monospace;
-}
-[data-theme="light"]{
-  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#f0f1f3;--surface-3:#e8e9ec;
-  --border:#d0d1d6;--text:#1a1a2e;--text-dim:#6b6b80;--text-bright:#000;
-  --accent:#6c5ce7;--accent-2:#5a4bd1;--accent-glow:rgba(108,92,231,0.06);
-  --green:#00a884;--yellow:#c49000;--red:#d63031;--blue:#2563eb;--orange:#c66900;--pink:#e84393;
+:root{
+  --bg:#111213;--surface:#1e1e1e;--surface-2:#282828;--surface-3:#333;
+  --border:#3d3d3d;--border-hud:#555;
+  --text:#c9d1d9;--text-dim:#8b949e;--text-bright:#fff;
+  --accent:#fb923c;--accent-dim:#c2410c;--accent-glow:rgba(251,146,60,0.15);
+  --green:#34d399;--yellow:#facc15;--red:#f87171;--blue:#38bdf8;--orange:#fb923c;--pink:#f472b6;
+  --font:'Space Grotesk','Rajdhani',system-ui,sans-serif;
+  --mono:'Share Tech Mono','Consolas',monospace;
 }
 html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+body{font-family:'Space Grotesk','Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:32px 32px;opacity:.4;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:220px;opacity:.08;pointer-events:none;z-index:0}
+.topbar,.layout,.mobile-nav{position:relative;z-index:1}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:0}
+::-webkit-scrollbar-thumb:hover{background:var(--accent-dim)}
 
-/* ── Top Bar ─────────────────────────────────── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px)}
-.topbar-left{display:flex;align-items:center;gap:12px}
-.topbar-back{color:var(--text-dim);text-decoration:none;font-size:13px;display:flex;align-items:center;gap:6px;transition:color .15s}
+.topbar{background:var(--surface);border-bottom:2px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 4px 0px rgba(0,0,0,.2)}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-back{color:var(--text);text-decoration:none;font-size:14px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px;transition:color .15s}
 .topbar-back:hover{color:var(--accent)}
-.topbar h1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
-.topbar h1 .icon{width:20px;height:20px;border-radius:4px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.topbar-right .theme-toggle{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-dim);cursor:pointer;padding:4px 10px;font-size:12px;transition:all .15s}
-.topbar-right .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.topbar h1{font-size:15px;font-weight:600;font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:10px;color:var(--text-bright)}
+.topbar h1 .icon{width:22px;height:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;font-weight:700;font-family:var(--mono);box-shadow:2px 2px 0px rgba(0,0,0,.5)}
 
-/* ── Layout ──────────────────────────────────── */
 .layout{display:flex;flex:1}
 
-/* ── Sidebar ─────────────────────────────────── */
-.sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;overflow-y:auto;height:calc(100vh - 49px);position:sticky;top:49px}
-.sidebar-section{margin-bottom:8px}
-.sidebar-section-label{padding:8px 20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim)}
-.sidebar a{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;color:var(--text-dim);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
-.sidebar a:hover{color:var(--text);background:var(--accent-glow)}
-.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-glow);font-weight:500}
-.sidebar a .num{font-family:var(--mono);font-size:10px;color:var(--text-dim);width:18px;text-align:right}
+.sidebar{width:300px;min-width:300px;background:#1a1a1a;border-right:2px solid var(--border);padding:24px 0;overflow-y:auto;height:calc(100vh - 50px);position:sticky;top:50px;z-index:2}
+.sidebar-section{margin-bottom:12px}
+.sidebar-section-label{padding:14px 24px 8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#999;font-family:var(--mono)}
+.sidebar a{display:flex;align-items:center;gap:12px;padding:12px 24px;font-size:15px;color:#eee;text-decoration:none;transition:all .15s;border-left:4px solid transparent;font-family:'Space Grotesk','Rajdhani',sans-serif;line-height:1.4}
+.sidebar a:hover{color:#fff;background:rgba(251,146,60,0.1)}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:rgba(251,146,60,0.12);font-weight:700}
+.sidebar a .num{font-family:var(--mono);font-size:12px;color:#888;width:24px;text-align:right;flex-shrink:0}
 .sidebar a.active .num{color:var(--accent)}
 
-/* ── Main Content ────────────────────────────── */
-.main{flex:1;max-width:960px;padding:40px 48px 120px;margin:0 auto}
+.main{flex:1;max-width:1200px;padding:40px 56px 120px;margin:0 auto;background:var(--bg);position:relative;z-index:1}
 .section{display:none}
-.section.active{display:block;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section.active{display:block;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-.section-hero{margin-bottom:40px}
-.section-hero .tag{display:inline-block;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-.tag-strategy{background:rgba(253,203,110,0.15);color:var(--yellow)}
-.tag-pipeline{background:rgba(108,92,231,0.15);color:var(--accent-2)}
-.tag-operations{background:rgba(0,184,148,0.15);color:var(--green)}
-.tag-controls{background:rgba(225,112,85,0.15);color:var(--red)}
-.tag-system{background:rgba(116,185,255,0.15);color:var(--blue)}
-.tag-finance{background:rgba(253,121,168,0.15);color:var(--pink)}
-.section-hero h2{font-size:28px;font-weight:800;line-height:1.2;margin-bottom:8px}
-.section-hero p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.section-hero{margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.section-hero .tag{display:inline-block;padding:5px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;font-family:var(--mono);border-left:3px solid}
+.tag-strategy{background:rgba(250,204,21,0.08);color:var(--yellow);border-left-color:var(--yellow)}
+.tag-pipeline{background:rgba(251,146,60,0.08);color:var(--accent);border-left-color:var(--accent)}
+.tag-operations{background:rgba(52,211,153,0.08);color:var(--green);border-left-color:var(--green)}
+.tag-controls{background:rgba(248,113,113,0.08);color:var(--red);border-left-color:var(--red)}
+.tag-system{background:rgba(56,189,248,0.08);color:var(--blue);border-left-color:var(--blue)}
+.tag-finance{background:rgba(244,114,182,0.08);color:var(--pink);border-left-color:var(--pink)}
+.section-hero h2{font-size:30px;font-weight:700;line-height:1.2;margin-bottom:8px;color:var(--text-bright);font-family:'Space Grotesk','Rajdhani',sans-serif}
+.section-hero p{font-size:16px;color:var(--text-dim);line-height:1.7}
 
-/* ── Typography ──────────────────────────────── */
-h3{font-size:18px;font-weight:700;margin:32px 0 12px;color:var(--text-bright)}
-h4{font-size:14px;font-weight:600;margin:24px 0 8px;color:var(--text)}
-p,.li{font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:12px}
+h3{font-size:19px;font-weight:700;margin:32px 0 12px;color:var(--text-bright);font-family:'Space Grotesk','Rajdhani',sans-serif;padding-left:12px;border-left:3px solid var(--accent)}
+h4{font-size:15px;font-weight:600;margin:24px 0 8px;color:var(--text-bright)}
+p,.li{font-size:15px;line-height:1.8;color:var(--text);margin-bottom:12px}
 
-/* ── Cards ───────────────────────────────────── */
 .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
 @media(max-width:768px){.card-grid{grid-template-columns:1fr}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;transition:border-color .2s}
+.card{background:var(--surface);border:1px solid var(--border);padding:20px;transition:border-color .2s;position:relative;box-shadow:4px 4px 0px rgba(0,0,0,.2)}
+.card::before,.card::after{content:'';position:absolute;width:12px;height:12px;border-color:var(--accent);border-style:solid;opacity:.6;pointer-events:none}
+.card::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
 .card:hover{border-color:var(--accent)}
-.card .card-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
-.card h4{margin:0 0 6px;font-size:14px;font-weight:600}
-.card p{margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.6}
+.card:hover::before,.card:hover::after{opacity:1}
+.card .card-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;font-family:var(--mono);font-weight:700}
+.card h4{margin:0 0 6px;font-size:15px;font-weight:600;color:var(--text-bright)}
+.card p{margin:0;font-size:13.5px;color:var(--text);line-height:1.7}
 
 .card-full{grid-column:1/-1}
 .card-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:900px){.card-3{grid-template-columns:1fr}}
 
-/* ── Tables ──────────────────────────────────── */
-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12.5px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px;font-family:'Space Grotesk','Rajdhani',sans-serif}
 thead{background:var(--surface-2)}
-th{text-align:left;padding:10px 14px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);border-bottom:1px solid var(--border)}
-td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+th{text-align:left;padding:10px 14px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);border-bottom:2px solid var(--border);font-family:var(--mono)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
 tr:hover td{background:var(--accent-glow)}
 
-/* ── Badges ──────────────────────────────────── */
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);white-space:nowrap}
-.badge-green{background:rgba(0,184,148,0.15);color:var(--green)}
-.badge-yellow{background:rgba(253,203,110,0.15);color:var(--yellow)}
-.badge-red{background:rgba(225,112,85,0.15);color:var(--red)}
-.badge-blue{background:rgba(116,185,255,0.15);color:var(--blue)}
-.badge-purple{background:rgba(108,92,231,0.15);color:var(--accent-2)}
-.badge-gray{background:rgba(122,122,143,0.15);color:var(--text-dim)}
-.badge-pink{background:rgba(253,121,168,0.15);color:var(--pink)}
-.badge-orange{background:rgba(243,156,18,0.15);color:var(--orange)}
+.badge{display:inline-block;padding:3px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);white-space:nowrap;border:1px solid rgba(255,255,255,.06)}
+.badge-green{background:rgba(52,211,153,0.10);color:var(--green);border-left:2px solid var(--green)}
+.badge-yellow{background:rgba(250,204,21,0.08);color:var(--yellow);border-left:2px solid var(--yellow)}
+.badge-red{background:rgba(248,113,113,0.10);color:var(--red);border-left:2px solid var(--red)}
+.badge-blue{background:rgba(56,189,248,0.10);color:var(--blue);border-left:2px solid var(--blue)}
+.badge-purple{background:rgba(251,146,60,0.08);color:var(--accent);border-left:2px solid var(--accent)}
+.badge-gray{background:rgba(139,148,158,0.10);color:var(--text-dim);border-left:2px solid var(--text-dim)}
+.badge-pink{background:rgba(244,114,182,0.10);color:var(--pink);border-left:2px solid var(--pink)}
+.badge-orange{background:rgba(251,146,60,0.10);color:var(--orange);border-left:2px solid var(--orange)}
 
-/* ── Flow / Diagram blocks ───────────────────── */
 .flow{display:flex;flex-direction:column;gap:0;margin:20px 0}
 .flow-step{display:flex;gap:16px;position:relative}
 .flow-line{width:32px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.flow-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);z-index:1;flex-shrink:0}
+.flow-dot{width:12px;height:12px;border:2px solid var(--accent);background:var(--surface);z-index:1;flex-shrink:0}
 .flow-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent)}
 .flow-connector{width:2px;flex:1;background:var(--border);min-height:20px}
 .flow-content{flex:1;padding-bottom:24px}
-.flow-content h4{margin:0 0 4px;font-size:14px;font-weight:600}
-.flow-content p{margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.5}
+.flow-content h4{margin:0 0 4px;font-size:15px;font-weight:600;color:var(--text-bright)}
+.flow-content p{margin:0;font-size:13.5px;color:var(--text);line-height:1.7}
 .flow-content .flow-tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .flow-step:last-child .flow-connector{display:none}
 .flow-step:last-child .flow-content{padding-bottom:0}
 
-/* ── Inline SVG diagrams ─────────────────────── */
-.diagram{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;margin:20px 0;overflow-x:auto}
+.diagram{background:var(--surface);border:1px solid var(--border);padding:24px;margin:20px 0;overflow-x:auto;box-shadow:4px 4px 0px rgba(0,0,0,.2)}
 .diagram svg{width:100%;height:auto;display:block}
 
-/* ── Code / Mono blocks ──────────────────────── */
-.code-block{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text-dim)}
+.code-block{background:var(--surface-2);border:1px solid var(--border);padding:16px 20px;margin:12px 0;font-family:var(--mono);font-size:13px;line-height:1.8;overflow-x:auto;white-space:pre;color:var(--text);box-shadow:inset 2px 2px 0px rgba(0,0,0,.3)}
 
-/* ── Callout ──────────────────────────────────── */
-.callout{border-radius:8px;padding:14px 18px;margin:16px 0;font-size:13px;line-height:1.6;display:flex;gap:10px}
+.callout{padding:14px 18px;margin:16px 0;font-size:14px;line-height:1.8;display:flex;gap:10px;border-left:3px solid}
 .callout-icon{flex-shrink:0;font-size:16px}
-.callout-info{background:rgba(116,185,255,0.08);border:1px solid rgba(116,185,255,0.15)}
-.callout-warn{background:rgba(253,203,110,0.08);border:1px solid rgba(253,203,110,0.15)}
-.callout-danger{background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.15)}
-.callout-success{background:rgba(0,184,148,0.08);border:1px solid rgba(0,184,148,0.15)}
+.callout-info{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-left:3px solid var(--blue)}
+.callout-warn{background:rgba(250,204,21,0.06);border:1px solid rgba(250,204,21,0.15);border-left:3px solid var(--yellow)}
+.callout-danger{background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.15);border-left:3px solid var(--red)}
+.callout-success{background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-left:3px solid var(--green)}
 
-/* ── Stat mini ───────────────────────────────── */
 .stat-row{display:flex;gap:12px;margin:16px 0;flex-wrap:wrap}
-.stat-mini{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;flex:1;min-width:120px}
+.stat-mini{background:var(--surface);border:1px solid var(--border);padding:14px 18px;flex:1;min-width:120px;box-shadow:4px 4px 0px rgba(0,0,0,.2);position:relative}
+.stat-mini::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent)}
 .stat-mini .stat-val{font-size:24px;font-weight:700;font-family:var(--mono);color:var(--text-bright)}
-.stat-mini .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-top:2px}
+.stat-mini .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);margin-top:2px;font-family:var(--mono)}
 
-/* ── Responsive ──────────────────────────────── */
 @media(max-width:900px){
   .sidebar{display:none}
   .main{padding:24px 20px 80px}
   .mobile-nav{display:flex !important}
 }
-.mobile-nav{display:none;gap:0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;padding:0 16px}
-.mobile-nav a{padding:10px 14px;font-size:12px;color:var(--text-dim);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.mobile-nav{display:none;gap:0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;padding:0 16px;position:relative;z-index:1}
+.mobile-nav a{padding:10px 14px;font-size:13px;font-family:var(--mono);color:var(--text);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;letter-spacing:.5px}
 .mobile-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
 
-/* ── Tooltip ─────────────────────────────────── */
 .tip{border-bottom:1px dashed var(--text-dim);cursor:help}
-
-/* ── Divider ─────────────────────────────────── */
 .divider{height:1px;background:var(--border);margin:32px 0}
+
+code{font-family:var(--mono);font-size:13px;background:var(--surface-2);padding:2px 6px;border:1px solid var(--border);color:var(--accent)}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--text-bright)}
+ul,ol{padding-left:24px;margin:12px 0}
+li{font-size:14.5px;line-height:1.8;color:var(--text);margin-bottom:6px}
+strong{color:var(--text-bright);font-weight:600}
 </style>
 </head>
 <body>
@@ -158,11 +154,8 @@ tr:hover td{background:var(--accent-glow)}
 <!-- ── Top Bar ────────────────────────────────── -->
 <div class="topbar">
   <div class="topbar-left">
-    <a href="/" class="topbar-back">&#8592; Dashboard</a>
-    <h1><span class="icon">?</span> System Documentation</h1>
-  </div>
-  <div class="topbar-right">
-    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    <a href="/" class="topbar-back">&#8592; TERMINAL</a>
+    <h1><span class="icon">?</span> SYSTEM DOCS</h1>
   </div>
 </div>
 
@@ -228,52 +221,52 @@ tr:hover td{background:var(--accent-glow)}
 <p>Every client follows the same path through this system:</p>
 
 <div class="diagram">
-<svg viewBox="0 0 840 100" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+<svg viewBox="0 0 840 100" xmlns="http://www.w3.org/2000/svg" style="font-family:'Space Grotesk','Rajdhani',sans-serif">
   <defs>
-    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6c5ce7"/></marker>
-    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6c5ce7"/><stop offset="100%" stop-color="#a29bfe"/></linearGradient>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#fb923c"/></marker>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#c2410c"/></linearGradient>
   </defs>
   <!-- boxes -->
-  <rect x="0" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
-  <text x="50" y="45" text-anchor="middle" fill="#fdcb6e" font-size="9" font-weight="700">HUMAN</text>
-  <text x="50" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Niche Pick</text>
+  <rect x="0" y="25" width="100" height="50" rx="8" fill="#1e1e1e" stroke="#3d3d3d" stroke-width="1"/>
+  <text x="50" y="45" text-anchor="middle" fill="#facc15" font-size="9" font-weight="700">HUMAN</text>
+  <text x="50" y="60" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">Niche Pick</text>
 
-  <rect x="130" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
-  <text x="180" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
-  <text x="180" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Find Leads</text>
+  <rect x="130" y="25" width="100" height="50" rx="8" fill="#1e1e1e" stroke="#3d3d3d" stroke-width="1"/>
+  <text x="180" y="45" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">AI</text>
+  <text x="180" y="60" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">Find Leads</text>
 
-  <rect x="260" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
-  <text x="310" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
-  <text x="310" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Audit &amp; Score</text>
+  <rect x="260" y="25" width="100" height="50" rx="8" fill="#1e1e1e" stroke="#3d3d3d" stroke-width="1"/>
+  <text x="310" y="45" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">AI</text>
+  <text x="310" y="60" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">Audit &amp; Score</text>
 
-  <rect x="390" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
-  <text x="440" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
-  <text x="440" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Hook Email</text>
+  <rect x="390" y="25" width="100" height="50" rx="8" fill="#1e1e1e" stroke="#3d3d3d" stroke-width="1"/>
+  <text x="440" y="45" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">AI</text>
+  <text x="440" y="60" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">Hook Email</text>
 
-  <rect x="520" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
-  <text x="570" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
-  <text x="570" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Demo + Close</text>
+  <rect x="520" y="25" width="100" height="50" rx="8" fill="#1e1e1e" stroke="#3d3d3d" stroke-width="1"/>
+  <text x="570" y="45" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">AI</text>
+  <text x="570" y="60" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">Demo + Close</text>
 
-  <rect x="650" y="25" width="90" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
-  <text x="695" y="45" text-anchor="middle" fill="#00b894" font-size="9" font-weight="700">ONGOING</text>
-  <text x="695" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Deliver &amp; Support</text>
+  <rect x="650" y="25" width="90" height="50" rx="8" fill="#1e1e1e" stroke="#3d3d3d" stroke-width="1"/>
+  <text x="695" y="45" text-anchor="middle" fill="#34d399" font-size="9" font-weight="700">ONGOING</text>
+  <text x="695" y="60" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">Deliver &amp; Support</text>
 
   <!-- arrows -->
-  <line x1="100" y1="50" x2="128" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-  <line x1="230" y1="50" x2="258" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-  <line x1="360" y1="50" x2="388" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-  <line x1="490" y1="50" x2="518" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-  <line x1="620" y1="50" x2="648" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="100" y1="50" x2="128" y2="50" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="230" y1="50" x2="258" y2="50" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="50" x2="388" y2="50" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="490" y1="50" x2="518" y2="50" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="620" y1="50" x2="648" y2="50" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- bottom label -->
-  <text x="370" y="95" text-anchor="middle" fill="#7a7a8f" font-size="10">Every step is logged, policy-checked, and auditable. Human gates exist at email review, demo review, and launch.</text>
+  <text x="370" y="95" text-anchor="middle" fill="#8b949e" font-size="10">Every step is logged, policy-checked, and auditable. Human gates exist at email review, demo review, and launch.</text>
 </svg>
 </div>
 
 <h3>Who Does What</h3>
 <div class="card-grid card-3">
   <div class="card">
-    <div class="card-icon" style="background:rgba(253,203,110,0.15)">H</div>
+    <div class="card-icon" style="background:rgba(250,204,21,0.15)">H</div>
     <h4>Human Operator (You)</h4>
     <p>Picks niches, sets strategy, reviews agent output at quality gates, handles legal threats and escalations, manages payment provider accounts, and decides when to remove approval gates.</p>
   </div>
@@ -283,7 +276,7 @@ tr:hover td{background:var(--accent-glow)}
     <p>Runs 24/7. Scrapes leads, audits websites, writes and sends emails, classifies replies, builds demos, assembles sites from templates, handles Tier 1 support, generates monthly reports, monitors billing states.</p>
   </div>
   <div class="card">
-    <div class="card-icon" style="background:rgba(225,112,85,0.15)">&#9888;</div>
+    <div class="card-icon" style="background:rgba(248,113,113,0.15)">&#9888;</div>
     <h4>Policy Engine</h4>
     <p>Runs before every outbound action. Enforces hard guardrails: no demo before interest, no unauthorized discounts, no guarantees, strict data isolation, legal escalation. Cannot be bypassed by the agent.</p>
   </div>
@@ -539,55 +532,55 @@ tr:hover td{background:var(--accent-glow)}
 
 <h3>The Scraping Pipeline</h3>
 <div class="diagram">
-<svg viewBox="0 0 840 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
-  <defs><marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6c5ce7"/></marker></defs>
+<svg viewBox="0 0 840 140" xmlns="http://www.w3.org/2000/svg" style="font-family:'Space Grotesk','Rajdhani',sans-serif">
+  <defs><marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fb923c"/></marker></defs>
 
   <!-- Row 1: Main pipeline -->
-  <rect x="10" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="75" y="28" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">JOB: lead_gen</text>
-  <text x="75" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Google Maps Scrape</text>
+  <rect x="10" y="10" width="130" height="44" rx="8" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="75" y="28" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">JOB: lead_gen</text>
+  <text x="75" y="42" text-anchor="middle" fill="#c9d1d9" font-size="10">Google Maps Scrape</text>
 
-  <line x1="140" y1="32" x2="170" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="140" y1="32" x2="170" y2="32" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar)"/>
 
-  <rect x="172" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="237" y="28" text-anchor="middle" fill="#e4e4ef" font-size="10">Dedup + Tier</text>
-  <text x="237" y="42" text-anchor="middle" fill="#7a7a8f" font-size="9">hot / warm / low</text>
+  <rect x="172" y="10" width="130" height="44" rx="8" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="237" y="28" text-anchor="middle" fill="#c9d1d9" font-size="10">Dedup + Tier</text>
+  <text x="237" y="42" text-anchor="middle" fill="#8b949e" font-size="9">hot / warm / low</text>
 
-  <line x1="302" y1="32" x2="332" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="302" y1="32" x2="332" y2="32" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar)"/>
 
-  <rect x="334" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="399" y="28" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">JOB: email_enrich</text>
-  <text x="399" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Find Owner Emails</text>
+  <rect x="334" y="10" width="130" height="44" rx="8" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="399" y="28" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">JOB: email_enrich</text>
+  <text x="399" y="42" text-anchor="middle" fill="#c9d1d9" font-size="10">Find Owner Emails</text>
 
-  <line x1="464" y1="32" x2="494" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="464" y1="32" x2="494" y2="32" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar)"/>
 
-  <rect x="496" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="561" y="28" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">JOB: email_validate</text>
-  <text x="561" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Verify Deliverability</text>
+  <rect x="496" y="10" width="130" height="44" rx="8" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="561" y="28" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">JOB: email_validate</text>
+  <text x="561" y="42" text-anchor="middle" fill="#c9d1d9" font-size="10">Verify Deliverability</text>
 
-  <line x1="626" y1="32" x2="656" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="626" y1="32" x2="656" y2="32" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar)"/>
 
-  <rect x="658" y="10" width="170" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="743" y="28" text-anchor="middle" fill="#00b894" font-size="9" font-weight="700">SEGMENTATION</text>
-  <text x="743" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Email-ready / Phone / Unreachable</text>
+  <rect x="658" y="10" width="170" height="44" rx="8" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="743" y="28" text-anchor="middle" fill="#34d399" font-size="9" font-weight="700">SEGMENTATION</text>
+  <text x="743" y="42" text-anchor="middle" fill="#c9d1d9" font-size="10">Email-ready / Phone / Unreachable</text>
 
   <!-- Row 2: Segmentation outputs -->
-  <rect x="10" y="90" width="230" height="44" rx="8" fill="rgba(0,184,148,0.08)" stroke="rgba(0,184,148,0.2)"/>
-  <text x="125" y="108" text-anchor="middle" fill="#00b894" font-size="10" font-weight="600">Email-Ready (valid email + hot/warm)</text>
-  <text x="125" y="122" text-anchor="middle" fill="#7a7a8f" font-size="9">&rarr; Enters 2-step outreach pipeline</text>
+  <rect x="10" y="90" width="230" height="44" rx="8" fill="rgba(52,211,153,0.08)" stroke="rgba(52,211,153,0.2)"/>
+  <text x="125" y="108" text-anchor="middle" fill="#34d399" font-size="10" font-weight="600">Email-Ready (valid email + hot/warm)</text>
+  <text x="125" y="122" text-anchor="middle" fill="#8b949e" font-size="9">&rarr; Enters 2-step outreach pipeline</text>
 
-  <rect x="270" y="90" width="230" height="44" rx="8" fill="rgba(253,203,110,0.08)" stroke="rgba(253,203,110,0.2)"/>
-  <text x="385" y="108" text-anchor="middle" fill="#fdcb6e" font-size="10" font-weight="600">Phone Fallback (no email + has phone)</text>
-  <text x="385" y="122" text-anchor="middle" fill="#7a7a8f" font-size="9">&rarr; Short SMS/phone opener workflow</text>
+  <rect x="270" y="90" width="230" height="44" rx="8" fill="rgba(250,204,21,0.08)" stroke="rgba(250,204,21,0.2)"/>
+  <text x="385" y="108" text-anchor="middle" fill="#facc15" font-size="10" font-weight="600">Phone Fallback (no email + has phone)</text>
+  <text x="385" y="122" text-anchor="middle" fill="#8b949e" font-size="9">&rarr; Short SMS/phone opener workflow</text>
 
-  <rect x="530" y="90" width="230" height="44" rx="8" fill="rgba(122,122,143,0.08)" stroke="rgba(122,122,143,0.2)"/>
-  <text x="645" y="108" text-anchor="middle" fill="#7a7a8f" font-size="10" font-weight="600">Unreachable (no email + no phone)</text>
-  <text x="645" y="122" text-anchor="middle" fill="#7a7a8f" font-size="9">&rarr; Archived, not contacted</text>
+  <rect x="530" y="90" width="230" height="44" rx="8" fill="rgba(139,148,158,0.08)" stroke="rgba(139,148,158,0.2)"/>
+  <text x="645" y="108" text-anchor="middle" fill="#8b949e" font-size="10" font-weight="600">Unreachable (no email + no phone)</text>
+  <text x="645" y="122" text-anchor="middle" fill="#8b949e" font-size="9">&rarr; Archived, not contacted</text>
 
   <!-- connectors from row 1 to row 2 -->
-  <line x1="743" y1="54" x2="125" y2="88" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="743" y1="54" x2="385" y2="88" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="743" y1="54" x2="645" y2="88" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="743" y1="54" x2="125" y2="88" stroke="#3d3d3d" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="743" y1="54" x2="385" y2="88" stroke="#3d3d3d" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="743" y1="54" x2="645" y2="88" stroke="#3d3d3d" stroke-width="1" stroke-dasharray="3,3"/>
 </svg>
 </div>
 
@@ -701,17 +694,17 @@ tr:hover td{background:var(--accent-glow)}
 
 <h3>Step 1: The Hook Email</h3>
 <div class="diagram">
-<svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
-  <rect x="10" y="10" width="680" height="140" rx="10" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="30" y="35" fill="#7a7a8f" font-size="10">FROM: First Name &lt;name@outreach-domain.com&gt;</text>
-  <text x="30" y="55" fill="#e4e4ef" font-size="13" font-weight="600">SUBJECT: Quick note about {{business_name}}'s website</text>
-  <line x1="30" y1="65" x2="670" y2="65" stroke="#2a2a3a"/>
-  <text x="30" y="85" fill="#e4e4ef" font-size="12">Hi {{name}},</text>
-  <text x="30" y="105" fill="#e4e4ef" font-size="12">I noticed {{business_name}}'s site &mdash; specifically that {{one_visible_issue}}. It's</text>
-  <text x="30" y="120" fill="#e4e4ef" font-size="12">something that could be quietly costing you leads.</text>
-  <text x="30" y="140" fill="#e4e4ef" font-size="12">Want to see a better version? &mdash; {{first_name}}</text>
-  <rect x="560" y="120" width="120" height="24" rx="4" fill="rgba(0,184,148,0.15)"/>
-  <text x="620" y="136" text-anchor="middle" fill="#00b894" font-size="10" font-weight="600">UNDER 80 WORDS</text>
+<svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="font-family:'Space Grotesk','Rajdhani',sans-serif">
+  <rect x="10" y="10" width="680" height="140" rx="10" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="30" y="35" fill="#8b949e" font-size="10">FROM: First Name &lt;name@outreach-domain.com&gt;</text>
+  <text x="30" y="55" fill="#c9d1d9" font-size="13" font-weight="600">SUBJECT: Quick note about {{business_name}}'s website</text>
+  <line x1="30" y1="65" x2="670" y2="65" stroke="#3d3d3d"/>
+  <text x="30" y="85" fill="#c9d1d9" font-size="12">Hi {{name}},</text>
+  <text x="30" y="105" fill="#c9d1d9" font-size="12">I noticed {{business_name}}'s site &mdash; specifically that {{one_visible_issue}}. It's</text>
+  <text x="30" y="120" fill="#c9d1d9" font-size="12">something that could be quietly costing you leads.</text>
+  <text x="30" y="140" fill="#c9d1d9" font-size="12">Want to see a better version? &mdash; {{first_name}}</text>
+  <rect x="560" y="120" width="120" height="24" rx="4" fill="rgba(52,211,153,0.15)"/>
+  <text x="620" y="136" text-anchor="middle" fill="#34d399" font-size="10" font-weight="600">UNDER 80 WORDS</text>
 </svg>
 </div>
 
@@ -1104,40 +1097,40 @@ tr:hover td{background:var(--accent-glow)}
 
 <h3>How It Works</h3>
 <div class="diagram">
-<svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
-  <defs><marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6c5ce7"/></marker></defs>
+<svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="font-family:'Space Grotesk','Rajdhani',sans-serif">
+  <defs><marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fb923c"/></marker></defs>
 
   <!-- Input -->
-  <rect x="10" y="40" width="140" height="60" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
-  <text x="80" y="65" text-anchor="middle" fill="#e4e4ef" font-size="11" font-weight="600">Agent produces</text>
-  <text x="80" y="82" text-anchor="middle" fill="#e4e4ef" font-size="11" font-weight="600">output (email/demo/etc)</text>
+  <rect x="10" y="40" width="140" height="60" rx="8" fill="#1e1e1e" stroke="#3d3d3d"/>
+  <text x="80" y="65" text-anchor="middle" fill="#c9d1d9" font-size="11" font-weight="600">Agent produces</text>
+  <text x="80" y="82" text-anchor="middle" fill="#c9d1d9" font-size="11" font-weight="600">output (email/demo/etc)</text>
 
-  <line x1="150" y1="70" x2="190" y2="70" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar2)"/>
+  <line x1="150" y1="70" x2="190" y2="70" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar2)"/>
 
   <!-- Policy Engine -->
-  <rect x="192" y="20" width="200" height="100" rx="10" fill="rgba(225,112,85,0.06)" stroke="rgba(225,112,85,0.3)" stroke-width="2"/>
-  <text x="292" y="45" text-anchor="middle" fill="#e17055" font-size="11" font-weight="700">POLICY ENGINE</text>
-  <text x="292" y="62" text-anchor="middle" fill="#7a7a8f" font-size="9">Checks 12 rules against</text>
-  <text x="292" y="75" text-anchor="middle" fill="#7a7a8f" font-size="9">action type + phase + context</text>
-  <text x="292" y="95" text-anchor="middle" fill="#7a7a8f" font-size="9">Result logged to policy_checks</text>
-  <text x="292" y="108" text-anchor="middle" fill="#7a7a8f" font-size="9">regardless of outcome</text>
+  <rect x="192" y="20" width="200" height="100" rx="10" fill="rgba(248,113,113,0.06)" stroke="rgba(248,113,113,0.3)" stroke-width="2"/>
+  <text x="292" y="45" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">POLICY ENGINE</text>
+  <text x="292" y="62" text-anchor="middle" fill="#8b949e" font-size="9">Checks 12 rules against</text>
+  <text x="292" y="75" text-anchor="middle" fill="#8b949e" font-size="9">action type + phase + context</text>
+  <text x="292" y="95" text-anchor="middle" fill="#8b949e" font-size="9">Result logged to policy_checks</text>
+  <text x="292" y="108" text-anchor="middle" fill="#8b949e" font-size="9">regardless of outcome</text>
 
   <!-- Three outcomes -->
-  <line x1="392" y1="40" x2="440" y2="30" stroke="#00b894" stroke-width="1.5" marker-end="url(#ar2)"/>
-  <line x1="392" y1="70" x2="440" y2="70" stroke="#e17055" stroke-width="1.5" marker-end="url(#ar2)"/>
-  <line x1="392" y1="100" x2="440" y2="110" stroke="#fdcb6e" stroke-width="1.5" marker-end="url(#ar2)"/>
+  <line x1="392" y1="40" x2="440" y2="30" stroke="#34d399" stroke-width="1.5" marker-end="url(#ar2)"/>
+  <line x1="392" y1="70" x2="440" y2="70" stroke="#f87171" stroke-width="1.5" marker-end="url(#ar2)"/>
+  <line x1="392" y1="100" x2="440" y2="110" stroke="#facc15" stroke-width="1.5" marker-end="url(#ar2)"/>
 
-  <rect x="442" y="10" width="120" height="40" rx="6" fill="rgba(0,184,148,0.1)" stroke="rgba(0,184,148,0.3)"/>
-  <text x="502" y="28" text-anchor="middle" fill="#00b894" font-size="10" font-weight="700">PASS</text>
-  <text x="502" y="42" text-anchor="middle" fill="#00b894" font-size="9">Execute action</text>
+  <rect x="442" y="10" width="120" height="40" rx="6" fill="rgba(52,211,153,0.1)" stroke="rgba(52,211,153,0.3)"/>
+  <text x="502" y="28" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700">PASS</text>
+  <text x="502" y="42" text-anchor="middle" fill="#34d399" font-size="9">Execute action</text>
 
-  <rect x="442" y="55" width="120" height="40" rx="6" fill="rgba(225,112,85,0.1)" stroke="rgba(225,112,85,0.3)"/>
-  <text x="502" y="73" text-anchor="middle" fill="#e17055" font-size="10" font-weight="700">BLOCKED</text>
-  <text x="502" y="87" text-anchor="middle" fill="#e17055" font-size="9">Log + alert human</text>
+  <rect x="442" y="55" width="120" height="40" rx="6" fill="rgba(248,113,113,0.1)" stroke="rgba(248,113,113,0.3)"/>
+  <text x="502" y="73" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">BLOCKED</text>
+  <text x="502" y="87" text-anchor="middle" fill="#f87171" font-size="9">Log + alert human</text>
 
-  <rect x="442" y="100" width="120" height="40" rx="6" fill="rgba(253,203,110,0.1)" stroke="rgba(253,203,110,0.3)"/>
-  <text x="502" y="118" text-anchor="middle" fill="#fdcb6e" font-size="10" font-weight="700">NEEDS HUMAN</text>
-  <text x="502" y="132" text-anchor="middle" fill="#fdcb6e" font-size="9">Queue for review</text>
+  <rect x="442" y="100" width="120" height="40" rx="6" fill="rgba(250,204,21,0.1)" stroke="rgba(250,204,21,0.3)"/>
+  <text x="502" y="118" text-anchor="middle" fill="#facc15" font-size="10" font-weight="700">NEEDS HUMAN</text>
+  <text x="502" y="132" text-anchor="middle" fill="#facc15" font-size="9">Queue for review</text>
 </svg>
 </div>
 
@@ -1178,62 +1171,62 @@ tr:hover td{background:var(--accent-glow)}
 
 <h3>Lead Pipeline</h3>
 <div class="diagram">
-<svg viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+<svg viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg" style="font-family:'Space Grotesk','Rajdhani',sans-serif">
   <defs>
-    <marker id="ar3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6c5ce7"/></marker>
-    <marker id="ar3r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#e17055"/></marker>
-    <marker id="ar3g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7a7a8f"/></marker>
+    <marker id="ar3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fb923c"/></marker>
+    <marker id="ar3r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f87171"/></marker>
+    <marker id="ar3g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#8b949e"/></marker>
   </defs>
 
   <!-- NEW -->
-  <rect x="330" y="10" width="120" height="40" rx="8" fill="#1a1a26" stroke="#74b9ff" stroke-width="1.5"/>
-  <text x="390" y="35" text-anchor="middle" fill="#74b9ff" font-size="12" font-weight="700">NEW</text>
+  <rect x="330" y="10" width="120" height="40" rx="8" fill="#1e1e1e" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="390" y="35" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="700">NEW</text>
 
-  <line x1="390" y1="50" x2="390" y2="75" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <line x1="390" y1="50" x2="390" y2="75" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar3)"/>
 
   <!-- SCORED -->
-  <rect x="330" y="78" width="120" height="40" rx="8" fill="#1a1a26" stroke="#fdcb6e" stroke-width="1.5"/>
-  <text x="390" y="103" text-anchor="middle" fill="#fdcb6e" font-size="12" font-weight="700">SCORED</text>
+  <rect x="330" y="78" width="120" height="40" rx="8" fill="#1e1e1e" stroke="#facc15" stroke-width="1.5"/>
+  <text x="390" y="103" text-anchor="middle" fill="#facc15" font-size="12" font-weight="700">SCORED</text>
 
-  <line x1="390" y1="118" x2="390" y2="143" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <line x1="390" y1="118" x2="390" y2="143" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar3)"/>
 
   <!-- CONTACTED -->
-  <rect x="330" y="146" width="120" height="40" rx="8" fill="#1a1a26" stroke="#6c5ce7" stroke-width="1.5"/>
-  <text x="390" y="171" text-anchor="middle" fill="#a29bfe" font-size="12" font-weight="700">CONTACTED</text>
+  <rect x="330" y="146" width="120" height="40" rx="8" fill="#1e1e1e" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="390" y="171" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="700">CONTACTED</text>
 
   <!-- Branches from CONTACTED -->
   <!-- Left: ARCHIVED -->
-  <line x1="330" y1="166" x2="190" y2="166" stroke="#7a7a8f" stroke-width="1.5" marker-end="url(#ar3g)"/>
-  <rect x="70" y="146" width="120" height="40" rx="8" fill="#1a1a26" stroke="#7a7a8f" stroke-width="1"/>
-  <text x="130" y="171" text-anchor="middle" fill="#7a7a8f" font-size="11" font-weight="600">ARCHIVED</text>
-  <text x="245" y="158" text-anchor="middle" fill="#7a7a8f" font-size="8">no response</text>
+  <line x1="330" y1="166" x2="190" y2="166" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar3g)"/>
+  <rect x="70" y="146" width="120" height="40" rx="8" fill="#1e1e1e" stroke="#8b949e" stroke-width="1"/>
+  <text x="130" y="171" text-anchor="middle" fill="#8b949e" font-size="11" font-weight="600">ARCHIVED</text>
+  <text x="245" y="158" text-anchor="middle" fill="#8b949e" font-size="8">no response</text>
 
   <!-- Down: REPLIED_INTERESTED -->
-  <line x1="390" y1="186" x2="390" y2="214" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
-  <rect x="310" y="217" width="160" height="40" rx="8" fill="#1a1a26" stroke="#00b894" stroke-width="1.5"/>
-  <text x="390" y="242" text-anchor="middle" fill="#00b894" font-size="11" font-weight="700">REPLIED_INTERESTED</text>
-  <text x="405" y="208" text-anchor="middle" fill="#00b894" font-size="8">interested reply</text>
+  <line x1="390" y1="186" x2="390" y2="214" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <rect x="310" y="217" width="160" height="40" rx="8" fill="#1e1e1e" stroke="#34d399" stroke-width="1.5"/>
+  <text x="390" y="242" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">REPLIED_INTERESTED</text>
+  <text x="405" y="208" text-anchor="middle" fill="#34d399" font-size="8">interested reply</text>
 
   <!-- Down: DEMO_SENT -->
-  <line x1="390" y1="257" x2="390" y2="282" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
-  <rect x="330" y="285" width="120" height="40" rx="8" fill="#1a1a26" stroke="#fdcb6e" stroke-width="1.5"/>
-  <text x="390" y="310" text-anchor="middle" fill="#fdcb6e" font-size="12" font-weight="700">DEMO_SENT</text>
+  <line x1="390" y1="257" x2="390" y2="282" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <rect x="330" y="285" width="120" height="40" rx="8" fill="#1e1e1e" stroke="#facc15" stroke-width="1.5"/>
+  <text x="390" y="310" text-anchor="middle" fill="#facc15" font-size="12" font-weight="700">DEMO_SENT</text>
 
   <!-- Left from DEMO_SENT: LOST -->
-  <line x1="330" y1="305" x2="190" y2="305" stroke="#e17055" stroke-width="1.5" marker-end="url(#ar3r)"/>
-  <rect x="70" y="285" width="120" height="40" rx="8" fill="#1a1a26" stroke="#e17055" stroke-width="1"/>
-  <text x="130" y="310" text-anchor="middle" fill="#e17055" font-size="11" font-weight="600">LOST</text>
-  <text x="245" y="298" text-anchor="middle" fill="#e17055" font-size="8">declined</text>
+  <line x1="330" y1="305" x2="190" y2="305" stroke="#f87171" stroke-width="1.5" marker-end="url(#ar3r)"/>
+  <rect x="70" y="285" width="120" height="40" rx="8" fill="#1e1e1e" stroke="#f87171" stroke-width="1"/>
+  <text x="130" y="310" text-anchor="middle" fill="#f87171" font-size="11" font-weight="600">LOST</text>
+  <text x="245" y="298" text-anchor="middle" fill="#f87171" font-size="8">declined</text>
 
   <!-- Right from DEMO_SENT: PAID -->
-  <line x1="450" y1="305" x2="570" y2="305" stroke="#00b894" stroke-width="1.5" marker-end="url(#ar3g)"/>
-  <rect x="572" y="285" width="120" height="40" rx="8" fill="rgba(0,184,148,0.1)" stroke="#00b894" stroke-width="2"/>
-  <text x="632" y="310" text-anchor="middle" fill="#00b894" font-size="12" font-weight="700">PAID</text>
-  <text x="520" y="298" text-anchor="middle" fill="#00b894" font-size="8">payment confirmed</text>
+  <line x1="450" y1="305" x2="570" y2="305" stroke="#34d399" stroke-width="1.5" marker-end="url(#ar3g)"/>
+  <rect x="572" y="285" width="120" height="40" rx="8" fill="rgba(52,211,153,0.1)" stroke="#34d399" stroke-width="2"/>
+  <text x="632" y="310" text-anchor="middle" fill="#34d399" font-size="12" font-weight="700">PAID</text>
+  <text x="520" y="298" text-anchor="middle" fill="#34d399" font-size="8">payment confirmed</text>
 
   <!-- PAID transitions to client -->
-  <line x1="632" y1="285" x2="632" y2="255" stroke="#00b894" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="632" y="248" text-anchor="middle" fill="#7a7a8f" font-size="9">&darr; Creates CLIENT record</text>
+  <line x1="632" y1="285" x2="632" y2="255" stroke="#34d399" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="632" y="248" text-anchor="middle" fill="#8b949e" font-size="9">&darr; Creates CLIENT record</text>
 </svg>
 </div>
 
@@ -1555,7 +1548,6 @@ tr:hover td{background:var(--accent-glow)}
   const sidebar = document.getElementById('sidebar');
   const mobileNav = document.getElementById('mobileNav');
 
-  // Build mobile nav
   if(mobileNav){
     sidebar.querySelectorAll('a').forEach(a => {
       const clone = a.cloneNode(true);
@@ -1581,22 +1573,10 @@ tr:hover td{background:var(--accent-glow)}
     });
   });
 
-  // Handle hash on load
   const hash = location.hash.slice(1);
   if(hash && document.getElementById(hash)){
     navigate(hash);
   }
-
-  // Theme
-  const saved = localStorage.getItem('theme');
-  if(saved === 'light') document.documentElement.setAttribute('data-theme','light');
-
-  window.toggleTheme = function(){
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-  };
 })();
 </script>
 </body>

@@ -37,7 +37,7 @@
       background-color: var(--color-bg);
       color: var(--color-hud-bright);
     }
-        body::before {
+    body::before {
       content: '';
       position: fixed;
       inset: 0;
@@ -67,7 +67,6 @@
 
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
 
     .hud-panel {
       position: relative;
@@ -76,7 +75,6 @@
       border-radius: 0;
       box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
     }
-    .hud-panel > div:first-child { border-radius: 0 !important; }
     .hud-panel::before, .hud-panel::after {
       content: '';
       position: absolute;
@@ -89,22 +87,12 @@
     }
     .hud-panel::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
     .hud-panel::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
-    
-    .hud-panel::marker { content: none; }
-
-    .glass-panel {
-      background: var(--color-surface-2);
-      border: 1px solid var(--color-border);
-      border-radius: 0;
-      box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
-    }
 
     .header-shell {
       background: var(--color-surface);
       border-bottom: 2px solid var(--color-border);
       box-shadow: 0 4px 0px rgba(0,0,0,0.2);
     }
-
     .nav-shell {
       background: var(--color-surface-2);
       border-bottom: 1px solid var(--color-border);
@@ -119,10 +107,7 @@
       text-transform: uppercase;
       box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
     }
-    .btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: none;
-    }
+    .btn:active { transform: translate(2px, 2px); box-shadow: none; }
     .btn::after {
       content: '';
       position: absolute;
@@ -140,10 +125,7 @@
       color: #000 !important;
       font-weight: 700;
     }
-    .btn-primary:hover {
-      background: #ff8533;
-      border-color: #ff8533 !important;
-    }
+    .btn-primary:hover { background: #ff8533; border-color: #ff8533 !important; }
 
     .view { display: none; }
     .view.active { display: flex; }
@@ -155,10 +137,7 @@
       color: var(--color-hud-bright) !important;
       box-shadow: inset 2px 2px 0px rgba(0,0,0,0.3);
     }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--color-accent) !important;
-      outline: none;
-    }
+    input:focus, select:focus, textarea:focus { border-color: var(--color-accent) !important; outline: none; }
 
     .nav-tab {
       border-radius: 0;
@@ -169,39 +148,42 @@
       border-bottom: 2px solid transparent;
       color: var(--color-dim);
     }
-    .nav-tab:hover {
-      color: var(--color-hud-bright);
-      background: var(--color-surface);
-    }
-
-    .nav-tab.nav-active {
-      color: var(--color-accent);
-      border-bottom-color: var(--color-accent);
-      background: var(--color-surface);
-    }
-
-    .results-table th {
-      border-radius: 0;
-    }
+    .nav-tab:hover { color: var(--color-hud-bright); background: var(--color-surface); }
+    .nav-tab.nav-active { color: var(--color-accent); border-bottom-color: var(--color-accent); background: var(--color-surface); }
 
     .spinner { display: none; width: 12px; height: 12px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 0; animation: spin 0.6s linear infinite; }
     .btn.loading .spinner { display: inline-block; }
     .btn.loading { opacity: 0.7; pointer-events: none; }
-    .badge { display: inline-block; padding: 4px 8px; border-radius: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; font-family: 'Share Tech Mono', monospace; border: 1px solid rgba(255,255,255,0.08); }
+
+    .badge {
+      display: inline-block; padding: 4px 8px; border-radius: 0; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+      font-family: 'Share Tech Mono', monospace; border: 1px solid rgba(255,255,255,0.08);
+    }
+
     .badge-new { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-scored { background: rgba(99, 102, 241, 0.10); color: #818cf8; border-left: 2px solid #818cf8; }
     .badge-contacted { background: rgba(234, 179, 8, 0.08); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-interested, .badge-closed_won { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-demo_sent { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-closed_lost { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-excluded { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
+    .badge-replied_interested { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-replied_objection { background: rgba(249, 115, 22, 0.08); color: var(--color-accent); border-left: 2px solid var(--color-accent); }
+    .badge-demo_sent { background: rgba(56, 189, 248, 0.10); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-paid { background: rgba(16, 185, 129, 0.15); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-lost { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-archived { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
+
     .badge-queued { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
     .badge-running { background: rgba(234, 179, 8, 0.12); color: var(--color-warn); border-left: 2px solid var(--color-warn); animation: pulse 1.5s infinite; }
     .badge-completed { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
     .badge-failed, .badge-dead { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+
+    .badge-pending_payment { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
     .badge-onboarding { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
     .badge-active { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-churned { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-paused { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-payment_failed { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-grace_period { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-suspended { background: rgba(239, 68, 68, 0.12); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-cancelled { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
+
     .badge-hot { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
     .badge-warm { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
     .badge-low { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
@@ -209,34 +191,92 @@
     .badge-risky { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
     .badge-invalid { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
     .badge-pending { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+
     .badge-candidate { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
     .badge-scored { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
     .badge-validated { background: rgba(249, 115, 22, 0.08); color: var(--color-accent); border-left: 2px solid var(--color-accent); }
     .badge-approved { background: rgba(16, 185, 129, 0.12); color: var(--color-good); border-left: 2px solid var(--color-good); }
     .badge-parked { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
     .badge-dropped { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+
     .score-bar { display: flex; height: 8px; border-radius: 0; overflow: hidden; background: var(--color-bg); width: 100px; border: 1px solid var(--color-border); }
     .score-bar-fill { height: 100%; border-radius: 0; transition: width 0.3s; }
     .score-high { background: var(--color-good); }
     .score-mid { background: var(--color-warn); }
     .score-low { background: var(--color-bad); }
-    .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 0; margin-right: 4px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.5); }
-    .priority-dot-hot { background: var(--color-bad); }
-    .priority-dot-warm { background: var(--color-warn); }
-    .priority-dot-low { background: var(--color-dim); }
-    .has-indicator { color: var(--color-good); }
-    .no-indicator { color: var(--color-dim); }
-    .pipeline-bar { display: flex; height: 12px; border-radius: 0; overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-border); }
+
+    .pipeline-bar { display: flex; height: 14px; border-radius: 0; overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-border); }
     .pipeline-bar div { height: 100%; transition: width 0.5s ease; border-right: 1px solid var(--color-bg); }
+
+    .kanban-col {
+      min-width: 180px;
+      flex: 1;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    .kanban-col-header {
+      padding: 10px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border-bottom: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .kanban-col-body {
+      max-height: 340px;
+      overflow-y: auto;
+    }
+    .kanban-card {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 13px;
+      font-family: 'Share Tech Mono', monospace;
+      cursor: default;
+      transition: background 0.15s;
+    }
+    .kanban-card:hover { background: var(--color-surface-2); }
+    .kanban-card .card-name { font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+    .kanban-card .card-meta { font-size: 11px; color: var(--color-dim); }
+
     .results-table { width: 100%; border-collapse: collapse; font-size: 14px; font-family: 'Share Tech Mono', monospace; }
     .results-table th { text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-dim); border-bottom: 2px solid var(--color-border); background: var(--color-surface); position: sticky; top: 0; font-family: 'Share Tech Mono', monospace; }
     .results-table td { padding: 12px 16px; border-bottom: 1px solid var(--color-border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; font-family: 'Share Tech Mono', monospace; }
     .results-table tr:hover td { background: var(--color-surface-2); }
-    .results-table .mono { font-size: 13px; }
+
     .toast { position: fixed; bottom: 32px; right: 32px; padding: 16px 24px; border-radius: 0; font-size: 14px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 4px 4px 0px rgba(0,0,0,0.6); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 4px solid var(--color-good); color: var(--color-hud-bright); }
     .toast.error { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 4px solid var(--color-bad); color: var(--color-hud-bright); }
+
+    .kpi-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: 16px 20px;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--color-accent);
+    }
+    .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--color-dim); font-family: 'Share Tech Mono', monospace; margin-bottom: 6px; }
+    .kpi-value { font-size: 32px; font-weight: 700; line-height: 1; }
+    .kpi-sub { font-size: 12px; color: var(--color-dim); margin-top: 4px; font-family: 'Share Tech Mono', monospace; }
+
+    .activity-item {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 13px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .activity-item:hover { background: var(--color-surface-2); }
   </style>
 </head>
 <body class="min-h-screen p-0 m-0 bg-bg text-hud-bright">
@@ -244,14 +284,14 @@
   <header class="header-shell px-10 py-4 flex items-center justify-between sticky top-0 z-100">
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2">
-        <span class="w-2 h-2 bg-accent rounded-sm inline-block"></span>
+        <span class="w-2 h-2 bg-accent inline-block"></span>
         <span class="text-[13px] tracking-[3px] text-accent uppercase font-semibold" style="font-family:'Share Tech Mono',monospace">UNSC-OGM</span>
       </div>
       <span class="text-dim text-base">|</span>
       <h1 class="text-base font-bold tracking-wide uppercase" style="font-family:'Space Grotesk',sans-serif;color:var(--color-hud-bright)">Operations Terminal</h1>
     </div>
     <div class="flex gap-5 text-[13px] tracking-[1px] uppercase" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)">
-      <a href="/about" class="text-accent no-underline font-medium hover:text-accent" style="font-family:'Share Tech Mono',monospace">DOCS</a>
+      <a href="/about" class="text-accent no-underline font-medium hover:underline" style="font-family:'Share Tech Mono',monospace">DOCS</a>
       <span id="phase">PHASE —</span>
       <span id="uptime">—</span>
       <span id="last-refresh">—</span>
@@ -259,41 +299,50 @@
   </header>
 
   <nav class="nav-shell flex px-8">
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="dashboard" onclick="switchTab('dashboard')">
-      <i class="ph ph-squares-four mr-1"></i>Dashboard
+    <button class="nav-tab nav-active px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="pipeline" onclick="switchTab('pipeline')">
+      <i class="ph ph-funnel mr-1"></i>Pipeline
     </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="niches" onclick="switchTab('niches')">
-      <i class="ph ph-crosshair mr-1"></i>Niches
-    </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="discovery" onclick="switchTab('discovery')">
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="discovery" onclick="switchTab('discovery')">
       <i class="ph ph-compass mr-1"></i>Discovery
     </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="scraper" onclick="switchTab('scraper')">
-      <i class="ph ph-spider-web mr-1"></i>Scraper
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="scraper" onclick="switchTab('scraper')">
+      <i class="ph ph-spider-web mr-1"></i>Lead Gen
+    </button>
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="niches" onclick="switchTab('niches')">
+      <i class="ph ph-crosshair mr-1"></i>Niches
+    </button>
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="activity" onclick="switchTab('activity')">
+      <i class="ph ph-clock-counter-clockwise mr-1"></i>Activity
+    </button>
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="config" onclick="switchTab('config')">
+      <i class="ph ph-gear mr-1"></i>Config
     </button>
   </nav>
 
   <main class="p-6 flex flex-col gap-5 w-full">
 
-    <!-- ===================== DASHBOARD VIEW ===================== -->
-      <div id="view-dashboard" class="view active flex flex-col gap-5">
+    <!-- ===================== PIPELINE VIEW ===================== -->
+    <div id="view-pipeline" class="view active flex flex-col gap-5">
+
       <div class="flex gap-2 flex-wrap">
-        <button class="btn btn-primary px-6 py-3 rounded border cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
+        <button class="btn btn-primary px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
           <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper
         </button>
-        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 rounded border cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
           <span class="spinner"></span><i class="ph ph-user-minus"></i> Churn Check
         </button>
-        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 rounded border cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
           <span class="spinner"></span><i class="ph ph-chart-bar"></i> Monthly Report
         </button>
       </div>
 
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="stats-row"></div>
+      <!-- KPI ROW -->
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4" id="kpi-row"></div>
 
-      <div class="hud-panel pt-4 col-span-full">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE</h2>
+      <!-- PIPELINE BAR -->
+      <div class="hud-panel">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE FLOW</h2>
         </div>
         <div class="px-5 pt-4">
           <div class="pipeline-bar" id="pipeline-bar"></div>
@@ -301,47 +350,24 @@
         </div>
       </div>
 
-      <div class="hud-panel col-span-full">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-users mr-1.5"></i>Leads</h2>
-          <span class="text-[13px] text-dim" id="lead-count">—</span>
+      <!-- KANBAN BOARD -->
+      <div class="hud-panel">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-columns mr-1.5"></i>WORKFLOW STAGES</h2>
         </div>
-        <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
-          <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
-          <select id="f-status" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
-            <option value="">All</option>
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="interested">Interested</option>
-            <option value="demo_sent">Demo Sent</option>
-            <option value="closed_won">Won</option>
-            <option value="closed_lost">Lost</option>
-            <option value="excluded">Excluded</option>
-          </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
-          <select id="f-niche" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
-            <option value="">All</option>
-          </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-          <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none min-w-[140px] focus:border-accent">
-          <label class="text-[13px] text-dim uppercase tracking-wide">Search</label>
-          <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none min-w-[140px] focus:border-accent">
-          <button onclick="clearFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
-            <i class="ph ph-x"></i> Clear
-          </button>
-        </div>
-        <div class="overflow-y-auto max-h-[500px]" id="leads-list"></div>
+        <div class="flex gap-0 overflow-x-auto" id="kanban-board"></div>
       </div>
 
+      <!-- BOTTOM ROW: JOBS + CLIENTS -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="hud-panel overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
+        <div class="hud-panel overflow-hidden">
           <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
             <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-queue mr-1.5"></i>Jobs</h2>
             <span class="text-[13px] text-dim" id="job-count">—</span>
           </div>
           <div class="overflow-y-auto max-h-[360px]" id="jobs-list"></div>
         </div>
-        <div class="hud-panel overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
+        <div class="hud-panel overflow-hidden">
           <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
             <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-buildings mr-1.5"></i>Clients</h2>
             <span class="text-[13px] text-dim" id="client-count">—</span>
@@ -349,12 +375,33 @@
           <div class="overflow-y-auto max-h-[360px]" id="clients-list"></div>
         </div>
       </div>
+    </div>
 
-      <div class="hud-panel col-span-full">
+    <!-- ===================== ACTIVITY VIEW ===================== -->
+    <div id="view-activity" class="view flex flex-col gap-5">
+      <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-timeline mr-1.5"></i>PIPELINE EVENTS</h2>
+          <span class="text-[13px] text-dim" id="event-count">—</span>
+        </div>
+        <div class="overflow-y-auto max-h-[600px]" id="events-list"></div>
+      </div>
+      <div class="hud-panel">
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-shield-check mr-1.5"></i>POLICY CHECKS</h2>
+          <span class="text-[13px] text-dim" id="policy-count">—</span>
+        </div>
+        <div class="overflow-y-auto max-h-[400px]" id="policy-list"></div>
+      </div>
+    </div>
+
+    <!-- ===================== CONFIG VIEW ===================== -->
+    <div id="view-config" class="view flex flex-col gap-5">
+      <div class="hud-panel">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
         </div>
-        <div class="overflow-y-auto" id="config-panel"></div>
+        <div id="config-panel"></div>
       </div>
     </div>
 
@@ -364,8 +411,8 @@
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
           <div class="flex gap-2">
-            <button onclick="loadDiscoveryConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
-            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[13px] py-1 px-3 btn-primary rounded cursor-pointer transition-all">Save Config</button>
+            <button onclick="loadDiscoveryConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">Reset</button>
+            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[13px] py-1 px-3 btn-primary cursor-pointer">Save Config</button>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-6 p-5">
@@ -379,28 +426,28 @@
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Batch Size</label>
-            <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Interval (Hours)</label>
-            <input id="dc-interval" type="number" min="1" max="168" placeholder="6" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="dc-interval" type="number" min="1" max="168" placeholder="6">
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Priority Cities (one per line: "City, ST")</label>
-            <textarea id="dc-priority-cities" rows="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
+            <textarea id="dc-priority-cities" rows="3"></textarea>
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Exclude Niches (one per line)</label>
-            <textarea id="dc-exclude-niches" rows="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
+            <textarea id="dc-exclude-niches" rows="3"></textarea>
           </div>
         </div>
       </div>
 
       <div class="flex gap-2 flex-wrap">
-        <button onclick="triggerDiscovery()" id="btn-trigger-discovery" class="btn btn-primary px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all">
+        <button onclick="triggerDiscovery()" id="btn-trigger-discovery" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5">
           <span class="spinner"></span><i class="ph ph-magnifying-glass"></i> Trigger Discovery
         </button>
-        <button onclick="refreshDiscoveryView()" class="bg-surface border border-border text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="refreshDiscoveryView()" class="btn bg-surface border border-border text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
           <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
       </div>
@@ -408,7 +455,7 @@
       <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="discovery-stats-row"></div>
 
       <div class="hud-panel">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
         </div>
         <div class="px-5 pt-4">
@@ -424,51 +471,49 @@
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
           <div class="flex gap-2">
-            <button onclick="loadScraperConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
-            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[13px] py-1 px-3 btn-primary rounded cursor-pointer transition-all">Save Config</button>
+            <button onclick="loadScraperConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">Reset</button>
+            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[13px] py-1 px-3 btn-primary cursor-pointer">Save Config</button>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-6 p-5">
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Active Niche</label>
-            <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
-            <small class="text-[13px] text-dim">Business category to search for</small>
+            <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Max Requests / Minute</label>
-            <input id="sc-rpm" type="number" min="1" max="30" placeholder="8" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="sc-rpm" type="number" min="1" max="30" placeholder="8">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Max Retries</label>
-            <input id="sc-retries" type="number" min="0" max="10" placeholder="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="sc-retries" type="number" min="0" max="10" placeholder="3">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Delay Range (ms)</label>
             <div class="flex gap-2 items-center">
-              <input id="sc-delay-min" type="number" min="1000" placeholder="5000" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none w-24 focus:border-accent">
+              <input id="sc-delay-min" type="number" min="1000" placeholder="5000" class="w-24">
               <span class="text-dim">to</span>
-              <input id="sc-delay-max" type="number" min="1000" placeholder="12000" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none w-24 focus:border-accent">
+              <input id="sc-delay-max" type="number" min="1000" placeholder="12000" class="w-24">
             </div>
-            <small class="text-[13px] text-dim">Random delay between requests per city</small>
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Cities (one per line: "City, ST")</label>
-            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
+            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR"></textarea>
           </div>
         </div>
       </div>
 
       <div class="flex gap-2 flex-wrap items-center">
-        <button onclick="runScraper()" id="btn-run-scraper" class="btn btn-primary px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all">
+        <button onclick="runScraper()" id="btn-run-scraper" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5">
           <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper Now
         </button>
-        <button onclick="runEnrich()" id="btn-enrich" class="bg-surface border border-good text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="runEnrich()" id="btn-enrich" class="btn bg-surface border border-good text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
           <span class="spinner"></span><i class="ph ph-at"></i> Enrich Emails
         </button>
-        <button onclick="runValidate()" id="btn-validate" class="bg-surface border border-border text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="runValidate()" id="btn-validate" class="btn bg-surface border border-border text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
           <span class="spinner"></span><i class="ph ph-check-circle"></i> Validate Emails
         </button>
-        <button onclick="refreshScraperView()" class="bg-surface border border-border text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="refreshScraperView()" class="btn bg-surface border border-border text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
           <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
         <span id="scraper-status-text" class="text-base text-dim ml-2"></span>
@@ -483,38 +528,38 @@
         </div>
         <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
           <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
-          <select id="sf-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
-            <option value="">All</option><option value="new">New</option><option value="contacted">Contacted</option><option value="interested">Interested</option><option value="excluded">Excluded</option>
+          <select id="sf-status" onchange="refreshScraperResults()">
+            <option value="">All</option><option value="new">New</option><option value="scored">Scored</option><option value="contacted">Contacted</option><option value="archived">Archived</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">Priority</label>
-          <select id="sf-priority" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="sf-priority" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="low">Low</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">Email</label>
-          <select id="sf-email" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="sf-email" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="true">Has email</option><option value="false">No email</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">Contact</label>
-          <select id="sf-contact-mode" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="sf-contact-mode" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="email">Email-ready</option><option value="phone_only">Phone-only</option><option value="unreachable">No contact</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">Email Status</label>
-          <select id="sf-email-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="sf-email-status" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="valid">Valid</option><option value="risky">Risky</option><option value="invalid">Invalid</option><option value="pending">Pending</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()" class="min-w-[140px]">
           <label class="text-[13px] text-dim uppercase tracking-wide">Search</label>
-          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()" class="min-w-[140px]">
           <label class="text-[13px] text-dim uppercase tracking-wide">Website</label>
-          <select id="sf-website" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="sf-website" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="true">Has website</option><option value="false">No website</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">Phone</label>
-          <select id="sf-phone" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="sf-phone" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="true">Has phone</option><option value="false">No phone</option>
           </select>
-          <button onclick="clearScraperFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+          <button onclick="clearScraperFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">
             <i class="ph ph-x"></i> Clear
           </button>
         </div>
@@ -535,64 +580,64 @@
       <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="niche-stats-row"></div>
 
       <div class="hud-panel">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
         </div>
         <div class="grid grid-cols-2 gap-6 p-5">
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
-            <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-            <input id="np-city" type="text" placeholder="e.g. Tampa" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-city" type="text" placeholder="e.g. Tampa">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">State</label>
-            <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none uppercase focus:border-accent">
+            <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" class="uppercase">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Maps Count</label>
-            <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Review Velocity</label>
-            <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Ad Count</label>
-            <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Agency Pages</label>
-            <input id="np-agency" type="number" min="0" placeholder="Agency listing pages" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-agency" type="number" min="0" placeholder="Agency listing pages">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Weak Site %</label>
-            <input id="np-weak" type="number" min="0" max="100" placeholder="0–100" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-weak" type="number" min="0" max="100" placeholder="0–100">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Contactable %</label>
-            <input id="np-contact" type="number" min="0" max="100" placeholder="0–100" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-contact" type="number" min="0" max="100" placeholder="0–100">
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Economic Signal</label>
-            <select id="np-econ" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <select id="np-econ">
               <option value="growth">Growth</option><option value="flat" selected>Flat</option><option value="shrinking">Shrinking</option>
             </select>
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Revenue Estimate</label>
-            <select id="np-revenue" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <select id="np-revenue">
               <option value="high">High</option><option value="moderate" selected>Moderate</option><option value="low">Low</option><option value="very_low">Very Low</option>
             </select>
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[13px] text-dim uppercase tracking-wide">Notes</label>
-            <input id="np-notes" type="text" placeholder="Optional notes" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <input id="np-notes" type="text" placeholder="Optional notes">
           </div>
           <div class="self-end">
-            <button onclick="addNichePair()" id="btn-add-pair" class="btn btn-primary px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all">
+            <button onclick="addNichePair()" id="btn-add-pair" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5">
               <span class="spinner"></span><i class="ph ph-plus"></i> Add & Score
             </button>
           </div>
@@ -606,14 +651,14 @@
         </div>
         <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
           <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
-          <select id="nf-status" onchange="refreshNichePairs()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <select id="nf-status" onchange="refreshNichePairs()">
             <option value="">All</option><option value="candidate">Candidate</option><option value="scored">Scored</option><option value="validated">Validated</option><option value="approved">Approved</option><option value="parked">Parked</option><option value="dropped">Dropped</option>
           </select>
           <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
-          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()" class="min-w-[140px]">
           <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
-          <button onclick="clearNicheFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()" class="min-w-[140px]">
+          <button onclick="clearNicheFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">
             <i class="ph ph-x"></i> Clear
           </button>
         </div>
@@ -621,7 +666,7 @@
       </div>
 
       <div class="hud-panel">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
         </div>
         <div class="overflow-y-auto max-h-[400px]" id="niche-top-pairs"></div>
@@ -637,15 +682,32 @@
     const API_KEY = 'local_dev_api_key_change_in_prod';
     const headers = { 'x-api-key': API_KEY };
     const startTime = Date.now();
-    let knownNiches = new Set();
-    let debounceTimer = null;
-    let scraperDebounceTimer = null;
     let configDirty = false;
+    let discoveryConfigDirty = false;
+
+    const PIPELINE_STAGES = [
+      { key: 'new', label: 'NEW', color: '#74b9ff', icon: 'ph-dots-three' },
+      { key: 'scored', label: 'SCORED', color: '#818cf8', icon: 'ph-star' },
+      { key: 'contacted', label: 'CONTACTED', color: '#f0a64b', icon: 'ph-envelope' },
+      { key: 'replied_interested', label: 'INTERESTED', color: '#34d399', icon: 'ph-thumbs-up' },
+      { key: 'replied_objection', label: 'OBJECTION', color: '#fb923c', icon: 'ph-question' },
+      { key: 'demo_sent', label: 'DEMO', color: '#38bdf8', icon: 'ph-monitor' },
+      { key: 'paid', label: 'PAID', color: '#22c55e', icon: 'ph-check-circle' },
+      { key: 'lost', label: 'LOST', color: '#d95c4a', icon: 'ph-x-circle' },
+      { key: 'archived', label: 'ARCHIVED', color: '#5a6168', icon: 'ph-archive' },
+    ];
+
+    const PIPELINE_COLORS = {};
+    PIPELINE_STAGES.forEach(s => { PIPELINE_COLORS[s.key] = s.color; });
 
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#sc-niche, #sc-rpm, #sc-retries, #sc-delay-min, #sc-delay-max, #sc-cities').forEach(el => {
         el.addEventListener('input', () => { configDirty = true; });
         el.addEventListener('change', () => { configDirty = true; });
+      });
+      document.querySelectorAll('#dc-enabled, #dc-auto-approve, #dc-batch-size, #dc-interval, #dc-priority-cities, #dc-exclude-niches').forEach(el => {
+        el.addEventListener('input', () => { discoveryConfigDirty = true; });
+        el.addEventListener('change', () => { discoveryConfigDirty = true; });
       });
     });
 
@@ -660,255 +722,311 @@
 
     function badge(status) {
       const cls = 'badge-' + (status || 'new').replace(/\s/g, '_');
-      return `<span class="badge ${cls}">${status || 'new'}</span>`;
+      return '<span class="badge ' + cls + '">' + (status || 'new') + '</span>';
     }
 
     function uptime() {
       const s = Math.floor((Date.now() - startTime) / 1000);
       const m = Math.floor(s / 60);
       const h = Math.floor(m / 60);
-      if (h > 0) return `${h}h ${m % 60}m uptime`;
-      if (m > 0) return `${m}m ${s % 60}s uptime`;
-      return `${s}s uptime`;
+      if (h > 0) return h + 'h ' + (m % 60) + 'm uptime';
+      if (m > 0) return m + 'm ' + (s % 60) + 's uptime';
+      return s + 's uptime';
     }
 
-    function showToast(msg, type = 'success') {
+    function showToast(msg, type) {
       const t = document.getElementById('toast');
       t.textContent = msg;
-      t.className = `toast ${type} show`;
-      setTimeout(() => { t.className = 'toast'; }, 3000);
+      t.className = 'toast ' + (type || 'success') + ' show';
+      setTimeout(function() { t.className = 'toast'; }, 3000);
     }
 
     function switchTab(tab) {
-      document.querySelectorAll('.nav-tab').forEach(el => {
+      document.querySelectorAll('.nav-tab').forEach(function(el) {
         el.style.borderBottomColor = 'transparent';
         el.style.color = 'var(--color-dim)';
         el.classList.remove('nav-active');
       });
-      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-      const activeTab = document.querySelector(`.nav-tab[data-tab="${tab}"]`);
+      document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('active'); });
+      var activeTab = document.querySelector('.nav-tab[data-tab="' + tab + '"]');
       activeTab.style.borderBottomColor = 'var(--color-accent)';
-      activeTab.style.color = 'var(--color-hud-bright)';
+      activeTab.style.color = 'var(--color-accent)';
       activeTab.classList.add('nav-active');
-      document.getElementById(`view-${tab}`).classList.add('active');
+      document.getElementById('view-' + tab).classList.add('active');
+
       if (tab === 'scraper') refreshScraperView();
       if (tab === 'niches') refreshNichesView();
       if (tab === 'discovery') refreshDiscoveryView();
+      if (tab === 'activity') refreshActivity();
+      if (tab === 'config') refreshConfig();
     }
 
     async function triggerJob(jobType) {
-      const btn = document.getElementById('btn-' + jobType.replace(/_/g, '-'));
+      var btn = document.getElementById('btn-' + jobType.replace(/_/g, '-'));
       if (btn) btn.classList.add('loading');
       try {
-        await axios.post(API + '/api/jobs/trigger', { jobType }, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast(`✓ ${jobType.replace(/_/g, ' ')} queued`, 'success');
+        await axios.post(API + '/api/jobs/trigger', { jobType }, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 ' + jobType.replace(/_/g, ' ') + ' queued', 'success');
         setTimeout(refresh, 1000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast('\u2717 Failed: ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
-        if (btn) setTimeout(() => btn.classList.remove('loading'), 500);
+        if (btn) setTimeout(function() { btn.classList.remove('loading'); }, 500);
       }
     }
-
-    async function refreshLeads() {
-      const params = new URLSearchParams();
-      const status = document.getElementById('f-status').value;
-      const niche = document.getElementById('f-niche').value;
-      const city = document.getElementById('f-city').value.trim();
-      const search = document.getElementById('f-search').value.trim();
-      if (status) params.set('status', status);
-      if (niche) params.set('niche', niche);
-      if (city) params.set('city', city);
-      if (search) params.set('search', search);
-
-      try {
-        const res = await axios.get(API + '/api/leads?' + params.toString(), { headers });
-        const leads = res.data.docs || [];
-
-        document.getElementById('lead-count').textContent = `${res.data.totalDocs ?? leads.length} total`;
-        const list = document.getElementById('leads-list');
-        if (leads.length === 0) {
-          list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No leads match filters</div>';
-        } else {
-          list.innerHTML = leads.map(l => `
-            <div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
-              <span class="flex-1 font-medium truncate">${l.businessName || l.business_name || '—'}</span>
-              <span class="text-dim text-[13px]">${l.niche || ''} · ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
-              ${badge(l.status)}
-              <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(l.createdAt || l.created_at)}</span>
-            </div>
-          `).join('');
-        }
-
-        leads.forEach(l => { if (l.niche) knownNiches.add(l.niche); });
-        const nicheSelect = document.getElementById('f-niche');
-        const currentNiche = nicheSelect.value;
-        const opts = ['<option value="">All</option>'];
-        [...knownNiches].sort().forEach(n => {
-          opts.push(`<option value="${n}" ${n === currentNiche ? 'selected' : ''}>${n}</option>`);
-        });
-        nicheSelect.innerHTML = opts.join('');
-      } catch (err) {
-        console.error('Lead fetch error:', err);
-      }
-    }
-
-    function debounceLeads() {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(refreshLeads, 300);
-    }
-
-    function clearFilters() {
-      document.getElementById('f-status').value = '';
-      document.getElementById('f-niche').value = '';
-      document.getElementById('f-city').value = '';
-      document.getElementById('f-search').value = '';
-      refreshLeads();
-    }
-
-    const PIPELINE_COLORS = {
-      new: '#8fa3b6',
-      contacted: '#f0a64b',
-      interested: '#4db07a',
-      demo_sent: '#f5c26b',
-      closed_won: '#6cc6a2',
-      closed_lost: '#d95c4a',
-      excluded: '#5a6168',
-    };
 
     async function refresh() {
       try {
-        const [allLeadsRes, clientsRes, jobsRes, configRes] = await Promise.all([
-          axios.get(API + '/api/leads?limit=500', { headers }),
-          axios.get(API + '/api/clients', { headers }),
-          axios.get(API + '/api/jobs?limit=100', { headers }),
-          axios.get(API + '/api/config', { headers }),
+        var results = await Promise.all([
+          axios.get(API + '/api/leads?limit=500', { headers: headers }),
+          axios.get(API + '/api/clients', { headers: headers }),
+          axios.get(API + '/api/jobs?limit=100', { headers: headers }),
+          axios.get(API + '/api/config', { headers: headers }),
         ]);
+        var allLeads = results[0].data.docs || [];
+        var clients = results[1].data.docs || [];
+        var jobs = results[2].data.docs || [];
+        var config = results[3].data;
 
-        const allLeads = allLeadsRes.data.docs || [];
-        const clients = clientsRes.data.docs || [];
-        const jobs = jobsRes.data.docs || [];
-        const config = configRes.data;
-
-        document.getElementById('phase').textContent = `Phase ${config.currentPhase || '—'}`;
+        document.getElementById('phase').textContent = 'Phase ' + (config.currentPhase || '\u2014');
         document.getElementById('uptime').textContent = uptime();
         document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString();
 
-        const statusCounts = {};
-        allLeads.forEach(l => { statusCounts[l.status] = (statusCounts[l.status] || 0) + 1; });
+        var statusCounts = {};
+        allLeads.forEach(function(l) { statusCounts[l.status] = (statusCounts[l.status] || 0) + 1; });
+        var jobStatusCounts = {};
+        jobs.forEach(function(j) { jobStatusCounts[j.status] = (jobStatusCounts[j.status] || 0) + 1; });
 
-        const jobStatusCounts = {};
-        jobs.forEach(j => { jobStatusCounts[j.status] = (jobStatusCounts[j.status] || 0) + 1; });
-
-        document.getElementById('stats-row').innerHTML = `
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all hud-glow">
-            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-users mr-1"></i>TOTAL CONTACTS</span>
-            <span class="text-[48px] font-bold leading-none" style="color:var(--color-hud-bright)">${allLeadsRes.data.totalDocs || allLeads.length}</span>
-            <span class="text-[14px] text-hud-text" style="font-family:'Bebas Neue',sans-serif">${statusCounts.new || 0} NEW INCOMING</span>
-          </div>
-           <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
-             <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-thumbs-up mr-1"></i>INTERESTED</span>
-             <span class="text-[48px] font-bold leading-none text-good">${statusCounts.interested || 0}</span>
-             <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${statusCounts.demo_sent || 0} DEMO DEPLOYED</span>
-           </div>
-           <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
-             <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-buildings mr-1"></i>ACTIVE CLIENTS</span>
-             <span class="text-[48px] font-bold leading-none text-accent">${clientsRes.data.totalDocs || clients.length}</span>
-             <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${clients.filter(c => c.status === 'active').length} OPERATIONAL</span>
-           </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-queue mr-1"></i>QUEUED OPS</span>
-            <span class="text-[48px] font-bold leading-none text-warn">${jobStatusCounts.queued || 0}</span>
-            <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.running || 0} ACTIVE</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-check-circle mr-1"></i>OPS COMPLETE</span>
-            <span class="text-[48px] font-bold leading-none text-good">${jobStatusCounts.completed || 0}</span>
-            <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.failed || 0} FAIL / ${jobStatusCounts.dead || 0} KIA</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-trophy mr-1"></i>WON / LOST</span>
-            <span class="text-[48px] font-bold leading-none" style="color:var(--color-hud-bright)">${statusCounts.closed_won || 0}<span class="text-dim text-lg"> / </span>${statusCounts.closed_lost || 0}</span>
-            <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">CONVERSION PIPELINE</span>
-          </div>
-        `;
-
-        const total = allLeads.length || 1;
-        const bar = document.getElementById('pipeline-bar');
-        const legend = document.getElementById('pipeline-legend');
-        let barHtml = '';
-        let legendHtml = '';
-        for (const [status, color] of Object.entries(PIPELINE_COLORS)) {
-          const c = statusCounts[status] || 0;
-          if (c > 0) {
-            barHtml += `<div style="width:${(c/total)*100}%;background:${color}" title="${status}: ${c}"></div>`;
-          }
-          legendHtml += `<span class="text-[10px] text-dim flex items-center gap-1" style="font-family:'Share Tech Mono',monospace">
-            <span class="w-2 h-2 inline-block" style="background:${color}"></span>
-            ${status.replace(/_/g,' ')} (${c})
-          </span>`;
-        }
-        bar.innerHTML = barHtml;
-        legend.innerHTML = legendHtml;
-
-        allLeads.forEach(l => { if (l.niche) knownNiches.add(l.niche); });
-
-        document.getElementById('job-count').textContent = `${jobsRes.data.totalDocs || jobs.length} total`;
-        const jobsList = document.getElementById('jobs-list');
-        if (jobs.length === 0) {
-          jobsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No jobs yet</div>';
-        } else {
-          jobsList.innerHTML = jobs.slice(0, 30).map(j => `
-            <div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
-              <span class="flex-1 font-medium">${(j.jobType || j.job_type || '—').replace(/_/g, ' ')}</span>
-              ${badge(j.status)}
-              <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
-            </div>
-          `).join('');
-        }
-
-        document.getElementById('client-count').textContent = `${clientsRes.data.totalDocs || clients.length} total`;
-        const clientsList = document.getElementById('clients-list');
-        if (clients.length === 0) {
-          clientsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No clients yet</div>';
-        } else {
-          clientsList.innerHTML = clients.slice(0, 20).map(c => `
-            <div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
-              <span class="flex-1 font-medium truncate">${c.businessName || c.business_name || '—'}</span>
-              <span class="text-dim text-[13px]">${c.plan || '—'}</span>
-              ${badge(c.status)}
-              <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(c.createdAt || c.created_at)}</span>
-            </div>
-          `).join('');
-        }
-
-        const configPanel = document.getElementById('config-panel');
-        configPanel.innerHTML = `<div class="grid grid-cols-2 gap-px bg-border">
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Phase</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.currentPhase ?? '—'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Niche</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.activeNiche ?? '—'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Cities</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${(config.activeCities || []).join(', ') || '—'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Maintenance</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.maintenanceMode ? '🔴 ON' : '🟢 OFF'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Email Approval</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.emailApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Demo Approval</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.demoApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Launch Approval</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.launchApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Updated</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${ago(config.updatedAt || config.updated_at)}</span></div>
-        </div>`;
-
-        await refreshLeads();
+        renderKPIs(statusCounts, jobStatusCounts, clients, allLeads);
+        renderPipelineBar(statusCounts, allLeads.length);
+        renderKanban(allLeads);
+        renderJobs(jobs, results[2].data.totalDocs);
+        renderClients(clients, results[1].data.totalDocs);
 
       } catch (err) {
         console.error('Refresh failed:', err);
       }
     }
 
+    function renderKPIs(statusCounts, jobStatusCounts, clients, allLeads) {
+      var contacted = statusCounts.contacted || 0;
+      var replied = (statusCounts.replied_interested || 0) + (statusCounts.replied_objection || 0);
+      var replyRate = contacted > 0 ? ((replied / contacted) * 100).toFixed(1) : '\u2014';
+
+      var demosSent = statusCounts.demo_sent || 0;
+      var paid = statusCounts.paid || 0;
+      var demoCloseRate = demosSent > 0 ? ((paid / (demosSent + paid + (statusCounts.lost || 0))) * 100).toFixed(1) : '\u2014';
+
+      var activeClients = clients.filter(function(c) { return c.status === 'active'; }).length;
+      var totalLeads = allLeads.length;
+
+      var queueHealth = (jobStatusCounts.queued || 0) + ' queued / ' + (jobStatusCounts.running || 0) + ' active';
+      var deadJobs = jobStatusCounts.dead || 0;
+      if (deadJobs > 0) queueHealth += ' / ' + deadJobs + ' DEAD';
+
+      document.getElementById('kpi-row').innerHTML =
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Reply Rate</div>' +
+          '<div class="kpi-value" style="color:' + (replyRate === '\u2014' ? 'var(--color-dim)' : parseFloat(replyRate) >= 5 ? 'var(--color-good)' : 'var(--color-warn)') + '">' + replyRate + (replyRate !== '\u2014' ? '%' : '') + '</div>' +
+          '<div class="kpi-sub">' + replied + ' replies / ' + contacted + ' contacted</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Demo \u2192 Close Rate</div>' +
+          '<div class="kpi-value" style="color:' + (demoCloseRate === '\u2014' ? 'var(--color-dim)' : parseFloat(demoCloseRate) >= 30 ? 'var(--color-good)' : 'var(--color-warn)') + '">' + demoCloseRate + (demoCloseRate !== '\u2014' ? '%' : '') + '</div>' +
+          '<div class="kpi-sub">' + paid + ' paid from ' + demosSent + ' demos</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Active Clients</div>' +
+          '<div class="kpi-value" style="color:var(--color-good)">' + activeClients + '</div>' +
+          '<div class="kpi-sub">' + clients.length + ' total client records</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Total Leads</div>' +
+          '<div class="kpi-value" style="color:var(--color-info)">' + totalLeads + '</div>' +
+          '<div class="kpi-sub">' + (statusCounts.new || 0) + ' new, ' + (statusCounts.scored || 0) + ' scored</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Queue Health</div>' +
+          '<div class="kpi-value" style="color:var(--color-warn)">' + (jobStatusCounts.queued || 0) + '</div>' +
+          '<div class="kpi-sub">' + queueHealth + '</div>' +
+        '</div>';
+    }
+
+    function renderPipelineBar(statusCounts, total) {
+      total = total || 1;
+      var bar = document.getElementById('pipeline-bar');
+      var legend = document.getElementById('pipeline-legend');
+      var barHtml = '';
+      var legendHtml = '';
+      PIPELINE_STAGES.forEach(function(stage) {
+        var c = statusCounts[stage.key] || 0;
+        if (c > 0) {
+          barHtml += '<div style="width:' + ((c / total) * 100) + '%;background:' + stage.color + '" title="' + stage.label + ': ' + c + '"></div>';
+        }
+        legendHtml += '<span class="text-[11px] text-dim flex items-center gap-1" style="font-family:Share Tech Mono,monospace">' +
+          '<span class="w-2 h-2 inline-block" style="background:' + stage.color + '"></span>' +
+          stage.label + ' (' + c + ')</span>';
+      });
+      bar.innerHTML = barHtml;
+      legend.innerHTML = legendHtml;
+    }
+
+    function renderKanban(allLeads) {
+      var buckets = {};
+      PIPELINE_STAGES.forEach(function(s) { buckets[s.key] = []; });
+      allLeads.forEach(function(l) {
+        if (buckets[l.status]) {
+          buckets[l.status].push(l);
+        }
+      });
+
+      var html = '';
+      PIPELINE_STAGES.forEach(function(stage) {
+        var leads = buckets[stage.key] || [];
+        html += '<div class="kanban-col">' +
+          '<div class="kanban-col-header" style="border-left:3px solid ' + stage.color + '">' +
+            '<span style="color:' + stage.color + '"><i class="ph ' + stage.icon + ' mr-1"></i>' + stage.label + '</span>' +
+            '<span class="text-dim">' + leads.length + '</span>' +
+          '</div>' +
+          '<div class="kanban-col-body">';
+
+        if (leads.length === 0) {
+          html += '<div class="py-6 px-4 text-center text-dim text-[12px]">Empty</div>';
+        } else {
+          leads.slice(0, 15).forEach(function(l) {
+            var name = l.businessName || l.business_name || '\u2014';
+            var meta = (l.niche || '') + ' \u00b7 ' + (l.city || '');
+            var tier = l.priorityTier || l.priority_tier;
+            var tierDot = tier ? '<span class="priority-dot priority-dot-' + tier + '" style="display:inline-block;width:6px;height:6px;margin-right:4px;vertical-align:middle;border:1px solid rgba(0,0,0,0.5);background:var(--color-' + (tier === 'hot' ? 'bad' : tier === 'warm' ? 'warn' : 'dim') + ')"></span>' : '';
+            html += '<div class="kanban-card">' +
+              '<div class="card-name">' + tierDot + name + '</div>' +
+              '<div class="card-meta">' + meta + '</div>' +
+            '</div>';
+          });
+          if (leads.length > 15) {
+            html += '<div class="py-3 px-4 text-center text-dim text-[11px]">+' + (leads.length - 15) + ' more</div>';
+          }
+        }
+        html += '</div></div>';
+      });
+
+      document.getElementById('kanban-board').innerHTML = html;
+    }
+
+    function renderJobs(jobs, totalDocs) {
+      document.getElementById('job-count').textContent = (totalDocs || jobs.length) + ' total';
+      var list = document.getElementById('jobs-list');
+      if (jobs.length === 0) {
+        list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No jobs yet</div>';
+      } else {
+        list.innerHTML = jobs.slice(0, 30).map(function(j) {
+          return '<div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow">' +
+            '<span class="flex-1 font-medium">' + (j.jobType || j.job_type || '\u2014').replace(/_/g, ' ') + '</span>' +
+            badge(j.status) +
+            '<span class="text-dim text-[13px] min-w-[70px] text-right">' + ago(j.updatedAt || j.updated_at) + '</span>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    function renderClients(clients, totalDocs) {
+      document.getElementById('client-count').textContent = (totalDocs || clients.length) + ' total';
+      var list = document.getElementById('clients-list');
+      if (clients.length === 0) {
+        list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No clients yet</div>';
+      } else {
+        list.innerHTML = clients.slice(0, 20).map(function(c) {
+          return '<div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow">' +
+            '<span class="flex-1 font-medium truncate">' + (c.businessName || c.business_name || '\u2014') + '</span>' +
+            '<span class="text-dim text-[13px]">' + (c.plan || '\u2014') + '</span>' +
+            badge(c.status) +
+            '<span class="text-dim text-[13px] min-w-[70px] text-right">' + ago(c.createdAt || c.created_at) + '</span>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    async function refreshConfig() {
+      try {
+        var res = await axios.get(API + '/api/config', { headers: headers });
+        var config = res.data;
+        document.getElementById('config-panel').innerHTML = '<div class="grid grid-cols-2 gap-px bg-border">' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Phase</span><span class="text-base font-bold">' + (config.currentPhase ?? '\u2014') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Niche</span><span class="text-base font-bold">' + (config.activeNiche ?? '\u2014') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Cities</span><span class="text-base font-bold">' + ((config.activeCities || []).join(', ') || '\u2014') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Maintenance</span><span class="text-base font-bold">' + (config.maintenanceMode ? 'ON' : 'OFF') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Email Approval</span><span class="text-base font-bold">' + (config.emailApprovalRequired ? '\u2713 Required' : '\u2717 Auto') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Demo Approval</span><span class="text-base font-bold">' + (config.demoApprovalRequired ? '\u2713 Required' : '\u2717 Auto') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Launch Approval</span><span class="text-base font-bold">' + (config.launchApprovalRequired ? '\u2713 Required' : '\u2717 Auto') + '</span></div>' +
+          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Updated</span><span class="text-base font-bold">' + ago(config.updatedAt || config.updated_at) + '</span></div>' +
+        '</div>';
+      } catch (err) {
+        console.error('Config load error:', err);
+      }
+    }
+
+    async function refreshActivity() {
+      try {
+        var results = await Promise.all([
+          axios.get(API + '/api/jobs/pipeline/events?limit=50', { headers: headers }).catch(function() { return { data: { docs: [] } }; }),
+          axios.get(API + '/api/jobs/policy/checks?limit=50', { headers: headers }).catch(function() { return { data: { docs: [] } }; }),
+        ]);
+
+        var events = results[0].data.docs || [];
+        var policies = results[1].data.docs || [];
+
+        document.getElementById('event-count').textContent = events.length + ' events';
+        var eventsList = document.getElementById('events-list');
+        if (events.length === 0) {
+          eventsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No pipeline events yet</div>';
+        } else {
+          eventsList.innerHTML = events.map(function(e) {
+            var from = e.fromStatus || e.from_status || '?';
+            var to = e.toStatus || e.to_status || '?';
+            var by = e.triggeredBy || e.triggered_by || 'system';
+            return '<div class="activity-item">' +
+              '<div class="flex items-center gap-3">' +
+                '<span class="text-dim text-[12px] min-w-[70px]">' + ago(e.createdAt || e.created_at) + '</span>' +
+                badge(from) + '<span class="text-dim">\u2192</span>' + badge(to) +
+                '<span class="text-dim text-[11px] ml-auto">' + by + '</span>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+
+        document.getElementById('policy-count').textContent = policies.length + ' checks';
+        var policyList = document.getElementById('policy-list');
+        if (policies.length === 0) {
+          policyList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No policy checks yet</div>';
+        } else {
+          policyList.innerHTML = policies.map(function(p) {
+            var result = p.result || 'unknown';
+            var resultColor = result === 'pass' ? 'var(--color-good)' : result === 'blocked' ? 'var(--color-bad)' : 'var(--color-warn)';
+            return '<div class="activity-item">' +
+              '<div class="flex items-center gap-3">' +
+                '<span class="text-dim text-[12px] min-w-[70px]">' + ago(p.createdAt || p.created_at) + '</span>' +
+                '<span style="color:' + resultColor + ';font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:1px">' + result + '</span>' +
+                '<span class="text-dim text-[11px]">' + (p.ruleName || p.rule_name || '\u2014') + '</span>' +
+                '<span class="text-dim text-[11px] ml-auto">' + (p.actionType || p.action_type || '') + '</span>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Activity load error:', err);
+      }
+    }
+
+    // ─── SCRAPER FUNCTIONS ──────────────────────────────────
+
     async function loadScraperConfig() {
       try {
-        const res = await axios.get(API + '/api/scraper/config', { headers });
-        const cfg = res.data;
+        var res = await axios.get(API + '/api/scraper/config', { headers: headers });
+        var cfg = res.data;
         document.getElementById('sc-niche').value = cfg.niche || '';
         document.getElementById('sc-rpm').value = cfg.maxRequestsPerMinute || 8;
         document.getElementById('sc-retries').value = cfg.maxRetries || 3;
-        const delay = cfg.interRequestDelayMs || [5000, 12000];
+        var delay = cfg.interRequestDelayMs || [5000, 12000];
         document.getElementById('sc-delay-min').value = delay[0];
         document.getElementById('sc-delay-max').value = delay[1];
         document.getElementById('sc-cities').value = (cfg.cities || []).join('\n');
@@ -919,13 +1037,13 @@
     }
 
     async function saveScraperConfig() {
-      const btn = document.getElementById('btn-scraper-save');
+      var btn = document.getElementById('btn-scraper-save');
       btn.classList.add('loading');
       try {
-        const cities = document.getElementById('sc-cities').value.split('\n').map(l => l.trim()).filter(Boolean);
-        const data = {
+        var cities = document.getElementById('sc-cities').value.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+        var data = {
           niche: document.getElementById('sc-niche').value.trim() || 'hvac',
-          cities,
+          cities: cities,
           maxRequestsPerMinute: parseInt(document.getElementById('sc-rpm').value) || 8,
           maxRetries: parseInt(document.getElementById('sc-retries').value) || 3,
           interRequestDelayMs: [
@@ -933,36 +1051,32 @@
             parseInt(document.getElementById('sc-delay-max').value) || 12000,
           ],
         };
-        await axios.patch(API + '/api/scraper/config', data, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        await axios.patch(API + '/api/scraper/config', data, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
         configDirty = false;
-        showToast('✓ Scraper config saved', 'success');
+        showToast('\u2713 Scraper config saved', 'success');
       } catch (err) {
-        showToast(`✗ Save failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast('\u2717 Save failed: ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
     }
 
     async function runScraper() {
-      const btn = document.getElementById('btn-run-scraper');
+      var btn = document.getElementById('btn-run-scraper');
       btn.classList.add('loading');
       document.getElementById('scraper-status-text').textContent = 'Queuing scraper...';
       try {
-        const niche = document.getElementById('sc-niche').value.trim() || undefined;
-        const cities = document.getElementById('sc-cities').value.split('\n').map(l => l.trim()).filter(Boolean);
-        const payload = {};
+        var niche = document.getElementById('sc-niche').value.trim() || undefined;
+        var cities = document.getElementById('sc-cities').value.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+        var payload = {};
         if (niche) payload.niche = niche;
         if (cities.length > 0) payload.cities = cities;
-
-        await axios.post(API + '/api/scraper/run', payload, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Scraper job queued', 'success');
-        document.getElementById('scraper-status-text').textContent = 'Job queued — monitoring...';
-        setTimeout(() => {
-          refreshScraperView();
-          document.getElementById('scraper-status-text').textContent = '';
-        }, 2000);
+        await axios.post(API + '/api/scraper/run', payload, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Scraper job queued', 'success');
+        document.getElementById('scraper-status-text').textContent = 'Job queued \u2014 monitoring...';
+        setTimeout(function() { refreshScraperView(); document.getElementById('scraper-status-text').textContent = ''; }, 2000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast('\u2717 Failed: ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
         document.getElementById('scraper-status-text').textContent = '';
       } finally {
         btn.classList.remove('loading');
@@ -970,116 +1084,104 @@
     }
 
     async function runEnrich() {
-      const btn = document.getElementById('btn-enrich');
+      var btn = document.getElementById('btn-enrich');
       btn.classList.add('loading');
       try {
-        await axios.post(API + '/api/scraper/enrich', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Email enrichment job queued', 'success');
+        await axios.post(API + '/api/scraper/enrich', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Email enrichment job queued', 'success');
         setTimeout(refreshScraperView, 2000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast('\u2717 Failed: ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
     }
 
     async function runValidate() {
-      const btn = document.getElementById('btn-validate');
+      var btn = document.getElementById('btn-validate');
       btn.classList.add('loading');
       try {
-        await axios.post(API + '/api/scraper/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Email validation job queued', 'success');
+        await axios.post(API + '/api/scraper/validate', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Email validation job queued', 'success');
         setTimeout(refreshScraperView, 2000);
       } catch (err) {
-        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast('\u2717 Failed: ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
     }
 
     async function refreshScraperView() {
-      const tasks = [refreshScraperResults(), refreshScraperJobs(), refreshScraperStats()];
+      var tasks = [refreshScraperResults(), refreshScraperJobs(), refreshScraperStats()];
       if (!configDirty) tasks.push(loadScraperConfig());
       await Promise.all(tasks);
     }
 
     async function refreshScraperStats() {
       try {
-        const [leadsRes, jobsRes, enrichRes] = await Promise.all([
-          axios.get(API + '/api/scraper/results?limit=0', { headers }),
-          axios.get(API + '/api/scraper/history?limit=100', { headers }),
-          axios.get(API + '/api/scraper/enrich/stats', { headers }).catch(() => ({ data: {} })),
+        var results = await Promise.all([
+          axios.get(API + '/api/scraper/results?limit=0', { headers: headers }),
+          axios.get(API + '/api/scraper/history?limit=100', { headers: headers }),
+          axios.get(API + '/api/scraper/enrich/stats', { headers: headers }).catch(function() { return { data: {} }; }),
         ]);
+        var jobs = results[1].data.docs || [];
+        var completed = jobs.filter(function(j) { return j.status === 'completed'; });
+        var running = jobs.filter(function(j) { return j.status === 'running' || j.status === 'queued'; });
+        var failed = jobs.filter(function(j) { return j.status === 'failed'; });
+        var es = results[2].data;
 
-        const jobs = jobsRes.data.docs || [];
-        const completed = jobs.filter(j => j.status === 'completed');
-        const running = jobs.filter(j => j.status === 'running' || j.status === 'queued');
-        const failed = jobs.filter(j => j.status === 'failed');
-        const es = enrichRes.data;
-
-        let lastJobInfo = 'Never';
-        if (completed.length > 0) {
-          const last = completed[0];
-          const output = last.outputData || last.output_data || {};
-          lastJobInfo = `${output.leads_created ?? '?'} created, ${output.leads_skipped ?? '?'} skipped`;
-        }
-
-        document.getElementById('scraper-stats-row').innerHTML = `
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Scraped Leads</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${leadsRes.data.totalDocs ?? 0}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Emails Found</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${es.withEmail ?? 0}</span>
-            <span class="text-[13px] text-dim">${es.enriched ?? 0} enriched</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Valid Emails</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${es.emailValid ?? 0}</span>
-            <span class="text-[13px] text-dim">${es.emailRisky ?? 0} risky, ${es.emailInvalid ?? 0} invalid</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Outreach Ready</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-accent">${es.outreachReady ?? 0}</span>
-            <span class="text-[13px] text-dim">valid email + hot/warm</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Phone Fallback</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${es.phoneFallbackReady ?? 0}</span>
-            <span class="text-[13px] text-dim">phone only + hot/warm</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Contactable</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${es.contactable ?? 0}</span>
-            <span class="text-[13px] text-dim">email or phone available</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Priority Split</span>
-            <span class="text-[14px] font-bold">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Running / Queued</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${running.length}</span>
-            <span class="text-[13px] text-dim">${completed.length} runs, ${failed.length} failed</span>
-          </div>
-        `;
+        document.getElementById('scraper-stats-row').innerHTML =
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Scraped Leads</span>' +
+            '<span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + (results[0].data.totalDocs ?? 0) + '</span>' +
+          '</div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Emails Found</span>' +
+            '<span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + (es.withEmail ?? 0) + '</span>' +
+            '<span class="text-[13px] text-dim">' + (es.enriched ?? 0) + ' enriched</span>' +
+          '</div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Valid Emails</span>' +
+            '<span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + (es.emailValid ?? 0) + '</span>' +
+            '<span class="text-[13px] text-dim">' + (es.emailRisky ?? 0) + ' risky, ' + (es.emailInvalid ?? 0) + ' invalid</span>' +
+          '</div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Outreach Ready</span>' +
+            '<span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + (es.outreachReady ?? 0) + '</span>' +
+            '<span class="text-[13px] text-dim">valid email + hot/warm</span>' +
+          '</div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Phone Fallback</span>' +
+            '<span class="text-[28px] font-bold text-warn" style="font-family:Share Tech Mono,monospace">' + (es.phoneFallbackReady ?? 0) + '</span>' +
+            '<span class="text-[13px] text-dim">phone only + hot/warm</span>' +
+          '</div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Priority Split</span>' +
+            '<span class="text-[14px] font-bold">' + (es.hot ?? 0) + 'H ' + (es.warm ?? 0) + 'W ' + (es.low ?? 0) + 'L</span>' +
+          '</div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent">' +
+            '<span class="text-[13px] uppercase tracking-widest text-dim">Running / Queued</span>' +
+            '<span class="text-[28px] font-bold text-warn" style="font-family:Share Tech Mono,monospace">' + running.length + '</span>' +
+            '<span class="text-[13px] text-dim">' + completed.length + ' done, ' + failed.length + ' failed</span>' +
+          '</div>';
       } catch (err) {
         console.error('Scraper stats error:', err);
       }
     }
 
+    var scraperDebounceTimer = null;
+
     async function refreshScraperResults() {
-      const params = new URLSearchParams();
-      const status = document.getElementById('sf-status').value;
-      const city = document.getElementById('sf-city').value.trim();
-      const search = document.getElementById('sf-search').value.trim();
-      const hasWebsite = document.getElementById('sf-website').value;
-      const hasPhone = document.getElementById('sf-phone').value;
-      const hasEmail = document.getElementById('sf-email').value;
-      const contactMode = document.getElementById('sf-contact-mode').value;
-      const emailStatus = document.getElementById('sf-email-status').value;
-      const priorityTier = document.getElementById('sf-priority').value;
+      var params = new URLSearchParams();
+      var status = document.getElementById('sf-status').value;
+      var city = document.getElementById('sf-city').value.trim();
+      var search = document.getElementById('sf-search').value.trim();
+      var hasWebsite = document.getElementById('sf-website').value;
+      var hasPhone = document.getElementById('sf-phone').value;
+      var hasEmail = document.getElementById('sf-email').value;
+      var contactMode = document.getElementById('sf-contact-mode').value;
+      var emailStatus = document.getElementById('sf-email-status').value;
+      var priorityTier = document.getElementById('sf-priority').value;
       if (status) params.set('status', status);
       if (city) params.set('city', city);
       if (search) params.set('search', search);
@@ -1092,71 +1194,61 @@
       params.set('limit', '200');
 
       try {
-        const res = await axios.get(API + '/api/scraper/results?' + params.toString(), { headers });
-        const leads = res.data.docs || [];
-        const total = res.data.totalDocs ?? leads.length;
+        var res = await axios.get(API + '/api/scraper/results?' + params.toString(), { headers: headers });
+        var leads = res.data.docs || [];
+        var total = res.data.totalDocs ?? leads.length;
 
-        document.getElementById('scraper-lead-count').textContent = `${total} total`;
-        const list = document.getElementById('scraper-results-list');
-
+        document.getElementById('scraper-lead-count').textContent = total + ' total';
+        var list = document.getElementById('scraper-results-list');
         if (leads.length === 0) {
           list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scraped leads match filters</div>';
           return;
         }
+        list.innerHTML = '<table class="results-table"><thead><tr>' +
+          '<th>Business</th><th>City</th><th>Priority</th><th>Contact</th><th>Email</th><th>Email Status</th><th>Phone</th><th>Website</th><th>Status</th><th>Scraped</th>' +
+        '</tr></thead><tbody>' +
+        leads.map(function(l) {
+          var name = l.businessName || l.business_name || '\u2014';
+          var city = l.city || '';
+          var state = l.state || '';
+          var phone = l.phone;
+          var website = l.websiteUrl || l.website_url;
+          var email = l.email;
+          var eStatus = l.emailStatus || l.email_status || 'pending';
+          var priority = l.priorityTier || l.priority_tier || '';
+          var status = l.status || 'new';
+          var created = l.createdAt || l.created_at;
+          var contactMode = email ? 'email' : (phone ? 'phone_only' : 'unreachable');
 
-        list.innerHTML = `<table class="results-table">
-          <thead>
-            <tr>
-              <th>Business</th><th>City</th><th>Priority</th><th>Contact</th><th>Email</th><th>Email Status</th><th>Phone</th><th>Website</th><th>Status</th><th>Scraped</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${leads.map(l => {
-              const name = l.businessName || l.business_name || '—';
-              const city = l.city || '';
-              const state = l.state || '';
-              const phone = l.phone;
-              const website = l.websiteUrl || l.website_url;
-              const email = l.email;
-              const eStatus = l.emailStatus || l.email_status || 'pending';
-              const priority = l.priorityTier || l.priority_tier || '';
-              const status = l.status || 'new';
-              const created = l.createdAt || l.created_at;
-              const contactMode = email ? 'email' : (phone ? 'phone_only' : 'unreachable');
+          var priorityHtml = priority
+            ? '<span class="priority-dot priority-dot-' + priority + '"></span><span class="badge badge-' + priority + '">' + priority + '</span>'
+            : '<span class="text-dim">\u2014</span>';
+          var emailHtml = email
+            ? '<span class="has-indicator" title="' + email + '" style="font-size:11px">' + (email.length > 22 ? email.substring(0, 22) + '\u2026' : email) + '</span>'
+            : '<span class="text-dim">\u2014</span>';
+          var eStatusHtml = email
+            ? '<span class="badge badge-' + eStatus + '">' + eStatus + '</span>'
+            : '<span class="text-dim">\u2014</span>';
+          var contactModeHtml = contactMode === 'email'
+            ? '<span class="badge badge-valid">email</span>'
+            : contactMode === 'phone_only'
+              ? '<span class="badge badge-warm">phone-only</span>'
+              : '<span class="badge badge-low">none</span>';
 
-              const priorityHtml = priority
-                ? `<span class="priority-dot priority-dot-${priority}"></span><span class="badge badge-${priority}">${priority}</span>`
-                : '<span class="no-indicator">—</span>';
-
-              const emailHtml = email
-                ? `<span class="has-indicator" title="${email}" style="font-size:11px">${email.length > 22 ? email.substring(0, 22) + '…' : email}</span>`
-                : '<span class="no-indicator">—</span>';
-
-              const eStatusHtml = email
-                ? `<span class="badge badge-${eStatus}">${eStatus}</span>`
-                : '<span class="no-indicator">—</span>';
-
-              const contactModeHtml = contactMode === 'email'
-                ? '<span class="badge badge-valid">email</span>'
-                : contactMode === 'phone_only'
-                  ? '<span class="badge badge-warm">phone-only</span>'
-                  : '<span class="badge badge-low">none</span>';
-
-              return `<tr>
-                <td style="max-width:200px" title="${name}">${name}</td>
-                <td class="mono">${city}${state ? ', ' + state : ''}</td>
-                <td>${priorityHtml}</td>
-                <td>${contactModeHtml}</td>
-                <td class="mono" style="max-width:180px">${emailHtml}</td>
-                <td>${eStatusHtml}</td>
-                <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">—</span>'}</td>
-                <td class="mono" style="max-width:160px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="no-indicator">—</span>'}</td>
-                <td>${badge(status)}</td>
-                <td class="mono" style="font-size:10px">${ago(created)}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>`;
+          return '<tr>' +
+            '<td style="max-width:200px" title="' + name + '">' + name + '</td>' +
+            '<td class="mono">' + city + (state ? ', ' + state : '') + '</td>' +
+            '<td>' + priorityHtml + '</td>' +
+            '<td>' + contactModeHtml + '</td>' +
+            '<td class="mono" style="max-width:180px">' + emailHtml + '</td>' +
+            '<td>' + eStatusHtml + '</td>' +
+            '<td class="mono">' + (phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="text-dim">\u2014</span>') + '</td>' +
+            '<td class="mono" style="max-width:160px">' + (website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="text-dim">\u2014</span>') + '</td>' +
+            '<td>' + badge(status) + '</td>' +
+            '<td class="mono" style="font-size:10px">' + ago(created) + '</td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>';
       } catch (err) {
         console.error('Scraper results error:', err);
       }
@@ -1168,46 +1260,32 @@
     }
 
     function clearScraperFilters() {
-      document.getElementById('sf-status').value = '';
-      document.getElementById('sf-city').value = '';
-      document.getElementById('sf-search').value = '';
-      document.getElementById('sf-website').value = '';
-      document.getElementById('sf-phone').value = '';
-      document.getElementById('sf-email').value = '';
-      document.getElementById('sf-contact-mode').value = '';
-      document.getElementById('sf-email-status').value = '';
-      document.getElementById('sf-priority').value = '';
+      ['sf-status','sf-city','sf-search','sf-website','sf-phone','sf-email','sf-contact-mode','sf-email-status','sf-priority'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
       refreshScraperResults();
     }
 
     async function refreshScraperJobs() {
       try {
-        const res = await axios.get(API + '/api/scraper/history?limit=30', { headers });
-        const jobs = res.data.docs || [];
-
-        document.getElementById('scraper-job-count').textContent = `${res.data.totalDocs ?? jobs.length} total`;
-        const list = document.getElementById('scraper-jobs-list');
-
+        var res = await axios.get(API + '/api/scraper/history?limit=30', { headers: headers });
+        var jobs = res.data.docs || [];
+        document.getElementById('scraper-job-count').textContent = (res.data.totalDocs ?? jobs.length) + ' total';
+        var list = document.getElementById('scraper-jobs-list');
         if (jobs.length === 0) {
           list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scraper jobs yet</div>';
           return;
         }
-
-        list.innerHTML = jobs.map(j => {
-          const output = j.outputData || j.output_data || {};
-          const input = j.inputData || j.input_data || {};
-          const jobType = j.jobType || j.job_type || '';
-          let detail = '';
+        list.innerHTML = jobs.map(function(j) {
+          var output = j.outputData || j.output_data || {};
+          var input = j.inputData || j.input_data || {};
+          var jobType = j.jobType || j.job_type || '';
+          var detail = '';
           if (j.status === 'completed') {
-            if (jobType === 'lead_gen') {
-              detail = `${output.leads_created ?? 0} created, ${output.leads_skipped ?? 0} skipped`;
-            } else if (jobType === 'email_enrich') {
-              detail = `${output.processed ?? 0} checked, ${output.emails_found ?? 0} emails found`;
-            } else if (jobType === 'email_validate') {
-              detail = `${output.validated ?? 0} validated (${output.valid ?? 0} valid)`;
-            } else {
-              detail = 'Completed';
-            }
+            if (jobType === 'lead_gen') detail = (output.leads_created ?? 0) + ' created, ' + (output.leads_skipped ?? 0) + ' skipped';
+            else if (jobType === 'email_enrich') detail = (output.processed ?? 0) + ' checked, ' + (output.emails_found ?? 0) + ' emails found';
+            else if (jobType === 'email_validate') detail = (output.validated ?? 0) + ' validated (' + (output.valid ?? 0) + ' valid)';
+            else detail = 'Completed';
           } else if (j.status === 'failed') {
             detail = j.errorMessage || j.error_message || 'Unknown error';
           } else if (j.status === 'running') {
@@ -1215,20 +1293,21 @@
           } else {
             detail = 'Waiting...';
           }
-          return `<div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
-            <span class="flex-1 font-medium">${jobType.replace(/_/g, ' ')}${input.niche ? ' — ' + input.niche : ''}${(input.cities || []).length ? ' — ' + input.cities.join(', ') : ''}</span>
-            <span class="text-dim text-[13px]">${detail}</span>
-            ${badge(j.status)}
-            <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
-          </div>`;
+          return '<div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow">' +
+            '<span class="flex-1 font-medium">' + jobType.replace(/_/g, ' ') + (input.niche ? ' \u2014 ' + input.niche : '') + ((input.cities || []).length ? ' \u2014 ' + input.cities.join(', ') : '') + '</span>' +
+            '<span class="text-dim text-[13px]">' + detail + '</span>' +
+            badge(j.status) +
+            '<span class="text-dim text-[13px] min-w-[70px] text-right">' + ago(j.updatedAt || j.updated_at) + '</span>' +
+          '</div>';
         }).join('');
       } catch (err) {
         console.error('Scraper jobs error:', err);
       }
     }
 
-    let nicheDebounceTimer = null;
+    // ─── NICHE FUNCTIONS ──────────────────────────────────
 
+    var nicheDebounceTimer = null;
     function debounceNiches() {
       clearTimeout(nicheDebounceTimer);
       nicheDebounceTimer = setTimeout(refreshNichePairs, 300);
@@ -1242,12 +1321,9 @@
     }
 
     function scoreBarHTML(score) {
-      if (score == null || score === 0) return '<span class="text-dim text-[13px]">—</span>';
-      const cls = score >= 70 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
-      return `<div class="flex items-center gap-2">
-        <div class="score-bar"><div class="score-bar-fill ${cls}" style="width:${score}%"></div></div>
-        <span class="text-dim text-[13px] font-semibold">${score}</span>
-      </div>`;
+      if (score == null || score === 0) return '<span class="text-dim text-[13px]">\u2014</span>';
+      var cls = score >= 70 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
+      return '<div class="flex items-center gap-2"><div class="score-bar"><div class="score-bar-fill ' + cls + '" style="width:' + score + '%"></div></div><span class="text-dim text-[13px] font-semibold">' + score + '</span></div>';
     }
 
     async function refreshNichesView() {
@@ -1256,55 +1332,35 @@
 
     async function refreshNicheStats() {
       try {
-        const r = await axios.get(API + '/api/niches/stats', { headers });
-        const s = r.data;
-        const row = document.getElementById('niche-stats-row');
-        row.innerHTML = `
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Total Pairs</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${s.total}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Candidates</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-info">${s.byStatus.candidate}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Scored</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${s.byStatus.scored}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Validated</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-accent">${s.byStatus.validated}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Approved</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${s.byStatus.approved}/3</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Parked</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${s.byStatus.parked}</span>
-          </div>
-        `;
+        var r = await axios.get(API + '/api/niches/stats', { headers: headers });
+        var s = r.data;
+        document.getElementById('niche-stats-row').innerHTML =
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Total Pairs</span><span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + s.total + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Candidates</span><span class="text-[28px] font-bold text-info" style="font-family:Share Tech Mono,monospace">' + s.byStatus.candidate + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Scored</span><span class="text-[28px] font-bold text-warn" style="font-family:Share Tech Mono,monospace">' + s.byStatus.scored + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Validated</span><span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + s.byStatus.validated + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Approved</span><span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + s.byStatus.approved + '/3</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Parked</span><span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + s.byStatus.parked + '</span></div>';
 
-        const topEl = document.getElementById('niche-top-pairs');
+        var topEl = document.getElementById('niche-top-pairs');
         if (s.topPairs && s.topPairs.length > 0) {
-          topEl.innerHTML = `<table class="results-table">
-            <thead><tr>
-              <th>Niche</th><th>City</th><th>Score</th><th>Status</th>
-              <th>Demand</th><th>Competition</th><th>Weakness</th><th>Contact</th><th>Revenue</th>
-            </tr></thead>
-            <tbody>${s.topPairs.map(p => `<tr>
-              <td>${p.niche}</td>
-              <td>${p.city}, ${p.state}</td>
-              <td>${scoreBarHTML(p.totalScore ?? p.total_score)}</td>
-              <td>${badge(p.status)}</td>
-              <td class="mono">${p.demandScore ?? p.demand_score ?? '—'}</td>
-              <td class="mono">${p.competitionScore ?? p.competition_score ?? '—'}</td>
-              <td class="mono">${p.weaknessScore ?? p.weakness_score ?? '—'}</td>
-              <td class="mono">${p.contactScore ?? p.contact_score ?? '—'}</td>
-              <td class="mono">${p.revenueScore ?? p.revenue_score ?? '—'}</td>
-            </tr>`).join('')}</tbody>
-          </table>`;
+          topEl.innerHTML = '<table class="results-table"><thead><tr>' +
+            '<th>Niche</th><th>City</th><th>Score</th><th>Status</th><th>Demand</th><th>Competition</th><th>Weakness</th><th>Contact</th><th>Revenue</th>' +
+          '</tr></thead><tbody>' +
+          s.topPairs.map(function(p) {
+            return '<tr>' +
+              '<td>' + p.niche + '</td>' +
+              '<td>' + p.city + ', ' + p.state + '</td>' +
+              '<td>' + scoreBarHTML(p.totalScore ?? p.total_score) + '</td>' +
+              '<td>' + badge(p.status) + '</td>' +
+              '<td class="mono">' + (p.demandScore ?? p.demand_score ?? '\u2014') + '</td>' +
+              '<td class="mono">' + (p.competitionScore ?? p.competition_score ?? '\u2014') + '</td>' +
+              '<td class="mono">' + (p.weaknessScore ?? p.weakness_score ?? '\u2014') + '</td>' +
+              '<td class="mono">' + (p.contactScore ?? p.contact_score ?? '\u2014') + '</td>' +
+              '<td class="mono">' + (p.revenueScore ?? p.revenue_score ?? '\u2014') + '</td>' +
+            '</tr>';
+          }).join('') +
+          '</tbody></table>';
         } else {
           topEl.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scored pairs yet</div>';
         }
@@ -1315,73 +1371,70 @@
 
     async function refreshNichePairs() {
       try {
-        const params = new URLSearchParams();
-        const status = document.getElementById('nf-status').value;
-        const niche = document.getElementById('nf-niche').value.trim();
-        const city = document.getElementById('nf-city').value.trim();
+        var params = new URLSearchParams();
+        var status = document.getElementById('nf-status').value;
+        var niche = document.getElementById('nf-niche').value.trim();
+        var city = document.getElementById('nf-city').value.trim();
         if (status) params.set('status', status);
         if (niche) params.set('niche', niche);
         if (city) params.set('city', city);
         params.set('limit', '50');
 
-        const r = await axios.get(API + '/api/niches?' + params.toString(), { headers });
-        const list = document.getElementById('niche-pairs-list');
+        var r = await axios.get(API + '/api/niches?' + params.toString(), { headers: headers });
+        var list = document.getElementById('niche-pairs-list');
         document.getElementById('niche-pair-count').textContent = r.data.totalDocs + ' pairs';
 
         if (!r.data.docs || r.data.docs.length === 0) {
           list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No pairs found. Add one above.</div>';
           return;
         }
+        list.innerHTML = '<table class="results-table"><thead><tr>' +
+          '<th>Niche</th><th>City</th><th>Score</th><th>Status</th><th>Maps</th><th>Weak%</th><th>Contact%</th><th>Actions</th>' +
+        '</tr></thead><tbody>' +
+        r.data.docs.map(function(p) {
+          var id = p.id;
+          var score = p.totalScore ?? p.total_score;
+          var st = p.status;
+          var maps = p.mapsCount ?? p.maps_count ?? '\u2014';
+          var weak = p.weakSitePct ?? p.weak_site_pct ?? '\u2014';
+          var contact = p.contactablePct ?? p.contactable_pct ?? '\u2014';
 
-        list.innerHTML = `<table class="results-table">
-          <thead><tr>
-            <th>Niche</th><th>City</th><th>Score</th><th>Status</th>
-            <th>Maps</th><th>Weak%</th><th>Contact%</th><th>Actions</th>
-          </tr></thead>
-          <tbody>${r.data.docs.map(p => {
-            const id = p.id;
-            const score = p.totalScore ?? p.total_score;
-            const st = p.status;
-            const maps = p.mapsCount ?? p.maps_count ?? '—';
-            const weak = p.weakSitePct ?? p.weak_site_pct ?? '—';
-            const contact = p.contactablePct ?? p.contactable_pct ?? '—';
+          var actions = '';
+          if (st === 'candidate' || st === 'scored') {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent" onclick="scorePair(\'' + id + '\')">Score</button> ';
+          }
+          if (st === 'scored' || st === 'candidate') {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent" onclick="validatePair(\'' + id + '\')">Validate</button> ';
+          }
+          if (st === 'validated' || st === 'scored') {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-accent border border-accent text-white cursor-pointer hover:opacity-90" onclick="decidePair(\'' + id + '\')">Go/No-Go</button> ';
+          }
+          if (st !== 'approved') {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-surface border border-border cursor-pointer hover:border-accent" style="color:var(--color-bad)" onclick="deletePair(\'' + id + '\')">\u2715</button>';
+          }
 
-            let actions = '';
-            if (st === 'candidate' || st === 'scored') {
-              actions += `<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all" onclick="scorePair('${id}')">Score</button> `;
-            }
-            if (st === 'scored' || st === 'candidate') {
-              actions += `<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all" onclick="validatePair('${id}')">Validate</button> `;
-            }
-            if (st === 'validated' || st === 'scored') {
-              actions += `<button class="btn text-[10px] py-1 px-2 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all" onclick="decidePair('${id}')">Go/No-Go</button> `;
-            }
-            if (st !== 'approved') {
-              actions += `<button class="btn text-[10px] py-1 px-2 hud-panel cursor-pointer hover:border-accent transition-all" style="color:var(--color-bad)" onclick="deletePair('${id}')">✕</button>`;
-            }
-
-            return `<tr>
-              <td>${p.niche}</td>
-              <td>${p.city}, ${p.state}</td>
-              <td>${scoreBarHTML(score)}</td>
-              <td>${badge(st)}</td>
-              <td class="mono">${maps}</td>
-              <td class="mono">${weak}${weak !== '—' ? '%' : ''}</td>
-              <td class="mono">${contact}${contact !== '—' ? '%' : ''}</td>
-              <td>${actions}</td>
-            </tr>`;
-          }).join('')}</tbody>
-        </table>`;
+          return '<tr>' +
+            '<td>' + p.niche + '</td>' +
+            '<td>' + p.city + ', ' + p.state + '</td>' +
+            '<td>' + scoreBarHTML(score) + '</td>' +
+            '<td>' + badge(st) + '</td>' +
+            '<td class="mono">' + maps + '</td>' +
+            '<td class="mono">' + weak + (weak !== '\u2014' ? '%' : '') + '</td>' +
+            '<td class="mono">' + contact + (contact !== '\u2014' ? '%' : '') + '</td>' +
+            '<td>' + actions + '</td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>';
       } catch (err) {
         console.error('Niche pairs error:', err);
       }
     }
 
     async function addNichePair() {
-      const btn = document.getElementById('btn-add-pair');
+      var btn = document.getElementById('btn-add-pair');
       btn.classList.add('loading');
       try {
-        const body = {
+        var body = {
           niche: document.getElementById('np-niche').value.trim(),
           city: document.getElementById('np-city').value.trim(),
           state: document.getElementById('np-state').value.trim().toUpperCase(),
@@ -1395,26 +1448,16 @@
           revenueEstimate: document.getElementById('np-revenue').value,
           notes: document.getElementById('np-notes').value.trim() || null,
         };
-
-        if (!body.niche || !body.city || !body.state) {
-          showToast('Niche, city, and state are required', 'error');
-          return;
-        }
-
-        const r = await axios.post(API + '/api/niches', body, { headers: { ...headers, 'Content-Type': 'application/json' } });
-
+        if (!body.niche || !body.city || !body.state) { showToast('Niche, city, and state are required', 'error'); return; }
+        var r = await axios.post(API + '/api/niches', body, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
         if (body.mapsCount) {
-          await axios.patch(API + '/api/niches/' + r.data.id + '/score', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+          await axios.patch(API + '/api/niches/' + r.data.id + '/score', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
         }
-
-        ['np-niche', 'np-city', 'np-state', 'np-maps', 'np-velocity', 'np-ads', 'np-agency', 'np-weak', 'np-contact', 'np-notes'].forEach(id => {
-          document.getElementById(id).value = '';
-        });
-
-        showToast('✓ Pair added' + (body.mapsCount ? ' & scored' : ''), 'success');
+        ['np-niche','np-city','np-state','np-maps','np-velocity','np-ads','np-agency','np-weak','np-contact','np-notes'].forEach(function(id) { document.getElementById(id).value = ''; });
+        showToast('\u2713 Pair added' + (body.mapsCount ? ' & scored' : ''), 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1422,72 +1465,62 @@
 
     async function scorePair(id) {
       try {
-        const r = await axios.patch(API + '/api/niches/' + id + '/score', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        const total = r.data.scores?.totalScore ?? r.data.total_score ?? '?';
-        showToast(`✓ Scored: ${total}/100`, 'success');
+        var r = await axios.patch(API + '/api/niches/' + id + '/score', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        var total = r.data.scores && r.data.scores.totalScore ?? r.data.total_score ?? '?';
+        showToast('\u2713 Scored: ' + total + '/100', 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       }
     }
 
     async function validatePair(id) {
       try {
-        await axios.post(API + '/api/niches/' + id + '/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Validation job queued — check back in 2 minutes', 'success');
+        await axios.post(API + '/api/niches/' + id + '/validate', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Validation job queued \u2014 check back in 2 minutes', 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       }
     }
 
     async function decidePair(id) {
       try {
-        const r = await axios.patch(API + '/api/niches/' + id + '/decide', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        const decision = r.data.decision;
-        const reasons = r.data.reasons || [];
-        if (decision === 'approved') {
-          showToast('✓ APPROVED — Sprint started!', 'success');
-        } else if (decision === 'blocked') {
-          showToast('⚠ ' + reasons[0], 'error');
-        } else {
-          showToast('⚠ PARKED — ' + reasons.join('; '), 'error');
-        }
+        var r = await axios.patch(API + '/api/niches/' + id + '/decide', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        var decision = r.data.decision;
+        var reasons = r.data.reasons || [];
+        if (decision === 'approved') showToast('\u2713 APPROVED \u2014 Sprint started!', 'success');
+        else if (decision === 'blocked') showToast('\u26a0 ' + reasons[0], 'error');
+        else showToast('\u26a0 PARKED \u2014 ' + reasons.join('; '), 'error');
         refreshNichesView();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       }
     }
 
     async function deletePair(id) {
       if (!confirm('Delete this pair?')) return;
       try {
-        await axios.delete(API + '/api/niches/' + id, { headers });
-        showToast('✓ Pair deleted', 'success');
+        await axios.delete(API + '/api/niches/' + id, { headers: headers });
+        showToast('\u2713 Pair deleted', 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       }
     }
 
-    let discoveryConfigDirty = false;
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('#dc-enabled, #dc-auto-approve, #dc-batch-size, #dc-interval, #dc-priority-cities, #dc-exclude-niches').forEach(el => {
-        el.addEventListener('input', () => { discoveryConfigDirty = true; });
-        el.addEventListener('change', () => { discoveryConfigDirty = true; });
-      });
-    });
+    // ─── DISCOVERY FUNCTIONS ──────────────────────────────
 
     async function refreshDiscoveryView() {
-      const tasks = [refreshDiscoveryStats()];
+      var tasks = [refreshDiscoveryStats()];
       if (!discoveryConfigDirty) tasks.push(loadDiscoveryConfig());
       await Promise.all(tasks);
     }
 
     async function loadDiscoveryConfig() {
       try {
-        const res = await axios.get(API + '/api/niches/discover/config', { headers });
-        const c = res.data;
+        var res = await axios.get(API + '/api/niches/discover/config', { headers: headers });
+        var c = res.data;
         document.getElementById('dc-enabled').checked = !!c.enabled;
         document.getElementById('dc-auto-approve').checked = !!c.autoApprove;
         document.getElementById('dc-batch-size').value = c.batchSize || 20;
@@ -1501,41 +1534,39 @@
     }
 
     async function saveDiscoveryConfig() {
-      const btn = document.getElementById('btn-discovery-save');
+      var btn = document.getElementById('btn-discovery-save');
       btn.classList.add('loading');
       try {
-        const priorityCities = document.getElementById('dc-priority-cities').value.split('\n').map(s => s.trim()).filter(Boolean);
-        const excludeNiches = document.getElementById('dc-exclude-niches').value.split('\n').map(s => s.trim()).filter(Boolean);
-
-        const body = {
+        var priorityCities = document.getElementById('dc-priority-cities').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+        var excludeNiches = document.getElementById('dc-exclude-niches').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+        var body = {
           enabled: document.getElementById('dc-enabled').checked,
           autoApprove: document.getElementById('dc-auto-approve').checked,
           batchSize: parseInt(document.getElementById('dc-batch-size').value) || 20,
           intervalHours: parseInt(document.getElementById('dc-interval').value) || 6,
-          priorityCities,
-          excludeNiches
+          priorityCities: priorityCities,
+          excludeNiches: excludeNiches,
         };
-
-        await axios.patch(API + '/api/niches/discover/config', body, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Discovery config saved', 'success');
+        await axios.patch(API + '/api/niches/discover/config', body, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Discovery config saved', 'success');
         discoveryConfigDirty = false;
         await loadDiscoveryConfig();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
     }
 
     async function triggerDiscovery() {
-      const btn = document.getElementById('btn-trigger-discovery');
+      var btn = document.getElementById('btn-trigger-discovery');
       btn.classList.add('loading');
       try {
-        await axios.post(API + '/api/niches/discover', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('✓ Discovery triggered', 'success');
+        await axios.post(API + '/api/niches/discover', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Discovery triggered', 'success');
         refreshDiscoveryView();
       } catch (err) {
-        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1543,100 +1574,48 @@
 
     async function refreshDiscoveryStats() {
       try {
-        const res = await axios.get(API + '/api/niches/discover/stats', { headers });
-        const s = res.data;
+        var res = await axios.get(API + '/api/niches/discover/stats', { headers: headers });
+        var s = res.data;
+        document.getElementById('discovery-stats-row').innerHTML =
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Status</span><span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + (s.config && s.config.enabled ? 'Active' : 'Paused') + '</span><span class="text-[13px] text-dim">' + (s.config && s.config.autoApprove ? 'Auto-approve ON' : 'Human review required') + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Total Probed</span><span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + s.totalCandidate + '</span><span class="text-[13px] text-dim">candidate pairs found</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Scored</span><span class="text-[28px] font-bold text-warn" style="font-family:Share Tech Mono,monospace">' + s.totalScored + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Validated</span><span class="text-[28px] font-bold text-info" style="font-family:Share Tech Mono,monospace">' + s.totalValidated + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Approved</span><span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + s.totalApproved + '</span><span class="text-[13px] text-dim">ready for campaigns</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Parked/Dropped</span><span class="text-[28px] font-bold text-dim" style="font-family:Share Tech Mono,monospace">' + s.totalParked + ' / ' + s.totalDropped + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Last Run</span><span class="text-[14px] font-bold">' + ago(s.config && s.config.lastRun) + '</span></div>';
 
-        document.getElementById('discovery-stats-row').innerHTML = `
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Status</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-accent">${s.config?.enabled ? 'Active' : 'Paused'}</span>
-            <span class="text-[13px] text-dim">${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Total Probed</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${s.totalCandidate}</span>
-            <span class="text-[13px] text-dim">candidate pairs found</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Scored</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${s.totalScored}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Validated</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-info">${s.totalValidated}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Approved</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${s.totalApproved}</span>
-            <span class="text-[13px] text-dim">ready for campaigns</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Parked/Dropped</span>
-            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-dim">${s.totalParked} / ${s.totalDropped}</span>
-          </div>
-          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[13px] uppercase tracking-widest text-dim">Last Run</span>
-            <span class="text-[14px] font-bold">${ago(s.config?.lastRun)}</span>
-          </div>
-        `;
-
-        const funnelStatuses = ['candidate', 'scored', 'validated', 'approved'];
-        const funnelCounts = [s.totalCandidate, s.totalScored, s.totalValidated, s.totalApproved];
-        const funnelColors = ['#74b9ff', '#fdcb6e', '#3b82f6', '#00b894'];
-
-        const total = funnelCounts.reduce((a, b) => a + b, 0) || 1;
-        const bar = document.getElementById('discovery-funnel-bar');
-        const legend = document.getElementById('discovery-funnel-legend');
-
-        let barHtml = '';
-        let legendHtml = '';
-
-        funnelStatuses.forEach((status, i) => {
-          const c = funnelCounts[i] || 0;
-          if (c > 0) {
-            barHtml += `<div style="width:${(c/total)*100}%;background:${funnelColors[i]}" title="${status}: ${c}"></div>`;
-          }
-          legendHtml += `<span class="text-[13px] text-dim flex items-center gap-1">
-            <span class="w-2 h-2 rounded-sm inline-block" style="background:${funnelColors[i]}"></span>
-            ${status} (${c})
-          </span>`;
+        var funnelStatuses = ['candidate', 'scored', 'validated', 'approved'];
+        var funnelCounts = [s.totalCandidate, s.totalScored, s.totalValidated, s.totalApproved];
+        var funnelColors = ['#74b9ff', '#fdcb6e', '#3b82f6', '#00b894'];
+        var total = funnelCounts.reduce(function(a, b) { return a + b; }, 0) || 1;
+        var bar = document.getElementById('discovery-funnel-bar');
+        var legend = document.getElementById('discovery-funnel-legend');
+        var barHtml = '';
+        var legendHtml = '';
+        funnelStatuses.forEach(function(status, i) {
+          var c = funnelCounts[i] || 0;
+          if (c > 0) barHtml += '<div style="width:' + ((c / total) * 100) + '%;background:' + funnelColors[i] + '" title="' + status + ': ' + c + '"></div>';
+          legendHtml += '<span class="text-[13px] text-dim flex items-center gap-1"><span class="w-2 h-2 inline-block" style="background:' + funnelColors[i] + '"></span>' + status + ' (' + c + ')</span>';
         });
-
         bar.innerHTML = barHtml;
         legend.innerHTML = legendHtml;
-
       } catch (err) {
         console.error('Discovery stats error:', err);
       }
     }
 
-    document.documentElement.setAttribute('data-theme', 'dark');
+    // ─── INIT ──────────────────────────────────────────
 
-    // Init active tab styling
-    const initTab = document.querySelector('.nav-tab[data-tab="dashboard"]');
-    initTab.style.borderBottomColor = 'var(--color-accent)';
-    initTab.style.color = 'var(--color-accent)';
-
-    // Initial load + poll
     refresh();
-    setInterval(() => {
+    setInterval(function() {
       refresh();
-      if (document.getElementById('view-scraper').classList.contains('active')) {
-        refreshScraperView();
-      }
-      if (document.getElementById('view-niches').classList.contains('active')) {
-        refreshNichesView();
-      }
-      if (document.getElementById('view-discovery').classList.contains('active')) {
-        refreshDiscoveryView();
-      }
+      if (document.getElementById('view-scraper').classList.contains('active')) refreshScraperView();
+      if (document.getElementById('view-niches').classList.contains('active')) refreshNichesView();
+      if (document.getElementById('view-discovery').classList.contains('active')) refreshDiscoveryView();
+      if (document.getElementById('view-activity').classList.contains('active')) refreshActivity();
     }, 5000);
   </script>
 
 </body>
 </html>
-
-
-
-
-

@@ -1,42 +1,39 @@
-ome# Handoff — Web Agency Platform
+# Handoff — Web Agency Platform
 
 ## Last Updated
 2026-04-30
 
 ## What Was Done (This Session)
-Implemented autonomous niche+city discovery system. The agent now finds profitable niches on its own by probing cities with broad Google Maps queries and harvesting real business categories — no more manual niche picking.
 
-### New Files
-- `app-lite/src/data/us-cities.ts` — Seed database of 200+ US cities across 3 tiers (mid-size metros, smaller metros, growing suburbs).
-- `app-lite/src/data/niche-library.ts` — 60+ niches across 10 verticals as seed/fallback. Includes revenue estimates and franchise risk flags.
-- `app-lite/src/jobs/handlers/niche-discovery.ts` — Core discovery handler: broad probing → category harvesting → auto-scoring → validation queuing → auto-approve pipeline.
+### Dashboard overhaul (`app-lite/public/index.html`)
+Rebuilt dashboard to be workflow-centric instead of a generic admin panel.
 
-### Modified Files
-- `app-lite/src/db/schema.ts` — Added 8 discovery config fields to systemConfig (enabled, batchSize, intervalHours, autoApprove, excludeNiches, priorityCities, lastRun, humanReviewCount).
-- `app-lite/src/types/index.ts` — Added `niche_discover` to JOB_TYPES.
-- `app-lite/src/jobs/workers.ts` — Registered `handleNicheDiscover` handler.
-- `app-lite/src/jobs/scheduler.ts` — Added interval-based scheduling for `niche_discover` (every 6h, configurable).
-- `app-lite/src/routes/niches.ts` — Added discovery endpoints: POST /discover, GET/PATCH /discover/config, GET /discover/stats, PATCH /:id/approve.
-- `docs/22-Niche-Hunting-SOP.md` — Updated from manual to autonomous discovery. Scoring model and thresholds preserved.
+- **Fixed pipeline bar & status alignment**: Pipeline colors and badges now match actual `LEAD_STATUSES` from `types/index.ts` (`new, scored, contacted, replied_interested, replied_objection, demo_sent, paid, lost, archived`). Removed ghost statuses (`interested, excluded, closed_won, closed_lost`) that didn't exist in the state machine.
+- **Added KPI cards**: Reply rate, demo-to-close rate, active clients, total leads, queue health — all computed from lead status counts with color thresholds (green = good, yellow = needs attention).
+- **Added Kanban board**: Visual pipeline with one column per workflow stage. Shows lead cards with business name, niche, city, and priority tier dot. Color-coded column headers matching the state machine flow.
+- **Added Activity tab**: New tab showing pipeline events (`/api/jobs/pipeline/events`) and policy checks (`/api/jobs/policy/checks`) — the audit trail that was previously invisible in the dashboard.
+- **Restructured nav tabs**: `Pipeline | Discovery | Lead Gen | Niches | Activity | Config` — follows the operational workflow order instead of generic feature names.
+- **Split Config into its own tab**: System config (phase, niche, cities, approval gates) moved from dashboard clutter to dedicated tab.
+- **Badge CSS fixes**: Added missing badge classes for all lead/client/niche statuses.
 
-### Migration
-- Generated `drizzle/0000_nostalgic_human_robot.sql` for new discovery config columns.
-- Run `bun run db:migrate` to apply.
+### Docs page restyle (`app-lite/public/about.html`)
+Restyled the documentation page to match the dashboard's industrial brutalist theme.
 
-### Validation Run
-- `bun run typecheck` → passed (0 errors).
-- `bun run test` → 6 test files, 105 tests, all passed.
+- **Replaced fonts**: Inter/JetBrains Mono → Share Tech Mono + Space Grotesk + Rajdhani (matching dashboard)
+- **Replaced color scheme**: Purple accent (#6c5ce7) → Orange accent (#fb923c). All surface, border, text, status colors now match dashboard exactly.
+- **Replaced rounded corners with sharp brutalist styling**: No border-radius anywhere. Box shadows (6px 6px), corner bracket pseudo-elements on cards, left-border accent bars.
+- **Added grid background + noise overlay**: Same as dashboard — 32px grid lines at 0.03 opacity + SVG noise at 0.15 opacity.
+- **Updated all SVG diagrams**: All flow diagrams, state machine diagrams, and architecture diagrams now use the new color palette (orange arrows, correct status colors, matching surface fills).
+- **Updated badges**: Dashboard-style badges with left-border color indicator instead of rounded pill badges.
+- **Updated topbar**: Removed light/dark theme toggle (dark-only like dashboard). Updated title to "UNSC-OGM // SYSTEM DOCS", back link to "TERMINAL".
+- **Updated sidebar**: Share Tech Mono section labels, 3px active border, mono-font numbering.
+- **Updated tables**: Share Tech Mono font, 2px border headers, hover accent glow.
+- **Updated callouts**: Left-border accent instead of rounded, matching dashboard panel style.
+- **All 17 documentation sections preserved intact** — only visual styling changed, no content modified.
 
-### Key Design Decisions
-1. **Discovery is organic** — The agent does NOT just cross-product a static niche list against cities. It probes each city with broad queries ("local services", "home services") and harvests the Google Maps categories that come back. This discovers what actually thrives in each city.
-2. **Seed library is fallback** — The 60+ niche library is used when broad probing returns sparse data, but real discovery comes from Maps categories.
-3. **Human gate preserved** — First 3 go/no-go decisions require human approval (via `PATCH /api/niches/:id/approve`). After 3 reviews, `autoApprove` can be enabled.
-4. **Conservative rate limiting** — Discovery runs at 4 req/min (vs 8 for production scraping) to stay under the radar.
-
-## What Was Done (This Session)
-- **UI Pivot to Industrial Brutalist**: Overhauled `app-lite/public/index.html` to remove all soft UI elements (rounded corners, glows, glassy gradients) and implemented a strict, rigid industrial aesthetic. 
-- **Typography and Scale**: Scaled all font sizes up globally for readability, removed maximum width constraints to allow the UI to utilize 100% screen width, and refined color contrast (brighter accents on dark backgrounds, darker text on bright buttons). Reverted to the original cyberpunk-leaning font stack (`Share Tech Mono`, `Space Grotesk`, `Rajdhani`) per user request.
-- **Structural Integrity**: Replaced all soft shadows with hard-coded, 90-degree brutalist drop-shadows (`box-shadow: 6px 6px 0px rgba(0,0,0,0.3)`), ensuring physical weight and depth to the terminal sections.
+### Validation
+- `bun run typecheck` → passed (0 errors)
+- `bun run test` → 6 test files, 106 tests, all passed
 
 ## What's In Progress
 - None.
@@ -45,7 +42,10 @@ Implemented autonomous niche+city discovery system. The agent now finds profitab
 - None.
 
 ## Where Next Agent Should Pick Up
-1. Review the brutalist dashboard UI polish in `app-lite/public/index.html` and ensure the functionality (buttons, tabs, data fetching) remains robust across the new scaled-up layout.
+1. The dashboard is now structurally correct but depends on backend data being populated. When leads flow through the pipeline, the kanban board and KPIs will populate automatically.
+2. The Activity tab calls `/api/jobs/pipeline/events` and `/api/jobs/policy/checks` — verify these routes return data in the expected format. Routes exist in `src/routes/jobs.ts` but may need testing with real pipeline events.
+3. Consider adding client lifecycle kanban (separate from lead pipeline) — `pending_payment → onboarding → active → cancelled` etc.
+4. The docs page SVG diagrams use `rx="8"` (rounded corners) on boxes — could be changed to `rx="0"` for full brutalist consistency if desired.
 
 ## Current Pipeline Snapshot
 ```text
