@@ -1,562 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agency Engine â€” Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Agency Engine — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #111412;
-      --surface: #161a17;
-      --surface-2: #1d211e;
-      --border: #2c322d;
-      --text: #c8cdc9;
-      --text-dim: #6b736c;
-      --accent: #d4a54a;
-      --accent-glow: rgba(212, 165, 74, 0.08);
-      --green: #5a8a4a;
-      --yellow: #c9a84e;
-      --red: #b05040;
-      --blue: #5a7e96;
-      --orange: #b07830;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-      --mono: 'Inter', system-ui, sans-serif;
-    }
-
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 0;
-    }
-
-    /* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(12px);
-    }
-    .header h1 {
-      font-size: 18px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .header h1 .dot {
-      width: 8px; height: 8px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--green);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .header-meta {
-      display: flex;
-      gap: 20px;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-    .header-meta span { font-family: var(--mono); }
-
-    /* â”€â”€ Nav tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .nav-tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      padding: 0 32px;
-    }
-    .nav-tab {
-      padding: 12px 24px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-dim);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.15s;
-      user-select: none;
-    }
-    .nav-tab:hover { color: var(--text); }
-    .nav-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    /* â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .dashboard {
-      padding: 24px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .view { display: none; }
-    .view.active { display: flex; flex-direction: column; gap: 20px; }
-
-    /* â”€â”€ Stats Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: border-color 0.2s;
-    }
-    .stat-card:hover { border-color: var(--accent); }
-    .stat-card .label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-    }
-    .stat-card .value {
-      font-size: 28px;
-      font-weight: 700;
-      font-family: var(--mono);
-    }
-    .stat-card .sub {
-      font-size: 11px;
-      color: var(--text-dim);
-    }
-
-    /* â”€â”€ Panels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .panels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 900px) {
-      .panels { grid-template-columns: 1fr; }
-    }
-
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 6px rgba(0,0,0,0.35);
-    }
-    .panel-header {
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface-2);
-    }
-    .panel-header h2 {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .panel-header .count {
-      font-size: 11px;
-      color: var(--text-dim);
-      font-family: var(--mono);
-    }
-    .panel-body {
-      max-height: 360px;
-      overflow-y: auto;
-    }
-    .panel-body::-webkit-scrollbar { width: 4px; }
-    .panel-body::-webkit-scrollbar-track { background: transparent; }
-    .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-    /* â”€â”€ Table rows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .row {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      gap: 12px;
-      transition: background 0.15s;
-    }
-    .row:last-child { border-bottom: none; }
-    .row:hover { background: var(--accent-glow); }
-    .row .name {
-      flex: 1;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .row .meta {
-      color: var(--text-dim);
-      font-size: 11px;
-      font-family: var(--mono);
-      white-space: nowrap;
-    }
-    .row .time {
-      color: var(--text-dim);
-      font-size: 11px;
-      font-family: var(--mono);
-      min-width: 70px;
-      text-align: right;
-    }
-
-    /* â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 2px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-family: var(--mono);
-      white-space: nowrap;
-    }
-    .badge-new       { background: rgba(116,185,255,0.15); color: var(--blue); }
-    .badge-contacted { background: rgba(108,92,231,0.15); color: var(--accent); }
-    .badge-interested { background: rgba(0,184,148,0.15); color: var(--green); }
-    .badge-demo_sent { background: rgba(253,203,110,0.15); color: var(--yellow); }
-    .badge-closed_won { background: rgba(0,184,148,0.2); color: var(--green); }
-    .badge-closed_lost { background: rgba(225,112,85,0.15); color: var(--red); }
-    .badge-excluded  { background: rgba(122,122,143,0.15); color: var(--text-dim); }
-
-    .badge-queued    { background: rgba(116,185,255,0.15); color: var(--blue); }
-    .badge-running   { background: rgba(253,203,110,0.15); color: var(--yellow); animation: pulse 1s infinite; }
-    .badge-completed { background: rgba(0,184,148,0.15); color: var(--green); }
-    .badge-failed    { background: rgba(225,112,85,0.15); color: var(--red); }
-    .badge-dead      { background: rgba(225,112,85,0.25); color: var(--red); }
-
-    .badge-onboarding { background: rgba(116,185,255,0.15); color: var(--blue); }
-    .badge-active    { background: rgba(0,184,148,0.15); color: var(--green); }
-    .badge-churned   { background: rgba(225,112,85,0.15); color: var(--red); }
-    .badge-paused    { background: rgba(253,203,110,0.15); color: var(--yellow); }
-
-    /* Priority tier badges */
-    .badge-hot       { background: rgba(225,112,85,0.15); color: var(--red); }
-    .badge-warm      { background: rgba(253,203,110,0.15); color: var(--yellow); }
-    .badge-low       { background: rgba(122,122,143,0.15); color: var(--text-dim); }
-
-    /* Email status badges */
-    .badge-valid     { background: rgba(0,184,148,0.15); color: var(--green); }
-    .badge-risky     { background: rgba(243,156,18,0.15); color: var(--orange); }
-    .badge-invalid   { background: rgba(225,112,85,0.15); color: var(--red); }
-    .badge-pending   { background: rgba(116,185,255,0.15); color: var(--blue); }
-
-    /* Niche pair status badges */
-    .badge-candidate  { background: rgba(116,185,255,0.15); color: var(--blue); }
-    .badge-scored     { background: rgba(253,203,110,0.15); color: var(--yellow); }
-    .badge-validated  { background: rgba(108,92,231,0.15); color: var(--accent); }
-    .badge-approved   { background: rgba(0,184,148,0.15); color: var(--green); }
-    .badge-parked     { background: rgba(122,122,143,0.15); color: var(--text-dim); }
-    .badge-dropped    { background: rgba(225,112,85,0.15); color: var(--red); }
-
-    /* Score bar */
-    .score-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--surface-2); width: 100px; }
-    .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-    .score-high { background: var(--green); }
-    .score-mid { background: var(--yellow); }
-    .score-low { background: var(--red); }
-
-    /* Priority dot indicators */
-    .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
-    .priority-dot-hot { background: var(--red); box-shadow: 0 0 4px var(--red); }
-    .priority-dot-warm { background: var(--yellow); box-shadow: 0 0 4px var(--yellow); }
-    .priority-dot-low { background: var(--text-dim); }
-
-    /* â”€â”€ Config panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .config-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-    }
-    .config-item {
-      background: var(--surface);
-      padding: 12px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .config-item .ck { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-    .config-item .cv { font-size: 14px; font-family: var(--mono); font-weight: 500; }
-
-    /* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .empty {
-      padding: 40px 20px;
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 13px;
-    }
-
-    /* â”€â”€ Full-width panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .full-width { grid-column: 1 / -1; }
-
-    /* â”€â”€ Pipeline bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .pipeline-bar {
-      display: flex;
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden;
-      background: var(--surface-2);
-      margin: 0 20px 16px;
-    }
-    .pipeline-bar div {
-      height: 100%;
-      transition: width 0.5s ease;
-    }
-
-    /* â”€â”€ Action bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .action-bar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 16px;
-      border-radius: 3px;
-      cursor: pointer;
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn:hover { border-color: var(--accent); background: var(--accent-glow); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-accent {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-    .btn-accent:hover { opacity: 0.9; background: var(--accent); }
-    .btn .spinner {
-      display: none;
-      width: 12px; height: 12px;
-      border: 2px solid transparent;
-      border-top-color: currentColor;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-    .btn.loading .spinner { display: inline-block; }
-    .btn.loading { opacity: 0.7; pointer-events: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* â”€â”€ Filter bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .filter-bar select, .filter-bar input {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 6px 10px;
-      border-radius: 3px;
-      font-family: var(--font);
-      font-size: 12px;
-      outline: none;
-    }
-    .filter-bar select:focus, .filter-bar input:focus {
-      border-color: var(--accent);
-    }
-    .filter-bar input { min-width: 140px; }
-    .filter-bar label {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 20px;
-      border-radius: 3px;
-      font-size: 13px;
-      font-family: var(--font);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.success { border-left: 3px solid var(--green); }
-    .toast.error { border-left: 3px solid var(--red); }
-
-    /* â”€â”€ Scraper config form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .scraper-config-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      padding: 20px;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .form-group.full-width { grid-column: 1 / -1; }
-    .form-group label {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-group input, .form-group select {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 3px;
-      font-family: var(--mono);
-      font-size: 13px;
-      outline: none;
-    }
-    .form-group input:focus { border-color: var(--accent); }
-    .form-group small { font-size: 11px; color: var(--text-dim); }
-
-    /* â”€â”€ Scraper results table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .results-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-    .results-table th {
-      text-align: left;
-      padding: 8px 12px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-dim);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface-2);
-      position: sticky;
-      top: 0;
-    }
-    .results-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 200px;
-    }
-    .results-table tr:hover td { background: var(--accent-glow); }
-    .results-table .mono { font-family: var(--mono); font-size: 11px; }
-    .has-indicator { color: var(--green); }
-    .no-indicator { color: var(--text-dim); }
-
-    /* â”€â”€ Section header in scraper â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0;
-    }
-    .section-header h3 {
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: #111412;
+      --color-surface: #161a17;
+      --color-surface-2: #1d211e;
+      --color-border: #2c322d;
+      --color-dim: #6b736c;
+      --color-accent: #d4a54a;
+      --color-accent-glow: rgba(212, 165, 74, 0.08);
+      --color-good: #5a8a4a;
+      --color-warn: #c9a84e;
+      --color-bad: #b05040;
+      --color-info: #5a7e96;
     }
   </style>
+  <style>
+    @custom-variant dark (&:where(.dark, .dark *));
+    *, *::before, *::after { box-sizing: border-box; }
+    body { background: var(--color-bg); color: #c8cdc9; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { display: none; width: 12px; height: 12px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .btn.loading .spinner { display: inline-block; }
+    .btn.loading { opacity: 0.7; pointer-events: none; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .badge-new { background: rgba(90,126,150,0.15); color: var(--color-info); }
+    .badge-contacted { background: rgba(212,165,74,0.15); color: var(--color-accent); }
+    .badge-interested, .badge-closed_won { background: rgba(90,138,74,0.15); color: var(--color-good); }
+    .badge-demo_sent { background: rgba(201,168,78,0.15); color: var(--color-warn); }
+    .badge-closed_lost { background: rgba(176,80,64,0.15); color: var(--color-bad); }
+    .badge-excluded { background: rgba(107,115,108,0.15); color: var(--color-dim); }
+    .badge-queued { background: rgba(90,126,150,0.15); color: var(--color-info); }
+    .badge-running { background: rgba(201,168,78,0.15); color: var(--color-warn); animation: pulse 1s infinite; }
+    .badge-completed { background: rgba(90,138,74,0.15); color: var(--color-good); }
+    .badge-failed, .badge-dead { background: rgba(176,80,64,0.15); color: var(--color-bad); }
+    .badge-onboarding { background: rgba(90,126,150,0.15); color: var(--color-info); }
+    .badge-active { background: rgba(90,138,74,0.15); color: var(--color-good); }
+    .badge-churned { background: rgba(176,80,64,0.15); color: var(--color-bad); }
+    .badge-paused { background: rgba(201,168,78,0.15); color: var(--color-warn); }
+    .badge-hot { background: rgba(176,80,64,0.15); color: var(--color-bad); }
+    .badge-warm { background: rgba(201,168,78,0.15); color: var(--color-warn); }
+    .badge-low { background: rgba(107,115,108,0.15); color: var(--color-dim); }
+    .badge-valid { background: rgba(90,138,74,0.15); color: var(--color-good); }
+    .badge-risky { background: rgba(201,168,78,0.15); color: var(--color-warn); }
+    .badge-invalid { background: rgba(176,80,64,0.15); color: var(--color-bad); }
+    .badge-pending { background: rgba(90,126,150,0.15); color: var(--color-info); }
+    .badge-candidate { background: rgba(90,126,150,0.15); color: var(--color-info); }
+    .badge-scored { background: rgba(201,168,78,0.15); color: var(--color-warn); }
+    .badge-validated { background: rgba(212,165,74,0.15); color: var(--color-accent); }
+    .badge-approved { background: rgba(90,138,74,0.15); color: var(--color-good); }
+    .badge-parked { background: rgba(107,115,108,0.15); color: var(--color-dim); }
+    .badge-dropped { background: rgba(176,80,64,0.15); color: var(--color-bad); }
+    .score-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--color-surface-2); width: 100px; }
+    .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .score-high { background: var(--color-good); }
+    .score-mid { background: var(--color-warn); }
+    .score-low { background: var(--color-bad); }
+    .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+    .priority-dot-hot { background: var(--color-bad); box-shadow: 0 0 4px var(--color-bad); }
+    .priority-dot-warm { background: var(--color-warn); box-shadow: 0 0 4px var(--color-warn); }
+    .priority-dot-low { background: var(--color-dim); }
+    .has-indicator { color: var(--color-good); }
+    .no-indicator { color: var(--color-dim); }
+    .pipeline-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--color-surface-2); }
+    .pipeline-bar div { height: 100%; transition: width 0.5s ease; }
+    .results-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .results-table th { text-align: left; padding: 8px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-dim); border-bottom: 1px solid var(--color-border); background: var(--color-surface-2); position: sticky; top: 0; }
+    .results-table td { padding: 8px 12px; border-bottom: 1px solid var(--color-border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .results-table tr:hover td { background: var(--color-accent-glow); }
+    .results-table .mono { font-size: 11px; }
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 3px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 3px solid var(--color-good); color: #c8cdc9; }
+    .toast.error { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 3px solid var(--color-bad); color: #c8cdc9; }
+  </style>
 </head>
-<body>
-  <div class="header">
-    <h1><span class="dot"></span> Agency Engine</h1>
-    <div class="header-meta">
-      <a href="/about" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:500">System Docs</a>
+<body class="font-[Inter,system-ui,sans-serif] min-h-screen p-0 m-0">
+
+  <header class="bg-surface border-b border-border px-8 py-4 flex items-center justify-between sticky top-0 z-100 backdrop-blur-xl">
+    <h1 class="text-base font-semibold flex items-center gap-2.5">
+      <span class="w-2 h-2 bg-good rounded-full shadow-[0_0_8px_var(--color-good)] animate-[pulse_2s_infinite]"></span>
+      Agency Engine
+    </h1>
+    <div class="flex gap-5 text-xs text-dim">
+      <a href="/about" class="text-accent no-underline font-medium">System Docs</a>
       <span id="phase">Phase —</span>
       <span id="uptime">—</span>
       <span id="last-refresh">—</span>
-
     </div>
-  </div>
+  </header>
 
-  <div class="nav-tabs">
-    <div class="nav-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</div>
-    <div class="nav-tab" data-tab="niches" onclick="switchTab('niches')">Niches</div>
-    <div class="nav-tab" data-tab="discovery" onclick="switchTab('discovery')">Discovery</div>
-    <div class="nav-tab" data-tab="scraper" onclick="switchTab('scraper')">Scraper</div>
-  </div>
+  <nav class="flex border-b border-border bg-surface px-8">
+    <button class="nav-tab px-6 py-3 text-sm font-medium text-dim cursor-pointer border-b-2 border-transparent hover:text-[#c8cdc9] transition-all" data-tab="dashboard" onclick="switchTab('dashboard')">
+      <i class="ph ph-squares-four mr-1.5"></i>Dashboard
+    </button>
+    <button class="nav-tab px-6 py-3 text-sm font-medium text-dim cursor-pointer border-b-2 border-transparent hover:text-[#c8cdc9] transition-all" data-tab="niches" onclick="switchTab('niches')">
+      <i class="ph ph-crosshair mr-1.5"></i>Niches
+    </button>
+    <button class="nav-tab px-6 py-3 text-sm font-medium text-dim cursor-pointer border-b-2 border-transparent hover:text-[#c8cdc9] transition-all" data-tab="discovery" onclick="switchTab('discovery')">
+      <i class="ph ph-compass mr-1.5"></i>Discovery
+    </button>
+    <button class="nav-tab px-6 py-3 text-sm font-medium text-dim cursor-pointer border-b-2 border-transparent hover:text-[#c8cdc9] transition-all" data-tab="scraper" onclick="switchTab('scraper')">
+      <i class="ph ph-spider-web mr-1.5"></i>Scraper
+    </button>
+  </nav>
 
-  <div class="dashboard">
+  <main class="p-6 flex flex-col gap-5 max-w-[1400px] mx-auto">
 
     <!-- ===================== DASHBOARD VIEW ===================== -->
-    <div id="view-dashboard" class="view active">
-      <!-- Actions -->
-      <div class="action-bar">
-        <button class="btn btn-accent" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
-          <span class="spinner"></span> Run Scraper
+    <div id="view-dashboard" class="view flex flex-col gap-5">
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn bg-accent border-accent text-white hover:opacity-90 px-4 py-2 rounded border cursor-pointer text-sm font-medium flex items-center gap-1.5 transition-all" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
+          <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper
         </button>
-        <button class="btn" onclick="triggerJob('churn_check')" id="btn-churn-check">
-          <span class="spinner"></span> Churn Check
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-4 py-2 rounded border cursor-pointer text-sm font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
+          <span class="spinner"></span><i class="ph ph-user-minus"></i> Churn Check
         </button>
-        <button class="btn" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
-          <span class="spinner"></span> Monthly Report
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-4 py-2 rounded border cursor-pointer text-sm font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
+          <span class="spinner"></span><i class="ph ph-chart-bar"></i> Monthly Report
         </button>
       </div>
 
-      <!-- Stats -->
-      <div class="stats-row" id="stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="stats-row"></div>
 
-      <!-- Pipeline bar -->
-      <div class="panel full-width" style="padding-top:16px">
-        <div class="panel-header"><h2>Lead Pipeline</h2></div>
-        <div style="padding: 16px 0 0;">
+      <div class="bg-surface border border-border rounded pt-4 col-span-full">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-funnel mr-1.5"></i>Lead Pipeline</h2>
+        </div>
+        <div class="px-5 pt-4">
           <div class="pipeline-bar" id="pipeline-bar"></div>
-          <div style="display:flex; gap:16px; padding: 0 20px 16px; flex-wrap:wrap;" id="pipeline-legend"></div>
+          <div class="flex gap-4 py-4 flex-wrap" id="pipeline-legend"></div>
         </div>
       </div>
 
-      <!-- Leads (full width with filters) -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Leads</h2>
-          <span class="count" id="lead-count">â€”</span>
+      <div class="bg-surface border border-border rounded col-span-full">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-users mr-1.5"></i>Leads</h2>
+          <span class="text-[11px] text-dim" id="lead-count">—</span>
         </div>
-        <div class="filter-bar">
-          <label>Status</label>
-          <select id="f-status" onchange="refreshLeads()">
+        <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Status</label>
+          <select id="f-status" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
             <option value="">All</option>
             <option value="new">New</option>
             <option value="contacted">Contacted</option>
@@ -566,364 +161,318 @@
             <option value="closed_lost">Lost</option>
             <option value="excluded">Excluded</option>
           </select>
-          <label>Niche</label>
-          <select id="f-niche" onchange="refreshLeads()">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Niche</label>
+          <select id="f-niche" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
             <option value="">All</option>
           </select>
-          <label>City</label>
-          <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()">
-          <label>Search</label>
-          <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()">
-          <button class="btn" onclick="clearFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">âœ• Clear</button>
+          <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
+          <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none min-w-[140px] focus:border-accent">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Search</label>
+          <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none min-w-[140px] focus:border-accent">
+          <button onclick="clearFilters()" class="ml-auto text-xs py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+            <i class="ph ph-x"></i> Clear
+          </button>
         </div>
-        <div class="panel-body" id="leads-list" style="max-height:500px"></div>
+        <div class="overflow-y-auto max-h-[500px]" id="leads-list"></div>
       </div>
 
-      <!-- Panels -->
-      <div class="panels">
-        <!-- Jobs -->
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Jobs</h2>
-            <span class="count" id="job-count">â€”</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-surface border border-border rounded overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
+          <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+            <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-queue mr-1.5"></i>Jobs</h2>
+            <span class="text-[11px] text-dim" id="job-count">—</span>
           </div>
-          <div class="panel-body" id="jobs-list"></div>
+          <div class="overflow-y-auto max-h-[360px]" id="jobs-list"></div>
         </div>
-
-        <!-- Clients -->
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Clients</h2>
-            <span class="count" id="client-count">â€”</span>
+        <div class="bg-surface border border-border rounded overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
+          <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+            <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-buildings mr-1.5"></i>Clients</h2>
+            <span class="text-[11px] text-dim" id="client-count">—</span>
           </div>
-          <div class="panel-body" id="clients-list"></div>
+          <div class="overflow-y-auto max-h-[360px]" id="clients-list"></div>
         </div>
       </div>
 
-      <!-- System Config (full width) -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>System Config</h2>
+      <div class="bg-surface border border-border rounded col-span-full">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
         </div>
-          <div class="panel-body" id="config-panel"></div>
-        </div>
+        <div class="overflow-y-auto" id="config-panel"></div>
       </div>
+    </div>
 
     <!-- ===================== DISCOVERY VIEW ===================== -->
-    <div id="view-discovery" class="view">
-
-      <!-- Discovery Config -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Discovery Config</h2>
-          <div style="display:flex;gap:8px">
-            <button class="btn" onclick="loadDiscoveryConfig()" style="font-size:11px;padding:5px 12px">Reset</button>
-            <button class="btn btn-accent" onclick="saveDiscoveryConfig()" id="btn-discovery-save" style="font-size:11px;padding:5px 12px">Save Config</button>
+    <div id="view-discovery" class="view flex flex-col gap-5">
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
+          <div class="flex gap-2">
+            <button onclick="loadDiscoveryConfig()" class="text-[11px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
+            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[11px] py-1 px-3 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all">Save Config</button>
           </div>
         </div>
-        <div class="scraper-config-form">
-          <div class="form-group" style="flex-direction:row;align-items:center">
+        <div class="grid grid-cols-2 gap-4 p-5">
+          <div class="flex items-center gap-2">
             <input type="checkbox" id="dc-enabled">
-            <label for="dc-enabled" style="margin-bottom:0">Enabled</label>
+            <label for="dc-enabled" class="text-xs text-dim uppercase tracking-wide">Enabled</label>
           </div>
-          <div class="form-group" style="flex-direction:row;align-items:center">
+          <div class="flex items-center gap-2">
             <input type="checkbox" id="dc-auto-approve">
-            <label for="dc-auto-approve" style="margin-bottom:0">Auto Approve</label>
+            <label for="dc-auto-approve" class="text-xs text-dim uppercase tracking-wide">Auto Approve</label>
           </div>
-          <div class="form-group">
-            <label>Batch Size</label>
-            <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Batch Size</label>
+            <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Interval (Hours)</label>
-            <input id="dc-interval" type="number" min="1" max="168" placeholder="6">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Interval (Hours)</label>
+            <input id="dc-interval" type="number" min="1" max="168" placeholder="6" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group full-width">
-            <label>Priority Cities (one per line: "City, ST")</label>
-            <textarea id="dc-priority-cities" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:3px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Priority Cities (one per line: "City, ST")</label>
+            <textarea id="dc-priority-cities" rows="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
           </div>
-          <div class="form-group full-width">
-            <label>Exclude Niches (one per line)</label>
-            <textarea id="dc-exclude-niches" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:3px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Exclude Niches (one per line)</label>
+            <textarea id="dc-exclude-niches" rows="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
           </div>
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="action-bar" style="margin-bottom: 0;">
-        <button class="btn btn-accent" onclick="triggerDiscovery()" id="btn-trigger-discovery">
-          <span class="spinner"></span> ðŸ”Ž Trigger Discovery
+      <div class="flex gap-2 flex-wrap">
+        <button onclick="triggerDiscovery()" id="btn-trigger-discovery" class="bg-accent border border-accent text-white px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:opacity-90 transition-all">
+          <span class="spinner"></span><i class="ph ph-magnifying-glass"></i> Trigger Discovery
         </button>
-        <button class="btn" onclick="refreshDiscoveryView()">
-          <span class="spinner"></span> Refresh
+        <button onclick="refreshDiscoveryView()" class="bg-surface border border-border text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+          <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
       </div>
 
-      <!-- Discovery Stats -->
-      <div class="stats-row" id="discovery-stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="discovery-stats-row"></div>
 
-      <!-- Funnel visualization -->
-      <div class="panel full-width">
-        <div class="panel-header"><h2>Discovery Funnel</h2></div>
-        <div style="padding: 16px 0 0;">
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
+        </div>
+        <div class="px-5 pt-4">
           <div class="pipeline-bar" id="discovery-funnel-bar"></div>
-          <div style="display:flex; gap:16px; padding: 0 20px 16px; flex-wrap:wrap;" id="discovery-funnel-legend"></div>
+          <div class="flex gap-4 py-4 flex-wrap" id="discovery-funnel-legend"></div>
         </div>
       </div>
-
     </div>
 
     <!-- ===================== SCRAPER VIEW ===================== -->
-    <div id="view-scraper" class="view">
-
-      <!-- Scraper Config -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Scraper Config</h2>
-          <div style="display:flex;gap:8px">
-            <button class="btn" onclick="loadScraperConfig()" style="font-size:11px;padding:5px 12px">Reset</button>
-            <button class="btn btn-accent" onclick="saveScraperConfig()" id="btn-scraper-save" style="font-size:11px;padding:5px 12px">Save Config</button>
+    <div id="view-scraper" class="view flex flex-col gap-5">
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
+          <div class="flex gap-2">
+            <button onclick="loadScraperConfig()" class="text-[11px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
+            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[11px] py-1 px-3 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all">Save Config</button>
           </div>
         </div>
-        <div class="scraper-config-form">
-          <div class="form-group">
-            <label>Active Niche</label>
-            <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist">
-            <small>Business category to search for</small>
+        <div class="grid grid-cols-2 gap-4 p-5">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Active Niche</label>
+            <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+            <small class="text-[11px] text-dim">Business category to search for</small>
           </div>
-          <div class="form-group">
-            <label>Max Requests / Minute</label>
-            <input id="sc-rpm" type="number" min="1" max="30" placeholder="8">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Max Requests / Minute</label>
+            <input id="sc-rpm" type="number" min="1" max="30" placeholder="8" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Max Retries</label>
-            <input id="sc-retries" type="number" min="0" max="10" placeholder="3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Max Retries</label>
+            <input id="sc-retries" type="number" min="0" max="10" placeholder="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Delay Range (ms)</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="sc-delay-min" type="number" min="1000" placeholder="5000" style="width:100px">
-              <span style="color:var(--text-dim)">to</span>
-              <input id="sc-delay-max" type="number" min="1000" placeholder="12000" style="width:100px">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Delay Range (ms)</label>
+            <div class="flex gap-2 items-center">
+              <input id="sc-delay-min" type="number" min="1000" placeholder="5000" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none w-24 focus:border-accent">
+              <span class="text-dim">to</span>
+              <input id="sc-delay-max" type="number" min="1000" placeholder="12000" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none w-24 focus:border-accent">
             </div>
-            <small>Random delay between requests per city</small>
+            <small class="text-[11px] text-dim">Random delay between requests per city</small>
           </div>
-          <div class="form-group full-width">
-            <label>Cities (one per line: "City, ST")</label>
-            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:3px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Cities (one per line: "City, ST")</label>
+            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
           </div>
         </div>
       </div>
 
-      <!-- Run Scraper + Enrich + Validate -->
-      <div class="action-bar">
-        <button class="btn btn-accent" onclick="runScraper()" id="btn-run-scraper">
-          <span class="spinner"></span> Run Scraper Now
+      <div class="flex gap-2 flex-wrap items-center">
+        <button onclick="runScraper()" id="btn-run-scraper" class="bg-accent border border-accent text-white px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:opacity-90 transition-all">
+          <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper Now
         </button>
-        <button class="btn" onclick="runEnrich()" id="btn-enrich" style="border-color:var(--green)">
-          <span class="spinner"></span> ðŸ“§ Enrich Emails
+        <button onclick="runEnrich()" id="btn-enrich" class="bg-surface border border-good text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+          <span class="spinner"></span><i class="ph ph-at"></i> Enrich Emails
         </button>
-        <button class="btn" onclick="runValidate()" id="btn-validate">
-          <span class="spinner"></span> âœ… Validate Emails
+        <button onclick="runValidate()" id="btn-validate" class="bg-surface border border-border text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+          <span class="spinner"></span><i class="ph ph-check-circle"></i> Validate Emails
         </button>
-        <button class="btn" onclick="refreshScraperView()">
-          <span class="spinner"></span> Refresh
+        <button onclick="refreshScraperView()" class="bg-surface border border-border text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+          <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
-        <span id="scraper-status-text" style="font-size:12px;color:var(--text-dim);font-family:var(--mono);margin-left:8px"></span>
+        <span id="scraper-status-text" class="text-xs text-dim ml-2"></span>
       </div>
 
-      <!-- Scraper Stats -->
-      <div class="stats-row" id="scraper-stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="scraper-stats-row"></div>
 
-      <!-- Scraper Results -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Scraped Leads</h2>
-          <span class="count" id="scraper-lead-count">â€”</span>
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
+          <span class="text-[11px] text-dim" id="scraper-lead-count">—</span>
         </div>
-        <div class="filter-bar">
-          <label>Status</label>
-          <select id="sf-status" onchange="refreshScraperResults()">
-            <option value="">All</option>
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="interested">Interested</option>
-            <option value="excluded">Excluded</option>
+        <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Status</label>
+          <select id="sf-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">All</option><option value="new">New</option><option value="contacted">Contacted</option><option value="interested">Interested</option><option value="excluded">Excluded</option>
           </select>
-          <label>Priority</label>
-          <select id="sf-priority" onchange="refreshScraperResults()">
-            <option value="">Any</option>
-            <option value="hot">ðŸ”´ Hot</option>
-            <option value="warm">ðŸŸ¡ Warm</option>
-            <option value="low">âšª Low</option>
+          <label class="text-[11px] text-dim uppercase tracking-wide">Priority</label>
+          <select id="sf-priority" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">Any</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="low">Low</option>
           </select>
-          <label>Email</label>
-          <select id="sf-email" onchange="refreshScraperResults()">
-            <option value="">Any</option>
-            <option value="true">Has email</option>
-            <option value="false">No email</option>
+          <label class="text-[11px] text-dim uppercase tracking-wide">Email</label>
+          <select id="sf-email" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">Any</option><option value="true">Has email</option><option value="false">No email</option>
           </select>
-          <label>Contact Mode</label>
-          <select id="sf-contact-mode" onchange="refreshScraperResults()">
-            <option value="">Any</option>
-            <option value="email">Email-ready</option>
-            <option value="phone_only">Phone-only</option>
-            <option value="unreachable">No contact</option>
+          <label class="text-[11px] text-dim uppercase tracking-wide">Contact</label>
+          <select id="sf-contact-mode" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">Any</option><option value="email">Email-ready</option><option value="phone_only">Phone-only</option><option value="unreachable">No contact</option>
           </select>
-          <label>Email Status</label>
-          <select id="sf-email-status" onchange="refreshScraperResults()">
-            <option value="">Any</option>
-            <option value="valid">âœ… Valid</option>
-            <option value="risky">âš ï¸ Risky</option>
-            <option value="invalid">âŒ Invalid</option>
-            <option value="pending">â³ Pending</option>
+          <label class="text-[11px] text-dim uppercase tracking-wide">Email Status</label>
+          <select id="sf-email-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">Any</option><option value="valid">Valid</option><option value="risky">Risky</option><option value="invalid">Invalid</option><option value="pending">Pending</option>
           </select>
-          <label>City</label>
-          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()">
-          <label>Search</label>
-          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()">
-          <label>Website</label>
-          <select id="sf-website" onchange="refreshScraperResults()">
-            <option value="">Any</option>
-            <option value="true">Has website</option>
-            <option value="false">No website</option>
+          <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
+          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Search</label>
+          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Website</label>
+          <select id="sf-website" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">Any</option><option value="true">Has website</option><option value="false">No website</option>
           </select>
-          <label>Phone</label>
-          <select id="sf-phone" onchange="refreshScraperResults()">
-            <option value="">Any</option>
-            <option value="true">Has phone</option>
-            <option value="false">No phone</option>
+          <label class="text-[11px] text-dim uppercase tracking-wide">Phone</label>
+          <select id="sf-phone" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">Any</option><option value="true">Has phone</option><option value="false">No phone</option>
           </select>
-          <button class="btn" onclick="clearScraperFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">âœ• Clear</button>
+          <button onclick="clearScraperFilters()" class="ml-auto text-xs py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+            <i class="ph ph-x"></i> Clear
+          </button>
         </div>
-        <div class="panel-body" id="scraper-results-list" style="max-height:500px"></div>
+        <div class="overflow-y-auto max-h-[500px]" id="scraper-results-list"></div>
       </div>
 
-      <!-- Scraper Job History -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Scraper Jobs</h2>
-          <span class="count" id="scraper-job-count">â€”</span>
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Scraper Jobs</h2>
+          <span class="text-[11px] text-dim" id="scraper-job-count">—</span>
         </div>
-        <div class="panel-body" id="scraper-jobs-list" style="max-height:300px"></div>
+        <div class="overflow-y-auto max-h-[300px]" id="scraper-jobs-list"></div>
       </div>
-
     </div>
 
     <!-- ===================== NICHES VIEW ===================== -->
-    <div id="view-niches" class="view">
+    <div id="view-niches" class="view flex flex-col gap-5">
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="niche-stats-row"></div>
 
-      <!-- Niche Stats -->
-      <div class="stats-row" id="niche-stats-row"></div>
-
-      <!-- Add Pair Form -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Add City + Niche Pair</h2>
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
         </div>
-        <div class="scraper-config-form">
-          <div class="form-group">
-            <label>Niche</label>
-            <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal">
+        <div class="grid grid-cols-2 gap-4 p-5">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Niche</label>
+            <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>City</label>
-            <input id="np-city" type="text" placeholder="e.g. Tampa">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
+            <input id="np-city" type="text" placeholder="e.g. Tampa" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>State</label>
-            <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" style="text-transform:uppercase">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">State</label>
+            <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none uppercase focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Maps Count</label>
-            <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Maps Count</label>
+            <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Review Velocity</label>
-            <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Review Velocity</label>
+            <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Ad Count</label>
-            <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Ad Count</label>
+            <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Agency Pages</label>
-            <input id="np-agency" type="number" min="0" placeholder="Agency listing pages">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Agency Pages</label>
+            <input id="np-agency" type="number" min="0" placeholder="Agency listing pages" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Weak Site %</label>
-            <input id="np-weak" type="number" min="0" max="100" placeholder="0â€“100">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Weak Site %</label>
+            <input id="np-weak" type="number" min="0" max="100" placeholder="0–100" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Contactable %</label>
-            <input id="np-contact" type="number" min="0" max="100" placeholder="0â€“100">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Contactable %</label>
+            <input id="np-contact" type="number" min="0" max="100" placeholder="0–100" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group">
-            <label>Economic Signal</label>
-            <select id="np-econ">
-              <option value="growth">Growth</option>
-              <option value="flat" selected>Flat</option>
-              <option value="shrinking">Shrinking</option>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Economic Signal</label>
+            <select id="np-econ" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+              <option value="growth">Growth</option><option value="flat" selected>Flat</option><option value="shrinking">Shrinking</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Revenue Estimate</label>
-            <select id="np-revenue">
-              <option value="high">High</option>
-              <option value="moderate" selected>Moderate</option>
-              <option value="low">Low</option>
-              <option value="very_low">Very Low</option>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Revenue Estimate</label>
+            <select id="np-revenue" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
+              <option value="high">High</option><option value="moderate" selected>Moderate</option><option value="low">Low</option><option value="very_low">Very Low</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Notes</label>
-            <input id="np-notes" type="text" placeholder="Optional notes">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-dim uppercase tracking-wide">Notes</label>
+            <input id="np-notes" type="text" placeholder="Optional notes" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
-          <div class="form-group" style="align-self:end">
-            <button class="btn btn-accent" onclick="addNichePair()" id="btn-add-pair">
-              <span class="spinner"></span> Add & Score
+          <div class="self-end">
+            <button onclick="addNichePair()" id="btn-add-pair" class="bg-accent border border-accent text-white px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:opacity-90 transition-all">
+              <span class="spinner"></span><i class="ph ph-plus"></i> Add & Score
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Pair Listing -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>City + Niche Pairs</h2>
-          <span class="count" id="niche-pair-count">â€”</span>
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-map-pin mr-1.5"></i>City + Niche Pairs</h2>
+          <span class="text-[11px] text-dim" id="niche-pair-count">—</span>
         </div>
-        <div class="filter-bar">
-          <label>Status</label>
-          <select id="nf-status" onchange="refreshNichePairs()">
-            <option value="">All</option>
-            <option value="candidate">Candidate</option>
-            <option value="scored">Scored</option>
-            <option value="validated">Validated</option>
-            <option value="approved">Approved</option>
-            <option value="parked">Parked</option>
-            <option value="dropped">Dropped</option>
+        <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
+          <label class="text-[11px] text-dim uppercase tracking-wide">Status</label>
+          <select id="nf-status" onchange="refreshNichePairs()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+            <option value="">All</option><option value="candidate">Candidate</option><option value="scored">Scored</option><option value="validated">Validated</option><option value="approved">Approved</option><option value="parked">Parked</option><option value="dropped">Dropped</option>
           </select>
-          <label>Niche</label>
-          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()">
-          <label>City</label>
-          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()">
-          <button class="btn" onclick="clearNicheFilters()" style="margin-left:auto;font-size:11px;padding:5px 10px">âœ• Clear</button>
+          <label class="text-[11px] text-dim uppercase tracking-wide">Niche</label>
+          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
+          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <button onclick="clearNicheFilters()" class="ml-auto text-xs py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+            <i class="ph ph-x"></i> Clear
+          </button>
         </div>
-        <div class="panel-body" id="niche-pairs-list" style="max-height:600px"></div>
+        <div class="overflow-y-auto max-h-[600px]" id="niche-pairs-list"></div>
       </div>
 
-      <!-- Top Pairs -->
-      <div class="panel full-width">
-        <div class="panel-header">
-          <h2>Top Scoring Pairs</h2>
+      <div class="bg-surface border border-border rounded">
+        <div class="px-5 py-3.5 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-semibold uppercase tracking-wide"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
         </div>
-        <div class="panel-body" id="niche-top-pairs" style="max-height:400px"></div>
+        <div class="overflow-y-auto max-h-[400px]" id="niche-top-pairs"></div>
       </div>
-
     </div>
 
-  </div>
+  </main>
+
   <div id="toast" class="toast"></div>
 
   <script>
@@ -936,7 +485,6 @@
     let scraperDebounceTimer = null;
     let configDirty = false;
 
-    // Mark config dirty when user edits any scraper config field
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#sc-niche, #sc-rpm, #sc-retries, #sc-delay-min, #sc-delay-max, #sc-cities').forEach(el => {
         el.addEventListener('input', () => { configDirty = true; });
@@ -945,7 +493,7 @@
     });
 
     function ago(iso) {
-      if (!iso) return 'â€”';
+      if (!iso) return '—';
       const diff = Date.now() - new Date(iso).getTime();
       if (diff < 60000) return Math.floor(diff / 1000) + 's ago';
       if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
@@ -974,33 +522,35 @@
       setTimeout(() => { t.className = 'toast'; }, 3000);
     }
 
-    // â”€â”€ Tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function switchTab(tab) {
-      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.remove('text-accent');
+        el.style.borderBottomColor = 'transparent';
+      });
       document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-      document.querySelector(`.nav-tab[data-tab="${tab}"]`).classList.add('active');
+      const activeTab = document.querySelector(`.nav-tab[data-tab="${tab}"]`);
+      activeTab.classList.add('text-accent');
+      activeTab.style.borderBottomColor = 'var(--color-accent)';
       document.getElementById(`view-${tab}`).classList.add('active');
       if (tab === 'scraper') refreshScraperView();
       if (tab === 'niches') refreshNichesView();
       if (tab === 'discovery') refreshDiscoveryView();
     }
 
-    // â”€â”€ Trigger a job (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function triggerJob(jobType) {
       const btn = document.getElementById('btn-' + jobType.replace(/_/g, '-'));
       if (btn) btn.classList.add('loading');
       try {
         await axios.post(API + '/api/jobs/trigger', { jobType }, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast(`âœ“ ${jobType.replace(/_/g, ' ')} queued`, 'success');
+        showToast(`✓ ${jobType.replace(/_/g, ' ')} queued`, 'success');
         setTimeout(refresh, 1000);
       } catch (err) {
-        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         if (btn) setTimeout(() => btn.classList.remove('loading'), 500);
       }
     }
 
-    // â”€â”€ Filtered leads fetch (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function refreshLeads() {
       const params = new URLSearchParams();
       const status = document.getElementById('f-status').value;
@@ -1019,14 +569,14 @@
         document.getElementById('lead-count').textContent = `${res.data.totalDocs ?? leads.length} total`;
         const list = document.getElementById('leads-list');
         if (leads.length === 0) {
-          list.innerHTML = '<div class="empty">No leads match filters</div>';
+          list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No leads match filters</div>';
         } else {
           list.innerHTML = leads.map(l => `
-            <div class="row">
-              <span class="name">${l.businessName || l.business_name || 'â€”'}</span>
-              <span class="meta">${l.niche || ''} Â· ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
+            <div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+              <span class="flex-1 font-medium truncate">${l.businessName || l.business_name || '—'}</span>
+              <span class="text-dim text-[11px]">${l.niche || ''} · ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
               ${badge(l.status)}
-              <span class="time">${ago(l.createdAt || l.created_at)}</span>
+              <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(l.createdAt || l.created_at)}</span>
             </div>
           `).join('');
         }
@@ -1067,7 +617,6 @@
       excluded: '#636e72',
     };
 
-    // â”€â”€ Main refresh (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function refresh() {
       try {
         const [allLeadsRes, clientsRes, jobsRes, configRes] = await Promise.all([
@@ -1082,7 +631,7 @@
         const jobs = jobsRes.data.docs || [];
         const config = configRes.data;
 
-        document.getElementById('phase').textContent = `Phase ${config.currentPhase || 'â€”'}`;
+        document.getElementById('phase').textContent = `Phase ${config.currentPhase || '—'}`;
         document.getElementById('uptime').textContent = uptime();
         document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString();
 
@@ -1093,39 +642,38 @@
         jobs.forEach(j => { jobStatusCounts[j.status] = (jobStatusCounts[j.status] || 0) + 1; });
 
         document.getElementById('stats-row').innerHTML = `
-          <div class="stat-card">
-            <span class="label">Total Leads</span>
-            <span class="value">${allLeadsRes.data.totalDocs || allLeads.length}</span>
-            <span class="sub">${statusCounts.new || 0} new</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim"><i class="ph ph-users mr-1"></i>Total Leads</span>
+            <span class="text-[28px] font-bold">${allLeadsRes.data.totalDocs || allLeads.length}</span>
+            <span class="text-[11px] text-dim">${statusCounts.new || 0} new</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Interested</span>
-            <span class="value" style="color:var(--green)">${statusCounts.interested || 0}</span>
-            <span class="sub">${statusCounts.demo_sent || 0} demos sent</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim"><i class="ph ph-thumbs-up mr-1"></i>Interested</span>
+            <span class="text-[28px] font-bold text-good">${statusCounts.interested || 0}</span>
+            <span class="text-[11px] text-dim">${statusCounts.demo_sent || 0} demos sent</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Clients</span>
-            <span class="value" style="color:var(--accent)">${clientsRes.data.totalDocs || clients.length}</span>
-            <span class="sub">${clients.filter(c => c.status === 'active').length} active</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim"><i class="ph ph-buildings mr-1"></i>Clients</span>
+            <span class="text-[28px] font-bold text-accent">${clientsRes.data.totalDocs || clients.length}</span>
+            <span class="text-[11px] text-dim">${clients.filter(c => c.status === 'active').length} active</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Jobs Queued</span>
-            <span class="value" style="color:var(--yellow)">${jobStatusCounts.queued || 0}</span>
-            <span class="sub">${jobStatusCounts.running || 0} running</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim"><i class="ph ph-queue mr-1"></i>Jobs Queued</span>
+            <span class="text-[28px] font-bold text-warn">${jobStatusCounts.queued || 0}</span>
+            <span class="text-[11px] text-dim">${jobStatusCounts.running || 0} running</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Jobs Done</span>
-            <span class="value" style="color:var(--green)">${jobStatusCounts.completed || 0}</span>
-            <span class="sub">${jobStatusCounts.failed || 0} failed, ${jobStatusCounts.dead || 0} dead</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim"><i class="ph ph-check-circle mr-1"></i>Jobs Done</span>
+            <span class="text-[28px] font-bold text-good">${jobStatusCounts.completed || 0}</span>
+            <span class="text-[11px] text-dim">${jobStatusCounts.failed || 0} failed, ${jobStatusCounts.dead || 0} dead</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Won / Lost</span>
-            <span class="value">${statusCounts.closed_won || 0}<span style="color:var(--text-dim);font-size:16px"> / </span>${statusCounts.closed_lost || 0}</span>
-            <span class="sub">conversion pipeline</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim"><i class="ph ph-trophy mr-1"></i>Won / Lost</span>
+            <span class="text-[28px] font-bold">${statusCounts.closed_won || 0}<span class="text-dim text-base"> / </span>${statusCounts.closed_lost || 0}</span>
+            <span class="text-[11px] text-dim">conversion pipeline</span>
           </div>
         `;
 
-        // Pipeline bar
         const total = allLeads.length || 1;
         const bar = document.getElementById('pipeline-bar');
         const legend = document.getElementById('pipeline-legend');
@@ -1136,8 +684,8 @@
           if (c > 0) {
             barHtml += `<div style="width:${(c/total)*100}%;background:${color}" title="${status}: ${c}"></div>`;
           }
-          legendHtml += `<span style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px">
-            <span style="width:8px;height:8px;border-radius:2px;background:${color};display:inline-block"></span>
+          legendHtml += `<span class="text-[11px] text-dim flex items-center gap-1">
+            <span class="w-2 h-2 rounded-sm inline-block" style="background:${color}"></span>
             ${status.replace(/_/g,' ')} (${c})
           </span>`;
         }
@@ -1146,48 +694,45 @@
 
         allLeads.forEach(l => { if (l.niche) knownNiches.add(l.niche); });
 
-        // Jobs list
         document.getElementById('job-count').textContent = `${jobsRes.data.totalDocs || jobs.length} total`;
         const jobsList = document.getElementById('jobs-list');
         if (jobs.length === 0) {
-          jobsList.innerHTML = '<div class="empty">No jobs yet</div>';
+          jobsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No jobs yet</div>';
         } else {
           jobsList.innerHTML = jobs.slice(0, 30).map(j => `
-            <div class="row">
-              <span class="name">${(j.jobType || j.job_type || 'â€”').replace(/_/g, ' ')}</span>
+            <div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+              <span class="flex-1 font-medium">${(j.jobType || j.job_type || '—').replace(/_/g, ' ')}</span>
               ${badge(j.status)}
-              <span class="time">${ago(j.updatedAt || j.updated_at)}</span>
+              <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
             </div>
           `).join('');
         }
 
-        // Clients list
         document.getElementById('client-count').textContent = `${clientsRes.data.totalDocs || clients.length} total`;
         const clientsList = document.getElementById('clients-list');
         if (clients.length === 0) {
-          clientsList.innerHTML = '<div class="empty">No clients yet</div>';
+          clientsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No clients yet</div>';
         } else {
           clientsList.innerHTML = clients.slice(0, 20).map(c => `
-            <div class="row">
-              <span class="name">${c.businessName || c.business_name || 'â€”'}</span>
-              <span class="meta">${c.plan || 'â€”'}</span>
+            <div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+              <span class="flex-1 font-medium truncate">${c.businessName || c.business_name || '—'}</span>
+              <span class="text-dim text-[11px]">${c.plan || '—'}</span>
               ${badge(c.status)}
-              <span class="time">${ago(c.createdAt || c.created_at)}</span>
+              <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(c.createdAt || c.created_at)}</span>
             </div>
           `).join('');
         }
 
-        // Config panel
         const configPanel = document.getElementById('config-panel');
-        configPanel.innerHTML = `<div class="config-grid">
-          <div class="config-item"><span class="ck">Phase</span><span class="cv">${config.currentPhase ?? 'â€”'}</span></div>
-          <div class="config-item"><span class="ck">Niche</span><span class="cv">${config.activeNiche ?? 'â€”'}</span></div>
-          <div class="config-item"><span class="ck">Cities</span><span class="cv">${(config.activeCities || []).join(', ') || 'â€”'}</span></div>
-          <div class="config-item"><span class="ck">Maintenance</span><span class="cv">${config.maintenanceMode ? 'ðŸ”´ ON' : 'ðŸŸ¢ OFF'}</span></div>
-          <div class="config-item"><span class="ck">Email Approval</span><span class="cv">${config.emailApprovalRequired ? 'âœ“ Required' : 'âœ— Auto'}</span></div>
-          <div class="config-item"><span class="ck">Demo Approval</span><span class="cv">${config.demoApprovalRequired ? 'âœ“ Required' : 'âœ— Auto'}</span></div>
-          <div class="config-item"><span class="ck">Launch Approval</span><span class="cv">${config.launchApprovalRequired ? 'âœ“ Required' : 'âœ— Auto'}</span></div>
-          <div class="config-item"><span class="ck">Updated</span><span class="cv">${ago(config.updatedAt || config.updated_at)}</span></div>
+        configPanel.innerHTML = `<div class="grid grid-cols-2 gap-px bg-border">
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Phase</span><span class="text-sm font-medium">${config.currentPhase ?? '—'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Niche</span><span class="text-sm font-medium">${config.activeNiche ?? '—'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Cities</span><span class="text-sm font-medium">${(config.activeCities || []).join(', ') || '—'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Maintenance</span><span class="text-sm font-medium">${config.maintenanceMode ? '🔴 ON' : '🟢 OFF'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Email Approval</span><span class="text-sm font-medium">${config.emailApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Demo Approval</span><span class="text-sm font-medium">${config.demoApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Launch Approval</span><span class="text-sm font-medium">${config.launchApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[11px] text-dim uppercase tracking-wide">Updated</span><span class="text-sm font-medium">${ago(config.updatedAt || config.updated_at)}</span></div>
         </div>`;
 
         await refreshLeads();
@@ -1196,10 +741,6 @@
         console.error('Refresh failed:', err);
       }
     }
-
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    // â”€â”€ SCRAPER VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     async function loadScraperConfig() {
       try {
@@ -1222,10 +763,7 @@
       const btn = document.getElementById('btn-scraper-save');
       btn.classList.add('loading');
       try {
-        const cities = document.getElementById('sc-cities').value
-          .split('\n')
-          .map(l => l.trim())
-          .filter(Boolean);
+        const cities = document.getElementById('sc-cities').value.split('\n').map(l => l.trim()).filter(Boolean);
         const data = {
           niche: document.getElementById('sc-niche').value.trim() || 'hvac',
           cities,
@@ -1238,9 +776,9 @@
         };
         await axios.patch(API + '/api/scraper/config', data, { headers: { ...headers, 'Content-Type': 'application/json' } });
         configDirty = false;
-        showToast('âœ“ Scraper config saved', 'success');
+        showToast('✓ Scraper config saved', 'success');
       } catch (err) {
-        showToast(`âœ— Save failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`✗ Save failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1258,14 +796,14 @@
         if (cities.length > 0) payload.cities = cities;
 
         await axios.post(API + '/api/scraper/run', payload, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('âœ“ Scraper job queued', 'success');
-        document.getElementById('scraper-status-text').textContent = 'Job queued â€” monitoring...';
+        showToast('✓ Scraper job queued', 'success');
+        document.getElementById('scraper-status-text').textContent = 'Job queued — monitoring...';
         setTimeout(() => {
           refreshScraperView();
           document.getElementById('scraper-status-text').textContent = '';
         }, 2000);
       } catch (err) {
-        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
         document.getElementById('scraper-status-text').textContent = '';
       } finally {
         btn.classList.remove('loading');
@@ -1277,10 +815,10 @@
       btn.classList.add('loading');
       try {
         await axios.post(API + '/api/scraper/enrich', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('âœ“ Email enrichment job queued', 'success');
+        showToast('✓ Email enrichment job queued', 'success');
         setTimeout(refreshScraperView, 2000);
       } catch (err) {
-        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1291,22 +829,17 @@
       btn.classList.add('loading');
       try {
         await axios.post(API + '/api/scraper/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('âœ“ Email validation job queued', 'success');
+        showToast('✓ Email validation job queued', 'success');
         setTimeout(refreshScraperView, 2000);
       } catch (err) {
-        showToast(`âœ— Failed: ${err.response?.data?.error || err.message}`, 'error');
+        showToast(`✗ Failed: ${err.response?.data?.error || err.message}`, 'error');
       } finally {
         btn.classList.remove('loading');
       }
     }
 
     async function refreshScraperView() {
-      const tasks = [
-        refreshScraperResults(),
-        refreshScraperJobs(),
-        refreshScraperStats(),
-      ];
-      // Only reload config form if the user hasn't made unsaved edits
+      const tasks = [refreshScraperResults(), refreshScraperJobs(), refreshScraperStats()];
       if (!configDirty) tasks.push(loadScraperConfig());
       await Promise.all(tasks);
     }
@@ -1333,43 +866,43 @@
         }
 
         document.getElementById('scraper-stats-row').innerHTML = `
-          <div class="stat-card">
-            <span class="label">Scraped Leads</span>
-            <span class="value">${leadsRes.data.totalDocs ?? 0}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Scraped Leads</span>
+            <span class="text-[28px] font-bold">${leadsRes.data.totalDocs ?? 0}</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Emails Found</span>
-            <span class="value" style="color:var(--green)">${es.withEmail ?? 0}</span>
-            <span class="sub">${es.enriched ?? 0} enriched</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Emails Found</span>
+            <span class="text-[28px] font-bold text-good">${es.withEmail ?? 0}</span>
+            <span class="text-[11px] text-dim">${es.enriched ?? 0} enriched</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Valid Emails</span>
-            <span class="value" style="color:var(--green)">${es.emailValid ?? 0}</span>
-            <span class="sub">${es.emailRisky ?? 0} risky, ${es.emailInvalid ?? 0} invalid</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Valid Emails</span>
+            <span class="text-[28px] font-bold text-good">${es.emailValid ?? 0}</span>
+            <span class="text-[11px] text-dim">${es.emailRisky ?? 0} risky, ${es.emailInvalid ?? 0} invalid</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Outreach Ready</span>
-            <span class="value" style="color:var(--accent)">${es.outreachReady ?? 0}</span>
-            <span class="sub">valid email + hot/warm</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Outreach Ready</span>
+            <span class="text-[28px] font-bold text-accent">${es.outreachReady ?? 0}</span>
+            <span class="text-[11px] text-dim">valid email + hot/warm</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Phone Fallback</span>
-            <span class="value" style="color:var(--yellow)">${es.phoneFallbackReady ?? 0}</span>
-            <span class="sub">phone only + hot/warm</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Phone Fallback</span>
+            <span class="text-[28px] font-bold text-warn">${es.phoneFallbackReady ?? 0}</span>
+            <span class="text-[11px] text-dim">phone only + hot/warm</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Contactable</span>
-            <span class="value">${es.contactable ?? 0}</span>
-            <span class="sub">email or phone available</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Contactable</span>
+            <span class="text-[28px] font-bold">${es.contactable ?? 0}</span>
+            <span class="text-[11px] text-dim">email or phone available</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Priority Split</span>
-            <span class="value" style="font-size:14px">ðŸ”´${es.hot ?? 0} ðŸŸ¡${es.warm ?? 0} âšª${es.low ?? 0}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Priority Split</span>
+            <span class="text-[14px] font-bold">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Running / Queued</span>
-            <span class="value" style="color:var(--yellow)">${running.length}</span>
-            <span class="sub">${completed.length} runs, ${failed.length} failed</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Running / Queued</span>
+            <span class="text-[28px] font-bold text-warn">${running.length}</span>
+            <span class="text-[11px] text-dim">${completed.length} runs, ${failed.length} failed</span>
           </div>
         `;
       } catch (err) {
@@ -1408,28 +941,19 @@
         const list = document.getElementById('scraper-results-list');
 
         if (leads.length === 0) {
-          list.innerHTML = '<div class="empty">No scraped leads match filters</div>';
+          list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scraped leads match filters</div>';
           return;
         }
 
         list.innerHTML = `<table class="results-table">
           <thead>
             <tr>
-              <th>Business</th>
-              <th>City</th>
-              <th>Priority</th>
-              <th>Contact</th>
-              <th>Email</th>
-              <th>Email Status</th>
-              <th>Phone</th>
-              <th>Website</th>
-              <th>Status</th>
-              <th>Scraped</th>
+              <th>Business</th><th>City</th><th>Priority</th><th>Contact</th><th>Email</th><th>Email Status</th><th>Phone</th><th>Website</th><th>Status</th><th>Scraped</th>
             </tr>
           </thead>
           <tbody>
             ${leads.map(l => {
-              const name = l.businessName || l.business_name || 'â€”';
+              const name = l.businessName || l.business_name || '—';
               const city = l.city || '';
               const state = l.state || '';
               const phone = l.phone;
@@ -1443,15 +967,15 @@
 
               const priorityHtml = priority
                 ? `<span class="priority-dot priority-dot-${priority}"></span><span class="badge badge-${priority}">${priority}</span>`
-                : '<span class="no-indicator">â€”</span>';
+                : '<span class="no-indicator">—</span>';
 
               const emailHtml = email
-                ? `<span class="has-indicator" title="${email}" style="font-size:11px">${email.length > 22 ? email.substring(0, 22) + 'â€¦' : email}</span>`
-                : '<span class="no-indicator">â€”</span>';
+                ? `<span class="has-indicator" title="${email}" style="font-size:11px">${email.length > 22 ? email.substring(0, 22) + '…' : email}</span>`
+                : '<span class="no-indicator">—</span>';
 
               const eStatusHtml = email
                 ? `<span class="badge badge-${eStatus}">${eStatus}</span>`
-                : '<span class="no-indicator">â€”</span>';
+                : '<span class="no-indicator">—</span>';
 
               const contactModeHtml = contactMode === 'email'
                 ? '<span class="badge badge-valid">email</span>'
@@ -1466,8 +990,8 @@
                 <td>${contactModeHtml}</td>
                 <td class="mono" style="max-width:180px">${emailHtml}</td>
                 <td>${eStatusHtml}</td>
-                <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">â€”</span>'}</td>
-                <td class="mono" style="max-width:160px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="no-indicator">â€”</span>'}</td>
+                <td class="mono">${phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="no-indicator">—</span>'}</td>
+                <td class="mono" style="max-width:160px">${website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="no-indicator">—</span>'}</td>
                 <td>${badge(status)}</td>
                 <td class="mono" style="font-size:10px">${ago(created)}</td>
               </tr>`;
@@ -1506,7 +1030,7 @@
         const list = document.getElementById('scraper-jobs-list');
 
         if (jobs.length === 0) {
-          list.innerHTML = '<div class="empty">No scraper jobs yet</div>';
+          list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scraper jobs yet</div>';
           return;
         }
 
@@ -1532,19 +1056,17 @@
           } else {
             detail = 'Waiting...';
           }
-          return `<div class="row">
-            <span class="name">${jobType.replace(/_/g, ' ')}${input.niche ? ' â€” ' + input.niche : ''}${(input.cities || []).length ? ' â€” ' + input.cities.join(', ') : ''}</span>
-            <span class="meta">${detail}</span>
+          return `<div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+            <span class="flex-1 font-medium">${jobType.replace(/_/g, ' ')}${input.niche ? ' — ' + input.niche : ''}${(input.cities || []).length ? ' — ' + input.cities.join(', ') : ''}</span>
+            <span class="text-dim text-[11px]">${detail}</span>
             ${badge(j.status)}
-            <span class="time">${ago(j.updatedAt || j.updated_at)}</span>
+            <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
           </div>`;
         }).join('');
       } catch (err) {
         console.error('Scraper jobs error:', err);
       }
     }
-
-    // â”€â”€ NICHES TAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     let nicheDebounceTimer = null;
 
@@ -1561,11 +1083,11 @@
     }
 
     function scoreBarHTML(score) {
-      if (score == null || score === 0) return '<span class="meta">â€”</span>';
+      if (score == null || score === 0) return '<span class="text-dim text-[11px]">—</span>';
       const cls = score >= 70 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
-      return `<div style="display:flex;align-items:center;gap:8px">
+      return `<div class="flex items-center gap-2">
         <div class="score-bar"><div class="score-bar-fill ${cls}" style="width:${score}%"></div></div>
-        <span class="meta" style="font-weight:600">${score}</span>
+        <span class="text-dim text-[11px] font-semibold">${score}</span>
       </div>`;
     }
 
@@ -1579,15 +1101,32 @@
         const s = r.data;
         const row = document.getElementById('niche-stats-row');
         row.innerHTML = `
-          <div class="stat-card"><span class="label">Total Pairs</span><span class="value">${s.total}</span></div>
-          <div class="stat-card"><span class="label">Candidates</span><span class="value" style="color:var(--blue)">${s.byStatus.candidate}</span></div>
-          <div class="stat-card"><span class="label">Scored</span><span class="value" style="color:var(--yellow)">${s.byStatus.scored}</span></div>
-          <div class="stat-card"><span class="label">Validated</span><span class="value" style="color:var(--accent)">${s.byStatus.validated}</span></div>
-          <div class="stat-card"><span class="label">Approved</span><span class="value" style="color:var(--green)">${s.byStatus.approved}/3</span></div>
-          <div class="stat-card"><span class="label">Parked</span><span class="value">${s.byStatus.parked}</span></div>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Total Pairs</span>
+            <span class="text-[28px] font-bold">${s.total}</span>
+          </div>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Candidates</span>
+            <span class="text-[28px] font-bold text-info">${s.byStatus.candidate}</span>
+          </div>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Scored</span>
+            <span class="text-[28px] font-bold text-warn">${s.byStatus.scored}</span>
+          </div>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Validated</span>
+            <span class="text-[28px] font-bold text-accent">${s.byStatus.validated}</span>
+          </div>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Approved</span>
+            <span class="text-[28px] font-bold text-good">${s.byStatus.approved}/3</span>
+          </div>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Parked</span>
+            <span class="text-[28px] font-bold">${s.byStatus.parked}</span>
+          </div>
         `;
 
-        // Top pairs
         const topEl = document.getElementById('niche-top-pairs');
         if (s.topPairs && s.topPairs.length > 0) {
           topEl.innerHTML = `<table class="results-table">
@@ -1600,15 +1139,15 @@
               <td>${p.city}, ${p.state}</td>
               <td>${scoreBarHTML(p.totalScore ?? p.total_score)}</td>
               <td>${badge(p.status)}</td>
-              <td class="mono">${p.demandScore ?? p.demand_score ?? 'â€”'}</td>
-              <td class="mono">${p.competitionScore ?? p.competition_score ?? 'â€”'}</td>
-              <td class="mono">${p.weaknessScore ?? p.weakness_score ?? 'â€”'}</td>
-              <td class="mono">${p.contactScore ?? p.contact_score ?? 'â€”'}</td>
-              <td class="mono">${p.revenueScore ?? p.revenue_score ?? 'â€”'}</td>
+              <td class="mono">${p.demandScore ?? p.demand_score ?? '—'}</td>
+              <td class="mono">${p.competitionScore ?? p.competition_score ?? '—'}</td>
+              <td class="mono">${p.weaknessScore ?? p.weakness_score ?? '—'}</td>
+              <td class="mono">${p.contactScore ?? p.contact_score ?? '—'}</td>
+              <td class="mono">${p.revenueScore ?? p.revenue_score ?? '—'}</td>
             </tr>`).join('')}</tbody>
           </table>`;
         } else {
-          topEl.innerHTML = '<div class="empty">No scored pairs yet</div>';
+          topEl.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scored pairs yet</div>';
         }
       } catch (err) {
         console.error('Niche stats error:', err);
@@ -1631,36 +1170,35 @@
         document.getElementById('niche-pair-count').textContent = r.data.totalDocs + ' pairs';
 
         if (!r.data.docs || r.data.docs.length === 0) {
-          list.innerHTML = '<div class="empty">No pairs found. Add one above.</div>';
+          list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No pairs found. Add one above.</div>';
           return;
         }
 
         list.innerHTML = `<table class="results-table">
           <thead><tr>
             <th>Niche</th><th>City</th><th>Score</th><th>Status</th>
-            <th>Maps</th><th>Weak%</th><th>Contact%</th>
-            <th>Actions</th>
+            <th>Maps</th><th>Weak%</th><th>Contact%</th><th>Actions</th>
           </tr></thead>
           <tbody>${r.data.docs.map(p => {
             const id = p.id;
             const score = p.totalScore ?? p.total_score;
             const st = p.status;
-            const maps = p.mapsCount ?? p.maps_count ?? 'â€”';
-            const weak = p.weakSitePct ?? p.weak_site_pct ?? 'â€”';
-            const contact = p.contactablePct ?? p.contactable_pct ?? 'â€”';
+            const maps = p.mapsCount ?? p.maps_count ?? '—';
+            const weak = p.weakSitePct ?? p.weak_site_pct ?? '—';
+            const contact = p.contactablePct ?? p.contactable_pct ?? '—';
 
             let actions = '';
             if (st === 'candidate' || st === 'scored') {
-              actions += `<button class="btn" onclick="scorePair('${id}')" style="font-size:10px;padding:3px 8px">Score</button> `;
+              actions += `<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all" onclick="scorePair('${id}')">Score</button> `;
             }
             if (st === 'scored' || st === 'candidate') {
-              actions += `<button class="btn" onclick="validatePair('${id}')" style="font-size:10px;padding:3px 8px">Validate</button> `;
+              actions += `<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all" onclick="validatePair('${id}')">Validate</button> `;
             }
             if (st === 'validated' || st === 'scored') {
-              actions += `<button class="btn btn-accent" onclick="decidePair('${id}')" style="font-size:10px;padding:3px 8px">Go/No-Go</button> `;
+              actions += `<button class="btn text-[10px] py-1 px-2 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all" onclick="decidePair('${id}')">Go/No-Go</button> `;
             }
             if (st !== 'approved') {
-              actions += `<button class="btn" onclick="deletePair('${id}')" style="font-size:10px;padding:3px 8px;color:var(--red)">âœ•</button>`;
+              actions += `<button class="btn text-[10px] py-1 px-2 bg-surface border border-border rounded cursor-pointer hover:border-accent transition-all" style="color:var(--color-bad)" onclick="deletePair('${id}')">✕</button>`;
             }
 
             return `<tr>
@@ -1669,8 +1207,8 @@
               <td>${scoreBarHTML(score)}</td>
               <td>${badge(st)}</td>
               <td class="mono">${maps}</td>
-              <td class="mono">${weak}${weak !== 'â€”' ? '%' : ''}</td>
-              <td class="mono">${contact}${contact !== 'â€”' ? '%' : ''}</td>
+              <td class="mono">${weak}${weak !== '—' ? '%' : ''}</td>
+              <td class="mono">${contact}${contact !== '—' ? '%' : ''}</td>
               <td>${actions}</td>
             </tr>`;
           }).join('')}</tbody>
@@ -1706,20 +1244,18 @@
 
         const r = await axios.post(API + '/api/niches', body, { headers: { ...headers, 'Content-Type': 'application/json' } });
 
-        // Auto-score if raw data was provided
         if (body.mapsCount) {
           await axios.patch(API + '/api/niches/' + r.data.id + '/score', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
         }
 
-        // Clear form
         ['np-niche', 'np-city', 'np-state', 'np-maps', 'np-velocity', 'np-ads', 'np-agency', 'np-weak', 'np-contact', 'np-notes'].forEach(id => {
           document.getElementById(id).value = '';
         });
 
-        showToast('âœ“ Pair added' + (body.mapsCount ? ' & scored' : ''), 'success');
+        showToast('✓ Pair added' + (body.mapsCount ? ' & scored' : ''), 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1729,20 +1265,20 @@
       try {
         const r = await axios.patch(API + '/api/niches/' + id + '/score', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
         const total = r.data.scores?.totalScore ?? r.data.total_score ?? '?';
-        showToast(`âœ“ Scored: ${total}/100`, 'success');
+        showToast(`✓ Scored: ${total}/100`, 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       }
     }
 
     async function validatePair(id) {
       try {
         await axios.post(API + '/api/niches/' + id + '/validate', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('âœ“ Validation job queued â€” check back in 2 minutes', 'success');
+        showToast('✓ Validation job queued — check back in 2 minutes', 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       }
     }
 
@@ -1752,15 +1288,15 @@
         const decision = r.data.decision;
         const reasons = r.data.reasons || [];
         if (decision === 'approved') {
-          showToast('âœ“ APPROVED â€” Sprint started!', 'success');
+          showToast('✓ APPROVED — Sprint started!', 'success');
         } else if (decision === 'blocked') {
-          showToast('âš  ' + reasons[0], 'error');
+          showToast('⚠ ' + reasons[0], 'error');
         } else {
-          showToast('âš  PARKED â€” ' + reasons.join('; '), 'error');
+          showToast('⚠ PARKED — ' + reasons.join('; '), 'error');
         }
         refreshNichesView();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       }
     }
 
@@ -1768,16 +1304,12 @@
       if (!confirm('Delete this pair?')) return;
       try {
         await axios.delete(API + '/api/niches/' + id, { headers });
-        showToast('âœ“ Pair deleted', 'success');
+        showToast('✓ Pair deleted', 'success');
         refreshNichesView();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       }
     }
-
-    // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
-    // â”€â”€ DISCOVERY VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
 
     let discoveryConfigDirty = false;
     document.addEventListener('DOMContentLoaded', () => {
@@ -1801,8 +1333,8 @@
         document.getElementById('dc-auto-approve').checked = !!c.autoApprove;
         document.getElementById('dc-batch-size').value = c.batchSize || 20;
         document.getElementById('dc-interval').value = c.intervalHours || 6;
-        document.getElementById('dc-priority-cities').value = (c.priorityCities || []).join('\\n');
-        document.getElementById('dc-exclude-niches').value = (c.excludeNiches || []).join('\\n');
+        document.getElementById('dc-priority-cities').value = (c.priorityCities || []).join('\n');
+        document.getElementById('dc-exclude-niches').value = (c.excludeNiches || []).join('\n');
         discoveryConfigDirty = false;
       } catch (err) {
         console.error('Failed to load discovery config:', err);
@@ -1813,10 +1345,8 @@
       const btn = document.getElementById('btn-discovery-save');
       btn.classList.add('loading');
       try {
-        const priorityCities = document.getElementById('dc-priority-cities').value
-          .split('\\n').map(s => s.trim()).filter(Boolean);
-        const excludeNiches = document.getElementById('dc-exclude-niches').value
-          .split('\\n').map(s => s.trim()).filter(Boolean);
+        const priorityCities = document.getElementById('dc-priority-cities').value.split('\n').map(s => s.trim()).filter(Boolean);
+        const excludeNiches = document.getElementById('dc-exclude-niches').value.split('\n').map(s => s.trim()).filter(Boolean);
 
         const body = {
           enabled: document.getElementById('dc-enabled').checked,
@@ -1828,11 +1358,11 @@
         };
 
         await axios.patch(API + '/api/niches/discover/config', body, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('âœ“ Discovery config saved', 'success');
+        showToast('✓ Discovery config saved', 'success');
         discoveryConfigDirty = false;
         await loadDiscoveryConfig();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1843,10 +1373,10 @@
       btn.classList.add('loading');
       try {
         await axios.post(API + '/api/niches/discover', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
-        showToast('âœ“ Discovery triggered', 'success');
+        showToast('✓ Discovery triggered', 'success');
         refreshDiscoveryView();
       } catch (err) {
-        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+        showToast('✗ ' + (err.response?.data?.error || err.message), 'error');
       } finally {
         btn.classList.remove('loading');
       }
@@ -1858,36 +1388,36 @@
         const s = res.data;
 
         document.getElementById('discovery-stats-row').innerHTML = `
-          <div class="stat-card">
-            <span class="label">Status</span>
-            <span class="value" style="color:var(--accent)">${s.config?.enabled ? 'Active' : 'Paused'}</span>
-            <span class="sub">${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Status</span>
+            <span class="text-[28px] font-bold text-accent">${s.config?.enabled ? 'Active' : 'Paused'}</span>
+            <span class="text-[11px] text-dim">${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Total Probed</span>
-            <span class="value">${s.totalCandidate}</span>
-            <span class="sub">candidate pairs found</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Total Probed</span>
+            <span class="text-[28px] font-bold">${s.totalCandidate}</span>
+            <span class="text-[11px] text-dim">candidate pairs found</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Scored</span>
-            <span class="value" style="color:var(--yellow)">${s.totalScored}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Scored</span>
+            <span class="text-[28px] font-bold text-warn">${s.totalScored}</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Validated</span>
-            <span class="value" style="color:var(--blue)">${s.totalValidated}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Validated</span>
+            <span class="text-[28px] font-bold text-info">${s.totalValidated}</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Approved</span>
-            <span class="value" style="color:var(--green)">${s.totalApproved}</span>
-            <span class="sub">ready for campaigns</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Approved</span>
+            <span class="text-[28px] font-bold text-good">${s.totalApproved}</span>
+            <span class="text-[11px] text-dim">ready for campaigns</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Parked/Dropped</span>
-            <span class="value" style="color:var(--text-dim)">${s.totalParked} / ${s.totalDropped}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Parked/Dropped</span>
+            <span class="text-[28px] font-bold text-dim">${s.totalParked} / ${s.totalDropped}</span>
           </div>
-          <div class="stat-card">
-            <span class="label">Last Run</span>
-            <span class="value" style="font-size:14px">${ago(s.config?.lastRun)}</span>
+          <div class="bg-surface border border-border rounded p-4 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[11px] uppercase tracking-widest text-dim">Last Run</span>
+            <span class="text-[14px] font-bold">${ago(s.config?.lastRun)}</span>
           </div>
         `;
 
@@ -1907,8 +1437,8 @@
           if (c > 0) {
             barHtml += `<div style="width:${(c/total)*100}%;background:${funnelColors[i]}" title="${status}: ${c}"></div>`;
           }
-          legendHtml += `<span style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px">
-            <span style="width:8px;height:8px;border-radius:2px;background:${funnelColors[i]};display:inline-block"></span>
+          legendHtml += `<span class="text-[11px] text-dim flex items-center gap-1">
+            <span class="w-2 h-2 rounded-sm inline-block" style="background:${funnelColors[i]}"></span>
             ${status} (${c})
           </span>`;
         });
@@ -1922,6 +1452,10 @@
     }
 
     document.documentElement.setAttribute('data-theme', 'dark');
+
+    // Init active tab styling
+    document.querySelector('.nav-tab[data-tab="dashboard"]').classList.add('text-accent');
+    document.querySelector('.nav-tab[data-tab="dashboard"]').style.borderBottomColor = 'var(--color-accent)';
 
     // Initial load + poll
     refresh();
