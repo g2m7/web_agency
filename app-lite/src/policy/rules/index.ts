@@ -249,13 +249,13 @@ export const humanGateDemoApproval: PolicyRule = {
   name: 'human_gate_demo_approval',
   appliesTo: ['send_demo'],
   check: (ctx: PolicyContext): PolicyResult => {
-    if (ctx.phase < 5) {
+    if (ctx.phase < 6) {
       return {
         allowed: false,
         blocked: false,
         requiresHumanApproval: true,
         ruleName: 'human_gate_demo_approval',
-        blockingReason: 'Phase < 5: human must approve demos',
+        blockingReason: 'Phase < 6: human must approve demos',
       }
     }
     return { allowed: true, blocked: false, requiresHumanApproval: false, ruleName: 'human_gate_demo_approval' }

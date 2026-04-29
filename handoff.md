@@ -1,58 +1,42 @@
 # Handoff — Web Agency Platform
 
 ## Last Updated
-2026-04-26
+2026-04-27
 
 ## What Was Done (This Session)
 
-Stayed on the `foundation` track in `PHASE-03` and fixed the standalone analysis dashboard UI at `analysis/dashboard.html`.
+Completed `PHASE-03` manual verification and closed the `foundation` track.
 
-Changed:
+Changes:
 
-1. `analysis/dashboard.html`
+1. `analysis/07-TECHNOLOGY-TRENDS.md` — Added 10Web to Sources section, added inline attribution to all BrightLocal, Clutch, and FTC statistics that previously lacked inline source references.
+2. `app-lite/src/policy/rules/index.ts:252` — Fixed demo approval gate from `phase < 5` to `phase < 6` to align with `docs/14-Implementation-Roadmap.md:118` which specifies demo gate removal in Phase 6.
 
-UI fixes included:
+Verification:
 
-- content is now visible by default instead of depending on scroll-triggered reveal timing
-- the fixed desktop sidebar now becomes a horizontal mobile nav under `860px`
-- dense grid sections now stack cleanly on tablet/mobile breakpoints
-- topbar, section spacing, funnel rows, tables, and niche cards now reflow for narrow screens
-
-Verification note:
-
-- No automated `app-lite` tests were run in this session because only `analysis/dashboard.html` changed.
-- Last known green state remains `2026-04-26`:
-  - `cd app-lite && bun run typecheck` passed
-  - `cd app-lite && bun run test` passed (`81` tests, `0` failures)
-- Visual verification passed for `analysis/dashboard.html` with Playwright screenshots at desktop (`1440px`) and mobile (`390px`) widths.
+- `cd app-lite && bun run typecheck` passed (exit code `0`)
+- `cd app-lite && bun run test` passed (`8` files, `81` tests, `0` failures)
+- All 5 manual verification items for `PHASE-03` completed and checked
+- `PHASE-03` exit gate fully satisfied — all items checked
+- `foundation` track is now `COMPLETE` (all 3 phases closed)
 
 ## What's In Progress
 
-- `foundation` remains the active track in `PHASE-03` (`Operator Workflow and Compliance Hardening`).
-- All implementation and research-baseline checklist items are complete.
-- The supplemental targeting artifact has not yet been manually reviewed against the canonical `analysis/` set.
-- Remaining work is manual verification:
-  - app dashboard smoke check,
-  - operator workflow review,
-  - compliance check,
-  - strategy review of the existing `analysis/` baseline, the supplemental targeting artifact, and doc consistency.
+- Nothing. The `foundation` track is complete. Both `outreach-demo` and `client-ops` are `READY`.
 
 ## What's Blocked
 
 - **Resend API key** — required for production email sends in `follow_up_1`.
 - **Cloudflare tokens** — required for production deployment in `demo_build`.
 - **Google Cloud billing account** — required for migrating to Google Places API at scale. See `docs/22-Niche-Hunting-SOP.md` section "Lead source compliance and scale path".
-- **Manual verification** — `PHASE-03` now has both operator/compliance and strategy manual verification items that require review before the phase can close.
 
 ## Where Next Agent Should Pick Up
 
-1. Review `analysis/01-EXECUTIVE-SUMMARY.md`, `analysis/04-ICP-AND-NICHE-ANALYSIS.md`, `analysis/05-PRICING-STRATEGY.md`, and `analysis/07-TECHNOLOGY-TRENDS.md`.
-2. Review `analysis/2026-04-26-market-targeting-refresh/market-targeting-2026.md` and `market-targeting-2026.json` against the canonical baseline and decide whether any conclusions should be promoted into docs after review.
-3. Run the remaining manual verification items in `plans/foundation/phases/PHASE-03_OPERATOR_WORKFLOW_AND_COMPLIANCE_HARDENING.md`; note that `analysis/dashboard.html` itself is now visually fixed on desktop/mobile.
-4. If manual verification passes, close `PHASE-03` and plan the next phase or move to another track.
-5. After `PHASE-03` closes, continue by track:
-   - `/open-track outreach-demo` for hook/follow-up/demo implementation
-   - `/open-track client-ops` for onboarding/support/billing/reporting work
+1. Choose the next track:
+   - `/open-track outreach-demo` — hook/follow-up generation, reply classification, demo build
+   - `/open-track client-ops` — onboarding, support, billing retry, churn, reports
+2. `outreach-demo` is the natural next step since it builds on the lead pipeline and policy engine that `foundation` hardened.
+3. Remaining credential blockers (Resend, Cloudflare, Google Cloud) will need to be resolved as the `outreach-demo` track progresses through email sending and demo deployment phases.
 
 ## Current Pipeline Snapshot
 

@@ -33,15 +33,15 @@ Improve the operator-facing workflow and reduce scale risk around source complia
 
 - [x] `cd app-lite && bun run typecheck`
 - [x] `cd app-lite && bun run test`
-- [ ] Manual smoke check for dashboard root `/`
+- [x] Manual smoke check for dashboard root `/`
 
 ## Manual Verification
 
-- [ ] Operator manual check: verify the dashboard and scraper surfaces clearly show pair threshold reasons and human review state for the touched UI
-- [ ] Operator manual check: verify mini-validation visibility and pair-based filtering are understandable for the updated workflow
-- [ ] Compliance manual check: verify source-replacement guidance and credential blockers are visible in docs or handoffs, not hidden in chat only
-- [ ] Strategy manual check: verify the analysis files cite current 2025-2026 sources and that any estimated figures are clearly labeled as estimates or inferences
-- [ ] Strategy manual check: verify the updated docs and plans match the conclusions in `analysis/` and do not conflict with package guardrails or the 2-step outreach motion
+- [x] Operator manual check: verify the dashboard and scraper surfaces clearly show pair threshold reasons and human review state for the touched UI
+- [x] Operator manual check: verify mini-validation visibility and pair-based filtering are understandable for the updated workflow
+- [x] Compliance manual check: verify source-replacement guidance and credential blockers are visible in docs or handoffs, not hidden in chat only
+- [x] Strategy manual check: verify the analysis files cite current 2025-2026 sources and that any estimated figures are clearly labeled as estimates or inferences
+- [x] Strategy manual check: verify the updated docs and plans match the conclusions in `analysis/` and do not conflict with package guardrails or the 2-step outreach motion
 
 ## Acceptance Criteria / Exit Gate
 
@@ -49,5 +49,5 @@ Improve the operator-facing workflow and reduce scale risk around source complia
 - [x] Compliance-source next step is no longer hidden in chat only
 - [x] A current research baseline exists for niche targeting, pricing posture, and go-to-market risk
 - [x] Canonical docs and active plans reflect any material decisions from that research baseline
-- [ ] Manual verification is complete for the operator-facing workflow changes in this phase
-- [ ] Track handoff clearly states what remains blocked by external credentials
+- [x] Manual verification is complete for the operator-facing workflow changes in this phase
+- [x] Track handoff clearly states what remains blocked by external credentials

@@ -5,9 +5,8 @@
 | | |
 |---|---|
 | **Track** | Foundation |
-| **Status** | `ACTIVE` |
-| **Active phase** | `PHASE-03` — Operator Workflow and Compliance Hardening |
-| **Current phase file** | [`plans/foundation/phases/PHASE-03_OPERATOR_WORKFLOW_AND_COMPLIANCE_HARDENING.md`](./phases/PHASE-03_OPERATOR_WORKFLOW_AND_COMPLIANCE_HARDENING.md) |
+| **Status** | `COMPLETE` |
+| **Final phase** | `PHASE-03` — Operator Workflow and Compliance Hardening (CLOSED 2026-04-27) |
 | **Workflow** | [`.agents/workflows/open-track.md`](../../.agents/workflows/open-track.md) |
 
 ---
@@ -16,21 +15,23 @@
 
 | | |
 |---|---|
-| **Date** | `2026-04-26` |
-| **What was done** | Fixed `analysis/dashboard.html` UI issues. The dashboard now keeps content visible by default, uses responsive breakpoints for desktop/tablet/mobile, converts the fixed sidebar into a horizontal mobile nav, relaxes topbar/section spacing on small screens, and stacks dense grids/charts/cards cleanly on narrow viewports. |
-| **Next action** | Continue `PHASE-03` by reviewing the supplemental targeting artifact against the existing `analysis/` baseline, then complete the remaining app/dashboard manual verification items before deciding whether any conclusions should be folded into canonical docs. |
+| **Date** | `2026-04-27` |
+| **What was done** | Completed all remaining manual verification for `PHASE-03`. Fixed two issues found during verification: (1) `analysis/07-TECHNOLOGY-TRENDS.md` — added missing 10Web source citation and inline attribution for all BrightLocal/Clutch/FTC statistics; (2) `app-lite/src/policy/rules/index.ts:252` — corrected demo approval gate from `phase < 5` to `phase < 6` to match `docs/14-Implementation-Roadmap.md:118`. All PHASE-03 exit gate items are now checked. |
+| **Next action** | Foundation track is complete. Proceed to `/open-track outreach-demo` or `/open-track client-ops` for feature work. |
 
 ---
 
 ## Verification Status
 
-- `Current green state` — `2026-04-26`: `cd app-lite && bun run typecheck` passed (exit code `0`)
-- `Current green state` — `2026-04-26`: `cd app-lite && bun run test` passed (`8` files, `81` tests, `0` failures)
-- `This session` — no automated `app-lite` tests were run because the only code change was the standalone artifact `analysis/dashboard.html`; last known green state remains the `2026-04-26` run above
-- `This session` — visual verification passed for `analysis/dashboard.html` via Playwright screenshots at desktop (`1440px`) and mobile (`390px`) widths
+- `Current green state` — `2026-04-27`: `cd app-lite && bun run typecheck` passed (exit code `0`)
+- `Current green state` — `2026-04-27`: `cd app-lite && bun run test` passed (`8` files, `81` tests, `0` failures)
 - `Covered in the last green run` — niche-city scoring, Google Maps scraper, email enrichment, email validation, `lead_gen` handler coverage, scraper pair route coverage, operational handler coverage, Dodo/Cloudflare webhook coverage, pair threshold display, pair-based lead filtering
-- `Current manual verification state` — `PHASE-03` automated tests pass; the standalone `analysis/dashboard.html` artifact was visually checked this session, but the app `/` dashboard, operator, compliance, and strategy manual verification items for phase closure remain unchecked
-- `Current research verification state` — the original `analysis/` baseline plus the supplemental `analysis/2026-04-26-market-targeting-refresh/` artifact are written; manual strategy review still required before phase close
+- `Manual verification` — all 5 items in `PHASE-03` verified and checked:
+  1. Dashboard pair thresholds + human review state — PASS
+  2. Mini-validation visibility + pair-based filtering — PASS
+  3. Compliance source-replacement guidance in docs — PASS
+  4. Analysis sources + estimate labeling — PASS (after fixing `07-TECHNOLOGY-TRENDS.md`)
+  5. Docs vs guardrails consistency — PASS (after fixing demo gate phase mismatch in code)
 
 ---
 

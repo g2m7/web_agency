@@ -14,6 +14,7 @@
 - [Durable pricing / positioning](https://durable.co/pricing)
 - [Hostinger AI site builder](https://www.hostinger.com/ai-website-builder)
 - [Duda plans](https://www.duda.co/plans)
+- [10Web pricing](https://10web.io/pricing/)
 
 ## Is Google reducing the need for small-business websites?
 
@@ -21,13 +22,13 @@
 
 The website is weaker as a **first-touch discovery** asset than it used to be. But it is still important as an **owned conversion and trust layer**.
 
-Current signals:
+Current signals (all figures from [BrightLocal consumer search behavior](https://www.brightlocal.com/research/consumer-search-behavior/) unless noted):
 
-- `15%` of consumers now default directly to Google Maps for local-specific search.
-- `67%` often or always look at reviews after a local business search.
-- `85%` say contact information and opening hours matter when researching local businesses.
-- `40%` of consumers are actively using generative AI within search.
-- `54%` of consumers visit a business website after reading positive reviews.
+- `15%` of consumers now default directly to Google Maps for local-specific search (BrightLocal).
+- `67%` often or always look at reviews after a local business search (BrightLocal).
+- `85%` say contact information and opening hours matter when researching local businesses (BrightLocal).
+- `40%` of consumers are actively using generative AI within search (BrightLocal).
+- `54%` of consumers visit a business website after reading positive reviews ([BrightLocal local consumer review survey 2025](https://www.brightlocal.com/research/local-consumer-review-survey-2025/)).
 
 ### Implication
 
@@ -47,13 +48,13 @@ If anything, AI-assisted search punishes generic sites more aggressively because
 
 That is real.
 
-Evidence:
+Evidence ([Clutch](https://clutch.co/resources/state-of-small-business-websites-2025) for adoption stats; vendor pages for pricing):
 
-- `41%` of SMBs with websites use no-code builders like Wix or Squarespace.
-- `34%` use low-code platforms like WordPress or Shopify.
-- Durable starts at `~$15/mo`.
-- Hostinger’s AI builder promos start around `~$3/mo`.
-- 10Web is pushing AI-generated WordPress builds in the `~$20-$45/mo` band.
+- `41%` of SMBs with websites use no-code builders like Wix or Squarespace (Clutch).
+- `34%` use low-code platforms like WordPress or Shopify (Clutch).
+- Durable starts at `~$15/mo` ([Durable pricing](https://durable.co/pricing)).
+- Hostinger's AI builder promos start around `~$3/mo` ([Hostinger](https://www.hostinger.com/ai-website-builder)).
+- 10Web is pushing AI-generated WordPress builds in the `~$20-$45/mo` band ([10Web pricing](https://10web.io/pricing/)).
 
 ### What they do well
 
@@ -81,11 +82,11 @@ They are a **medium** threat to a narrow, managed, local-service offer with real
 
 | Trend | Signal | What it means |
 |---|---|---|
-| Google still dominates | `45%` default to Google for local search; `53%` if you include Safari’s Google usage | Your sites still need Google-first structure |
-| Maps matters more | `15%` default directly to Google Maps | GBP, reviews, and map presence are no longer optional |
-| Multi-platform research is normal | `79%` use multiple platforms at least some of the time | Website, Maps, and reviews must agree |
-| AI-assisted search is already mainstream | `40%` actively use generative AI in search | Structured pages and trustworthy business data matter more |
-| Reviews strongly influence path to site | `54%` visit a business website after reading positive reviews | Website and reputation now work together, not separately |
+| Google still dominates | `45%` default to Google for local search; `53%` if you include Safari's Google usage (BrightLocal) | Your sites still need Google-first structure |
+| Maps matters more | `15%` default directly to Google Maps (BrightLocal) | GBP, reviews, and map presence are no longer optional |
+| Multi-platform research is normal | `79%` use multiple platforms at least some of the time (BrightLocal) | Website, Maps, and reviews must agree |
+| AI-assisted search is already mainstream | `40%` actively use generative AI in search (BrightLocal) | Structured pages and trustworthy business data matter more |
+| Reviews strongly influence path to site | `54%` visit a business website after reading positive reviews (BrightLocal review survey 2025) | Website and reputation now work together, not separately |
 
 ## How risky is Google Maps scraping?
 
@@ -123,7 +124,7 @@ The FTC is explicit that CAN-SPAM applies to **all commercial email**, including
 - a working opt-out,
 - honoring opt-outs within `10 business days`.
 
-The FTC says each violating email can carry penalties of up to `$53,088`.
+The FTC says each violating email can carry penalties of up to `$53,088` ([FTC CAN-SPAM guide](https://www.ftc.gov/node/81459)).
 
 ## Privacy
 
