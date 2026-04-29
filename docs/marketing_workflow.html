@@ -8,11 +8,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 
         :root {
-            --bg-dark: #0f172a;
-            --text-light: #f8fafc;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #8b5cf6;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --bg-dark: #0f1110;
+            --text-light: #d0d4d0;
+            --accent-primary: #cfa86b;
+            --accent-secondary: #5c7054;
+            --card-bg: #141614;
         }
 
         * {
@@ -50,7 +50,7 @@
             height: 60vw;
             background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
             opacity: 0.15;
-            filter: blur(100px);
+            display: none;
             z-index: 0;
             top: -20%;
             left: -10%;
@@ -62,7 +62,7 @@
             height: 50vw;
             background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
             opacity: 0.15;
-            filter: blur(100px);
+            display: none;
             z-index: 0;
             bottom: -20%;
             right: -10%;
@@ -79,7 +79,7 @@
             font-size: 4rem;
             font-weight: 800;
             margin-bottom: 1rem;
-            background: linear-gradient(to right, #60a5fa, #c084fc);
+            color: var(--accent-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1.2;
@@ -111,7 +111,7 @@
             background: var(--card-bg);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
+            border-radius: 2px;
             padding: 2.5rem;
             flex: 1;
             min-width: 280px;
@@ -146,7 +146,7 @@
         .badge {
             display: inline-block;
             padding: 0.5rem 1rem;
-            border-radius: 2rem;
+            border-radius: 2px;
             font-size: 1rem;
             font-weight: 600;
             text-transform: uppercase;

@@ -6,49 +6,46 @@
   <title>UNSC-OGM // OPERATIONS TERMINAL</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
   <style type="text/tailwindcss">
     @theme {
-      --color-bg: #0a0c0b;
-      --color-surface: #10140f;
-      --color-surface-2: #171c18;
-      --color-border: #1f2a22;
-      --color-border-hud: rgba(120,200,120,0.12);
-      --color-dim: #6a8a6f;
-      --color-accent: #7dcc5c;
-      --color-accent-dim: #5aa03e;
-      --color-accent-glow: rgba(120,200,120,0.06);
-      --color-good: #5cb85c;
-      --color-warn: #c8a832;
-      --color-bad: #c44030;
-      --color-info: #5090b0;
-      --color-hud-text: #b0d8a0;
-      --color-hud-bright: #d0f0c0;
+      --color-bg: #111213;
+      --color-surface: #1e1e1e;
+      --color-surface-2: #282828;
+      --color-border: #3d3d3d;
+      --color-border-hud: #555555;
+      --color-dim: #8b949e;
+      --color-accent: #fb923c;
+      --color-accent-dim: #c2410c;
+      --color-accent-glow: rgba(251, 146, 60, 0.15);
+      --color-good: #34d399;
+      --color-warn: #facc15;
+      --color-bad: #f87171;
+      --color-info: #38bdf8;
+      --color-hud-text: #c9d1d9;
+      --color-hud-bright: #ffffff;
     }
   </style>
   <style>
     @custom-variant dark (&:where(.dark, .dark *));
     *, *::before, *::after { box-sizing: border-box; }
     body {
-      font-family: 'Rajdhani', 'Inter', system-ui, sans-serif;
-      background-color: #0a0c0b;
-      background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px),
-        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(90,140,70,0.04) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(50,80,60,0.03) 0%, transparent 50%);
-      background-attachment: fixed;
-      color: #b0d8a0;
+      font-family: 'Space Grotesk', 'Rajdhani', system-ui, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-hud-bright);
     }
-    body::before {
+        body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 200px;
-      opacity: 0.04;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.5;
       pointer-events: none;
       z-index: 0;
     }
@@ -56,105 +53,204 @@
       content: '';
       position: fixed;
       inset: 0;
-      background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.015) 1px, rgba(0,0,0,0.015) 2px);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 220px;
+      opacity: 0.15;
       pointer-events: none;
       z-index: 0;
     }
     header, nav, main, .toast { position: relative; z-index: 1; }
-    ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--color-accent-dim); border-radius: 0; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--color-surface); }
+    ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 0; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-dim); }
 
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
-    @keyframes glow-pulse { 0%, 100% { box-shadow: 0 0 4px rgba(120,200,120,0.1); } 50% { box-shadow: 0 0 8px rgba(120,200,120,0.2); } }
 
     .hud-panel {
       position: relative;
       border: 1px solid var(--color-border);
       background: var(--color-surface);
+      border-radius: 0;
+      box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
     }
+    .hud-panel > div:first-child { border-radius: 0 !important; }
     .hud-panel::before, .hud-panel::after {
       content: '';
       position: absolute;
-      width: 8px;
-      height: 8px;
-      border-color: var(--color-accent-dim);
+      width: 16px;
+      height: 16px;
+      border-color: var(--color-accent);
       border-style: solid;
-      opacity: 0.5;
+      opacity: 1;
+      pointer-events: none;
     }
-    .hud-panel::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
-    .hud-panel::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+    .hud-panel::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .hud-panel::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+    
+    .hud-panel::marker { content: none; }
 
-    .spinner { display: none; width: 12px; height: 12px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .glass-panel {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: 0;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+    }
+
+    .header-shell {
+      background: var(--color-surface);
+      border-bottom: 2px solid var(--color-border);
+      box-shadow: 0 4px 0px rgba(0,0,0,0.2);
+    }
+
+    .nav-shell {
+      background: var(--color-surface-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .btn {
+      border-radius: 0;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+    }
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .btn:hover::after { opacity: 1; }
+
+    .btn-primary {
+      background: var(--color-accent);
+      border-color: var(--color-accent) !important;
+      color: #000 !important;
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: #ff8533;
+      border-color: #ff8533 !important;
+    }
+
+    .view { display: none; }
+    .view.active { display: flex; }
+
+    input, select, textarea {
+      border-radius: 0 !important;
+      background: var(--color-bg) !important;
+      border: 1px solid var(--color-border) !important;
+      color: var(--color-hud-bright) !important;
+      box-shadow: inset 2px 2px 0px rgba(0,0,0,0.3);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--color-accent) !important;
+      outline: none;
+    }
+
+    .nav-tab {
+      border-radius: 0;
+      margin: 0;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--color-border);
+      border-bottom: 2px solid transparent;
+      color: var(--color-dim);
+    }
+    .nav-tab:hover {
+      color: var(--color-hud-bright);
+      background: var(--color-surface);
+    }
+
+    .nav-tab.nav-active {
+      color: var(--color-accent);
+      border-bottom-color: var(--color-accent);
+      background: var(--color-surface);
+    }
+
+    .results-table th {
+      border-radius: 0;
+    }
+
+    .spinner { display: none; width: 12px; height: 12px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 0; animation: spin 0.6s linear infinite; }
     .btn.loading .spinner { display: inline-block; }
     .btn.loading { opacity: 0.7; pointer-events: none; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; font-family: 'Share Tech Mono', monospace; }
-    .badge-new { background: rgba(80,144,176,0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
-    .badge-contacted { background: rgba(120,200,120,0.08); color: var(--color-accent); border-left: 2px solid var(--color-accent); }
-    .badge-interested, .badge-closed_won { background: rgba(92,184,92,0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-demo_sent { background: rgba(200,168,50,0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-closed_lost { background: rgba(196,64,48,0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-excluded { background: rgba(74,94,79,0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
-    .badge-queued { background: rgba(80,144,176,0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
-    .badge-running { background: rgba(200,168,50,0.12); color: var(--color-warn); border-left: 2px solid var(--color-warn); animation: pulse 1s infinite; }
-    .badge-completed { background: rgba(92,184,92,0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-failed, .badge-dead { background: rgba(196,64,48,0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-onboarding { background: rgba(80,144,176,0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
-    .badge-active { background: rgba(92,184,92,0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-churned { background: rgba(196,64,48,0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-paused { background: rgba(200,168,50,0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-hot { background: rgba(196,64,48,0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-warm { background: rgba(200,168,50,0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-low { background: rgba(74,94,79,0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
-    .badge-valid { background: rgba(92,184,92,0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-risky { background: rgba(200,168,50,0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-invalid { background: rgba(196,64,48,0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .badge-pending { background: rgba(80,144,176,0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
-    .badge-candidate { background: rgba(80,144,176,0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
-    .badge-scored { background: rgba(200,168,50,0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
-    .badge-validated { background: rgba(120,200,120,0.08); color: var(--color-accent); border-left: 2px solid var(--color-accent); }
-    .badge-approved { background: rgba(92,184,92,0.12); color: var(--color-good); border-left: 2px solid var(--color-good); }
-    .badge-parked { background: rgba(74,94,79,0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
-    .badge-dropped { background: rgba(196,64,48,0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
-    .score-bar { display: flex; height: 4px; border-radius: 0; overflow: hidden; background: var(--color-surface-2); width: 100px; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; font-family: 'Share Tech Mono', monospace; border: 1px solid rgba(255,255,255,0.08); }
+    .badge-new { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-contacted { background: rgba(234, 179, 8, 0.08); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-interested, .badge-closed_won { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-demo_sent { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-closed_lost { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-excluded { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
+    .badge-queued { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-running { background: rgba(234, 179, 8, 0.12); color: var(--color-warn); border-left: 2px solid var(--color-warn); animation: pulse 1.5s infinite; }
+    .badge-completed { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-failed, .badge-dead { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-onboarding { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-active { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-churned { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-paused { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-hot { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-warm { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-low { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
+    .badge-valid { background: rgba(16, 185, 129, 0.10); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-risky { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-invalid { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .badge-pending { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-candidate { background: rgba(14, 165, 233, 0.12); color: var(--color-info); border-left: 2px solid var(--color-info); }
+    .badge-scored { background: rgba(234, 179, 8, 0.10); color: var(--color-warn); border-left: 2px solid var(--color-warn); }
+    .badge-validated { background: rgba(249, 115, 22, 0.08); color: var(--color-accent); border-left: 2px solid var(--color-accent); }
+    .badge-approved { background: rgba(16, 185, 129, 0.12); color: var(--color-good); border-left: 2px solid var(--color-good); }
+    .badge-parked { background: rgba(139, 148, 158, 0.10); color: var(--color-dim); border-left: 2px solid var(--color-dim); }
+    .badge-dropped { background: rgba(239, 68, 68, 0.10); color: var(--color-bad); border-left: 2px solid var(--color-bad); }
+    .score-bar { display: flex; height: 8px; border-radius: 0; overflow: hidden; background: var(--color-bg); width: 100px; border: 1px solid var(--color-border); }
     .score-bar-fill { height: 100%; border-radius: 0; transition: width 0.3s; }
     .score-high { background: var(--color-good); }
     .score-mid { background: var(--color-warn); }
     .score-low { background: var(--color-bad); }
-    .priority-dot { display: inline-block; width: 6px; height: 6px; border-radius: 0; margin-right: 4px; vertical-align: middle; }
-    .priority-dot-hot { background: var(--color-bad); box-shadow: 0 0 4px var(--color-bad); }
-    .priority-dot-warm { background: var(--color-warn); box-shadow: 0 0 4px var(--color-warn); }
+    .priority-dot { display: inline-block; width: 8px; height: 8px; border-radius: 0; margin-right: 4px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.5); }
+    .priority-dot-hot { background: var(--color-bad); }
+    .priority-dot-warm { background: var(--color-warn); }
     .priority-dot-low { background: var(--color-dim); }
     .has-indicator { color: var(--color-good); }
     .no-indicator { color: var(--color-dim); }
-    .pipeline-bar { display: flex; height: 4px; border-radius: 0; overflow: hidden; background: var(--color-surface-2); }
-    .pipeline-bar div { height: 100%; transition: width 0.5s ease; }
-    .results-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Share Tech Mono', monospace; }
-    .results-table th { text-align: left; padding: 6px 12px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-accent-dim); border-bottom: 1px solid var(--color-border); background: var(--color-surface-2); position: sticky; top: 0; font-family: 'Share Tech Mono', monospace; }
-    .results-table td { padding: 6px 12px; border-bottom: 1px solid var(--color-border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; font-family: 'Share Tech Mono', monospace; }
-    .results-table tr:hover td { background: var(--color-accent-glow); }
-    .results-table .mono { font-size: 11px; }
-    .toast { position: fixed; bottom: 24px; right: 24px; padding: 10px 16px; border-radius: 0; font-size: 12px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .pipeline-bar { display: flex; height: 12px; border-radius: 0; overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-border); }
+    .pipeline-bar div { height: 100%; transition: width 0.5s ease; border-right: 1px solid var(--color-bg); }
+    .results-table { width: 100%; border-collapse: collapse; font-size: 14px; font-family: 'Share Tech Mono', monospace; }
+    .results-table th { text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-dim); border-bottom: 2px solid var(--color-border); background: var(--color-surface); position: sticky; top: 0; font-family: 'Share Tech Mono', monospace; }
+    .results-table td { padding: 12px 16px; border-bottom: 1px solid var(--color-border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; font-family: 'Share Tech Mono', monospace; }
+    .results-table tr:hover td { background: var(--color-surface-2); }
+    .results-table .mono { font-size: 13px; }
+    .toast { position: fixed; bottom: 32px; right: 32px; padding: 16px 24px; border-radius: 0; font-size: 14px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 4px 4px 0px rgba(0,0,0,0.6); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
     .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.success { background: var(--color-surface); border: 1px solid var(--color-good); border-left: 3px solid var(--color-good); color: var(--color-hud-bright); }
-    .toast.error { background: var(--color-surface); border: 1px solid var(--color-bad); border-left: 3px solid var(--color-bad); color: var(--color-hud-bright); }
+    .toast.success { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 4px solid var(--color-good); color: var(--color-hud-bright); }
+    .toast.error { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 4px solid var(--color-bad); color: var(--color-hud-bright); }
   </style>
 </head>
-<body class="min-h-screen p-0 m-0">
+<body class="min-h-screen p-0 m-0 bg-bg text-hud-bright">
 
-  <header class="bg-surface border-b border-border px-8 py-2.5 flex items-center justify-between sticky top-0 z-100" style="backdrop-filter:blur(8px);background:rgba(16,20,15,0.92)">
+  <header class="header-shell px-10 py-4 flex items-center justify-between sticky top-0 z-100">
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2">
-        <span class="w-2 h-2 bg-accent rounded-none inline-block" style="box-shadow:0 0 6px var(--color-accent);animation:glow-pulse 2s infinite"></span>
-        <span class="text-[11px] tracking-[3px] text-accent-dim uppercase font-semibold" style="font-family:'Share Tech Mono',monospace">UNSC-OGM</span>
+        <span class="w-2 h-2 bg-accent rounded-sm inline-block"></span>
+        <span class="text-[13px] tracking-[3px] text-accent uppercase font-semibold" style="font-family:'Share Tech Mono',monospace">UNSC-OGM</span>
       </div>
-      <span class="text-dim text-xs">|</span>
-      <h1 class="text-base font-bold tracking-wide uppercase" style="font-family:'Rajdhani',sans-serif;color:var(--color-hud-bright)">Operations Terminal</h1>
+      <span class="text-dim text-base">|</span>
+      <h1 class="text-base font-bold tracking-wide uppercase" style="font-family:'Space Grotesk',sans-serif;color:var(--color-hud-bright)">Operations Terminal</h1>
     </div>
-    <div class="flex gap-5 text-[11px] tracking-[1px] uppercase" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)">
+    <div class="flex gap-5 text-[13px] tracking-[1px] uppercase" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)">
       <a href="/about" class="text-accent no-underline font-medium hover:text-accent" style="font-family:'Share Tech Mono',monospace">DOCS</a>
       <span id="phase">PHASE —</span>
       <span id="uptime">—</span>
@@ -162,57 +258,57 @@
     </div>
   </header>
 
-  <nav class="flex border-b border-border bg-surface px-8" style="border-bottom:1px solid var(--color-border)">
-    <button class="nav-tab px-5 py-2.5 text-[11px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)" data-tab="dashboard" onclick="switchTab('dashboard')">
+  <nav class="nav-shell flex px-8">
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="dashboard" onclick="switchTab('dashboard')">
       <i class="ph ph-squares-four mr-1"></i>Dashboard
     </button>
-    <button class="nav-tab px-5 py-2.5 text-[11px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)" data-tab="niches" onclick="switchTab('niches')">
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="niches" onclick="switchTab('niches')">
       <i class="ph ph-crosshair mr-1"></i>Niches
     </button>
-    <button class="nav-tab px-5 py-2.5 text-[11px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)" data-tab="discovery" onclick="switchTab('discovery')">
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="discovery" onclick="switchTab('discovery')">
       <i class="ph ph-compass mr-1"></i>Discovery
     </button>
-    <button class="nav-tab px-5 py-2.5 text-[11px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)" data-tab="scraper" onclick="switchTab('scraper')">
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer border-b-2 border-transparent transition-all" style="font-family:'Share Tech Mono',monospace" data-tab="scraper" onclick="switchTab('scraper')">
       <i class="ph ph-spider-web mr-1"></i>Scraper
     </button>
   </nav>
 
-  <main class="p-5 flex flex-col gap-4 max-w-[1400px] mx-auto">
+  <main class="p-6 flex flex-col gap-5 w-full">
 
     <!-- ===================== DASHBOARD VIEW ===================== -->
-    <div id="view-dashboard" class="view flex flex-col gap-5">
+      <div id="view-dashboard" class="view active flex flex-col gap-5">
       <div class="flex gap-2 flex-wrap">
-        <button class="btn bg-accent border-accent text-white hover:opacity-90 px-4 py-2 rounded border cursor-pointer text-sm font-medium flex items-center gap-1.5 transition-all" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
+        <button class="btn btn-primary px-6 py-3 rounded border cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
           <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper
         </button>
-        <button class="btn bg-surface border-border text-[#c8cdc9] px-4 py-2 rounded border cursor-pointer text-sm font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 rounded border cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
           <span class="spinner"></span><i class="ph ph-user-minus"></i> Churn Check
         </button>
-        <button class="btn bg-surface border-border text-[#c8cdc9] px-4 py-2 rounded border cursor-pointer text-sm font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 rounded border cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
           <span class="spinner"></span><i class="ph ph-chart-bar"></i> Monthly Report
         </button>
       </div>
 
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="stats-row"></div>
 
       <div class="hud-panel pt-4 col-span-full">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE</h2>
         </div>
         <div class="px-5 pt-4">
           <div class="pipeline-bar" id="pipeline-bar"></div>
-          <div class="flex gap-4 py-4 flex-wrap" id="pipeline-legend"></div>
+          <div class="flex gap-6 py-4 flex-wrap" id="pipeline-legend"></div>
         </div>
       </div>
 
       <div class="hud-panel col-span-full">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-users mr-1.5"></i>Leads</h2>
-          <span class="text-[11px] text-dim" id="lead-count">—</span>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-users mr-1.5"></i>Leads</h2>
+          <span class="text-[13px] text-dim" id="lead-count">—</span>
         </div>
-        <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
-          <label class="text-[11px] text-dim uppercase tracking-wide">Status</label>
-          <select id="f-status" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+        <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
+          <select id="f-status" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">All</option>
             <option value="new">New</option>
             <option value="contacted">Contacted</option>
@@ -222,41 +318,41 @@
             <option value="closed_lost">Lost</option>
             <option value="excluded">Excluded</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Niche</label>
-          <select id="f-niche" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
+          <select id="f-niche" onchange="refreshLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">All</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
-          <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none min-w-[140px] focus:border-accent">
-          <label class="text-[11px] text-dim uppercase tracking-wide">Search</label>
-          <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none min-w-[140px] focus:border-accent">
-          <button onclick="clearFilters()" class="ml-auto text-xs py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+          <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
+          <input id="f-city" type="text" placeholder="Filter by city..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none min-w-[140px] focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Search</label>
+          <input id="f-search" type="text" placeholder="Business name..." oninput="debounceLeads()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none min-w-[140px] focus:border-accent">
+          <button onclick="clearFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
             <i class="ph ph-x"></i> Clear
           </button>
         </div>
         <div class="overflow-y-auto max-h-[500px]" id="leads-list"></div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div class="hud-panel overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
-          <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-            <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-queue mr-1.5"></i>Jobs</h2>
-            <span class="text-[11px] text-dim" id="job-count">—</span>
+          <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+            <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-queue mr-1.5"></i>Jobs</h2>
+            <span class="text-[13px] text-dim" id="job-count">—</span>
           </div>
           <div class="overflow-y-auto max-h-[360px]" id="jobs-list"></div>
         </div>
         <div class="hud-panel overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
-          <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-            <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-buildings mr-1.5"></i>Clients</h2>
-            <span class="text-[11px] text-dim" id="client-count">—</span>
+          <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+            <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-buildings mr-1.5"></i>Clients</h2>
+            <span class="text-[13px] text-dim" id="client-count">—</span>
           </div>
           <div class="overflow-y-auto max-h-[360px]" id="clients-list"></div>
         </div>
       </div>
 
       <div class="hud-panel col-span-full">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
         </div>
         <div class="overflow-y-auto" id="config-panel"></div>
       </div>
@@ -265,59 +361,59 @@
     <!-- ===================== DISCOVERY VIEW ===================== -->
     <div id="view-discovery" class="view flex flex-col gap-5">
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
           <div class="flex gap-2">
-            <button onclick="loadDiscoveryConfig()" class="text-[11px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
-            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[11px] py-1 px-3 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all">Save Config</button>
+            <button onclick="loadDiscoveryConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
+            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[13px] py-1 px-3 btn-primary rounded cursor-pointer transition-all">Save Config</button>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 p-5">
+        <div class="grid grid-cols-2 gap-6 p-5">
           <div class="flex items-center gap-2">
             <input type="checkbox" id="dc-enabled">
-            <label for="dc-enabled" class="text-xs text-dim uppercase tracking-wide">Enabled</label>
+            <label for="dc-enabled" class="text-base text-dim uppercase tracking-wide">Enabled</label>
           </div>
           <div class="flex items-center gap-2">
             <input type="checkbox" id="dc-auto-approve">
-            <label for="dc-auto-approve" class="text-xs text-dim uppercase tracking-wide">Auto Approve</label>
+            <label for="dc-auto-approve" class="text-base text-dim uppercase tracking-wide">Auto Approve</label>
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Batch Size</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Batch Size</label>
             <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Interval (Hours)</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Interval (Hours)</label>
             <input id="dc-interval" type="number" min="1" max="168" placeholder="6" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Priority Cities (one per line: "City, ST")</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Priority Cities (one per line: "City, ST")</label>
             <textarea id="dc-priority-cities" rows="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Exclude Niches (one per line)</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Exclude Niches (one per line)</label>
             <textarea id="dc-exclude-niches" rows="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
           </div>
         </div>
       </div>
 
       <div class="flex gap-2 flex-wrap">
-        <button onclick="triggerDiscovery()" id="btn-trigger-discovery" class="bg-accent border border-accent text-white px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:opacity-90 transition-all">
+        <button onclick="triggerDiscovery()" id="btn-trigger-discovery" class="btn btn-primary px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all">
           <span class="spinner"></span><i class="ph ph-magnifying-glass"></i> Trigger Discovery
         </button>
-        <button onclick="refreshDiscoveryView()" class="bg-surface border border-border text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="refreshDiscoveryView()" class="bg-surface border border-border text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
           <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
       </div>
 
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="discovery-stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="discovery-stats-row"></div>
 
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
         </div>
         <div class="px-5 pt-4">
           <div class="pipeline-bar" id="discovery-funnel-bar"></div>
-          <div class="flex gap-4 py-4 flex-wrap" id="discovery-funnel-legend"></div>
+          <div class="flex gap-6 py-4 flex-wrap" id="discovery-funnel-legend"></div>
         </div>
       </div>
     </div>
@@ -325,100 +421,100 @@
     <!-- ===================== SCRAPER VIEW ===================== -->
     <div id="view-scraper" class="view flex flex-col gap-5">
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
           <div class="flex gap-2">
-            <button onclick="loadScraperConfig()" class="text-[11px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
-            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[11px] py-1 px-3 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all">Save Config</button>
+            <button onclick="loadScraperConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
+            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[13px] py-1 px-3 btn-primary rounded cursor-pointer transition-all">Save Config</button>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 p-5">
+        <div class="grid grid-cols-2 gap-6 p-5">
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Active Niche</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Active Niche</label>
             <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
-            <small class="text-[11px] text-dim">Business category to search for</small>
+            <small class="text-[13px] text-dim">Business category to search for</small>
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Max Requests / Minute</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Max Requests / Minute</label>
             <input id="sc-rpm" type="number" min="1" max="30" placeholder="8" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Max Retries</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Max Retries</label>
             <input id="sc-retries" type="number" min="0" max="10" placeholder="3" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Delay Range (ms)</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Delay Range (ms)</label>
             <div class="flex gap-2 items-center">
               <input id="sc-delay-min" type="number" min="1000" placeholder="5000" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none w-24 focus:border-accent">
               <span class="text-dim">to</span>
               <input id="sc-delay-max" type="number" min="1000" placeholder="12000" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none w-24 focus:border-accent">
             </div>
-            <small class="text-[11px] text-dim">Random delay between requests per city</small>
+            <small class="text-[13px] text-dim">Random delay between requests per city</small>
           </div>
           <div class="col-span-2 flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Cities (one per line: "City, ST")</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Cities (one per line: "City, ST")</label>
             <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none resize-y focus:border-accent"></textarea>
           </div>
         </div>
       </div>
 
       <div class="flex gap-2 flex-wrap items-center">
-        <button onclick="runScraper()" id="btn-run-scraper" class="bg-accent border border-accent text-white px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:opacity-90 transition-all">
+        <button onclick="runScraper()" id="btn-run-scraper" class="btn btn-primary px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all">
           <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper Now
         </button>
-        <button onclick="runEnrich()" id="btn-enrich" class="bg-surface border border-good text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="runEnrich()" id="btn-enrich" class="bg-surface border border-good text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
           <span class="spinner"></span><i class="ph ph-at"></i> Enrich Emails
         </button>
-        <button onclick="runValidate()" id="btn-validate" class="bg-surface border border-border text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="runValidate()" id="btn-validate" class="bg-surface border border-border text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
           <span class="spinner"></span><i class="ph ph-check-circle"></i> Validate Emails
         </button>
-        <button onclick="refreshScraperView()" class="bg-surface border border-border text-[#c8cdc9] px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
+        <button onclick="refreshScraperView()" class="bg-surface border border-border text-[#c8cdc9] px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow transition-all">
           <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
-        <span id="scraper-status-text" class="text-xs text-dim ml-2"></span>
+        <span id="scraper-status-text" class="text-base text-dim ml-2"></span>
       </div>
 
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="scraper-stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="scraper-stats-row"></div>
 
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
-          <span class="text-[11px] text-dim" id="scraper-lead-count">—</span>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
+          <span class="text-[13px] text-dim" id="scraper-lead-count">—</span>
         </div>
-        <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
-          <label class="text-[11px] text-dim uppercase tracking-wide">Status</label>
-          <select id="sf-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+        <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
+          <select id="sf-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">All</option><option value="new">New</option><option value="contacted">Contacted</option><option value="interested">Interested</option><option value="excluded">Excluded</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Priority</label>
-          <select id="sf-priority" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Priority</label>
+          <select id="sf-priority" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">Any</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="low">Low</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Email</label>
-          <select id="sf-email" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Email</label>
+          <select id="sf-email" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">Any</option><option value="true">Has email</option><option value="false">No email</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Contact</label>
-          <select id="sf-contact-mode" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Contact</label>
+          <select id="sf-contact-mode" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">Any</option><option value="email">Email-ready</option><option value="phone_only">Phone-only</option><option value="unreachable">No contact</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Email Status</label>
-          <select id="sf-email-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Email Status</label>
+          <select id="sf-email-status" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">Any</option><option value="valid">Valid</option><option value="risky">Risky</option><option value="invalid">Invalid</option><option value="pending">Pending</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
-          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
-          <label class="text-[11px] text-dim uppercase tracking-wide">Search</label>
-          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
-          <label class="text-[11px] text-dim uppercase tracking-wide">Website</label>
-          <select id="sf-website" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
+          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Search</label>
+          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Website</label>
+          <select id="sf-website" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">Any</option><option value="true">Has website</option><option value="false">No website</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Phone</label>
-          <select id="sf-phone" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Phone</label>
+          <select id="sf-phone" onchange="refreshScraperResults()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">Any</option><option value="true">Has phone</option><option value="false">No phone</option>
           </select>
-          <button onclick="clearScraperFilters()" class="ml-auto text-xs py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+          <button onclick="clearScraperFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
             <i class="ph ph-x"></i> Clear
           </button>
         </div>
@@ -426,9 +522,9 @@
       </div>
 
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Scraper Jobs</h2>
-          <span class="text-[11px] text-dim" id="scraper-job-count">—</span>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Scraper Jobs</h2>
+          <span class="text-[13px] text-dim" id="scraper-job-count">—</span>
         </div>
         <div class="overflow-y-auto max-h-[300px]" id="scraper-jobs-list"></div>
       </div>
@@ -436,67 +532,67 @@
 
     <!-- ===================== NICHES VIEW ===================== -->
     <div id="view-niches" class="view flex flex-col gap-5">
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3" id="niche-stats-row"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="niche-stats-row"></div>
 
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
         </div>
-        <div class="grid grid-cols-2 gap-4 p-5">
+        <div class="grid grid-cols-2 gap-6 p-5">
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Niche</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
             <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
             <input id="np-city" type="text" placeholder="e.g. Tampa" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">State</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">State</label>
             <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none uppercase focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Maps Count</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Maps Count</label>
             <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Review Velocity</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Review Velocity</label>
             <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Ad Count</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Ad Count</label>
             <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Agency Pages</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Agency Pages</label>
             <input id="np-agency" type="number" min="0" placeholder="Agency listing pages" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Weak Site %</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Weak Site %</label>
             <input id="np-weak" type="number" min="0" max="100" placeholder="0–100" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Contactable %</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Contactable %</label>
             <input id="np-contact" type="number" min="0" max="100" placeholder="0–100" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Economic Signal</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Economic Signal</label>
             <select id="np-econ" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
               <option value="growth">Growth</option><option value="flat" selected>Flat</option><option value="shrinking">Shrinking</option>
             </select>
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Revenue Estimate</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Revenue Estimate</label>
             <select id="np-revenue" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
               <option value="high">High</option><option value="moderate" selected>Moderate</option><option value="low">Low</option><option value="very_low">Very Low</option>
             </select>
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] text-dim uppercase tracking-wide">Notes</label>
+            <label class="text-[13px] text-dim uppercase tracking-wide">Notes</label>
             <input id="np-notes" type="text" placeholder="Optional notes" class="bg-surface-2 border border-border text-[#c8cdc9] px-3 py-2 rounded text-[13px] outline-none focus:border-accent">
           </div>
           <div class="self-end">
-            <button onclick="addNichePair()" id="btn-add-pair" class="bg-accent border border-accent text-white px-4 py-2 rounded cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:opacity-90 transition-all">
+            <button onclick="addNichePair()" id="btn-add-pair" class="btn btn-primary px-6 py-3 rounded cursor-pointer text-base font-medium flex items-center gap-1.5 transition-all">
               <span class="spinner"></span><i class="ph ph-plus"></i> Add & Score
             </button>
           </div>
@@ -504,20 +600,20 @@
       </div>
 
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-map-pin mr-1.5"></i>City + Niche Pairs</h2>
-          <span class="text-[11px] text-dim" id="niche-pair-count">—</span>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-map-pin mr-1.5"></i>City + Niche Pairs</h2>
+          <span class="text-[13px] text-dim" id="niche-pair-count">—</span>
         </div>
-        <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
-          <label class="text-[11px] text-dim uppercase tracking-wide">Status</label>
-          <select id="nf-status" onchange="refreshNichePairs()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
+        <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
+          <select id="nf-status" onchange="refreshNichePairs()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
             <option value="">All</option><option value="candidate">Candidate</option><option value="scored">Scored</option><option value="validated">Validated</option><option value="approved">Approved</option><option value="parked">Parked</option><option value="dropped">Dropped</option>
           </select>
-          <label class="text-[11px] text-dim uppercase tracking-wide">Niche</label>
-          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
-          <label class="text-[11px] text-dim uppercase tracking-wide">City</label>
-          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-xs outline-none focus:border-accent">
-          <button onclick="clearNicheFilters()" class="ml-auto text-xs py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
+          <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
+          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
+          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()" class="bg-surface-2 border border-border text-[#c8cdc9] px-2.5 py-1.5 rounded text-base outline-none focus:border-accent">
+          <button onclick="clearNicheFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">
             <i class="ph ph-x"></i> Clear
           </button>
         </div>
@@ -525,8 +621,8 @@
       </div>
 
       <div class="hud-panel">
-        <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
         </div>
         <div class="overflow-y-auto max-h-[400px]" id="niche-top-pairs"></div>
       </div>
@@ -587,11 +683,13 @@
       document.querySelectorAll('.nav-tab').forEach(el => {
         el.style.borderBottomColor = 'transparent';
         el.style.color = 'var(--color-dim)';
+        el.classList.remove('nav-active');
       });
       document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
       const activeTab = document.querySelector(`.nav-tab[data-tab="${tab}"]`);
       activeTab.style.borderBottomColor = 'var(--color-accent)';
-      activeTab.style.color = 'var(--color-accent)';
+      activeTab.style.color = 'var(--color-hud-bright)';
+      activeTab.classList.add('nav-active');
       document.getElementById(`view-${tab}`).classList.add('active');
       if (tab === 'scraper') refreshScraperView();
       if (tab === 'niches') refreshNichesView();
@@ -633,11 +731,11 @@
           list.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No leads match filters</div>';
         } else {
           list.innerHTML = leads.map(l => `
-            <div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+            <div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
               <span class="flex-1 font-medium truncate">${l.businessName || l.business_name || '—'}</span>
-              <span class="text-dim text-[11px]">${l.niche || ''} · ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
+              <span class="text-dim text-[13px]">${l.niche || ''} · ${l.city || ''}${l.state ? ', ' + l.state : ''}</span>
               ${badge(l.status)}
-              <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(l.createdAt || l.created_at)}</span>
+              <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(l.createdAt || l.created_at)}</span>
             </div>
           `).join('');
         }
@@ -669,13 +767,13 @@
     }
 
     const PIPELINE_COLORS = {
-      new: '#74b9ff',
-      contacted: '#6c5ce7',
-      interested: '#00b894',
-      demo_sent: '#fdcb6e',
-      closed_won: '#00cec9',
-      closed_lost: '#e17055',
-      excluded: '#636e72',
+      new: '#8fa3b6',
+      contacted: '#f0a64b',
+      interested: '#4db07a',
+      demo_sent: '#f5c26b',
+      closed_won: '#6cc6a2',
+      closed_lost: '#d95c4a',
+      excluded: '#5a6168',
     };
 
     async function refresh() {
@@ -703,35 +801,35 @@
         jobs.forEach(j => { jobStatusCounts[j.status] = (jobStatusCounts[j.status] || 0) + 1; });
 
         document.getElementById('stats-row').innerHTML = `
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-users mr-1"></i>TOTAL CONTACTS</span>
-            <span class="text-[32px] font-bold leading-none" style="color:var(--color-hud-bright)">${allLeadsRes.data.totalDocs || allLeads.length}</span>
-            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${statusCounts.new || 0} NEW INCOMING</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all hud-glow">
+            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-users mr-1"></i>TOTAL CONTACTS</span>
+            <span class="text-[48px] font-bold leading-none" style="color:var(--color-hud-bright)">${allLeadsRes.data.totalDocs || allLeads.length}</span>
+            <span class="text-[14px] text-hud-text" style="font-family:'Bebas Neue',sans-serif">${statusCounts.new || 0} NEW INCOMING</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-thumbs-up mr-1"></i>INTERESTED</span>
-            <span class="text-[32px] font-bold leading-none text-good">${statusCounts.interested || 0}</span>
-            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${statusCounts.demo_sent || 0} DEMO DEPLOYED</span>
+           <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
+             <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-thumbs-up mr-1"></i>INTERESTED</span>
+             <span class="text-[48px] font-bold leading-none text-good">${statusCounts.interested || 0}</span>
+             <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${statusCounts.demo_sent || 0} DEMO DEPLOYED</span>
+           </div>
+           <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
+             <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-buildings mr-1"></i>ACTIVE CLIENTS</span>
+             <span class="text-[48px] font-bold leading-none text-accent">${clientsRes.data.totalDocs || clients.length}</span>
+             <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${clients.filter(c => c.status === 'active').length} OPERATIONAL</span>
+           </div>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
+            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-queue mr-1"></i>QUEUED OPS</span>
+            <span class="text-[48px] font-bold leading-none text-warn">${jobStatusCounts.queued || 0}</span>
+            <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.running || 0} ACTIVE</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-buildings mr-1"></i>ACTIVE CLIENTS</span>
-            <span class="text-[32px] font-bold leading-none text-accent">${clientsRes.data.totalDocs || clients.length}</span>
-            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${clients.filter(c => c.status === 'active').length} OPERATIONAL</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
+            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-check-circle mr-1"></i>OPS COMPLETE</span>
+            <span class="text-[48px] font-bold leading-none text-good">${jobStatusCounts.completed || 0}</span>
+            <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.failed || 0} FAIL / ${jobStatusCounts.dead || 0} KIA</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-queue mr-1"></i>QUEUED OPS</span>
-            <span class="text-[32px] font-bold leading-none text-warn">${jobStatusCounts.queued || 0}</span>
-            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.running || 0} ACTIVE</span>
-          </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-check-circle mr-1"></i>OPS COMPLETE</span>
-            <span class="text-[32px] font-bold leading-none text-good">${jobStatusCounts.completed || 0}</span>
-            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.failed || 0} FAIL / ${jobStatusCounts.dead || 0} KIA</span>
-          </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-trophy mr-1"></i>WON / LOST</span>
-            <span class="text-[32px] font-bold leading-none" style="color:var(--color-hud-bright)">${statusCounts.closed_won || 0}<span class="text-dim text-lg"> / </span>${statusCounts.closed_lost || 0}</span>
-            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">CONVERSION PIPELINE</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent-dim transition-all">
+            <span class="text-[13px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-trophy mr-1"></i>WON / LOST</span>
+            <span class="text-[48px] font-bold leading-none" style="color:var(--color-hud-bright)">${statusCounts.closed_won || 0}<span class="text-dim text-lg"> / </span>${statusCounts.closed_lost || 0}</span>
+            <span class="text-[14px] text-hud-text" style="font-family:'Share Tech Mono',monospace">CONVERSION PIPELINE</span>
           </div>
         `;
 
@@ -761,10 +859,10 @@
           jobsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No jobs yet</div>';
         } else {
           jobsList.innerHTML = jobs.slice(0, 30).map(j => `
-            <div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+            <div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
               <span class="flex-1 font-medium">${(j.jobType || j.job_type || '—').replace(/_/g, ' ')}</span>
               ${badge(j.status)}
-              <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
+              <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
             </div>
           `).join('');
         }
@@ -775,25 +873,25 @@
           clientsList.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No clients yet</div>';
         } else {
           clientsList.innerHTML = clients.slice(0, 20).map(c => `
-            <div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+            <div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
               <span class="flex-1 font-medium truncate">${c.businessName || c.business_name || '—'}</span>
-              <span class="text-dim text-[11px]">${c.plan || '—'}</span>
+              <span class="text-dim text-[13px]">${c.plan || '—'}</span>
               ${badge(c.status)}
-              <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(c.createdAt || c.created_at)}</span>
+              <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(c.createdAt || c.created_at)}</span>
             </div>
           `).join('');
         }
 
         const configPanel = document.getElementById('config-panel');
         configPanel.innerHTML = `<div class="grid grid-cols-2 gap-px bg-border">
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Phase</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${config.currentPhase ?? '—'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Niche</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${config.activeNiche ?? '—'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Cities</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${(config.activeCities || []).join(', ') || '—'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Maintenance</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${config.maintenanceMode ? '🔴 ON' : '🟢 OFF'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Email Approval</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${config.emailApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Demo Approval</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${config.demoApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Launch Approval</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${config.launchApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
-          <div class="bg-surface px-5 py-3 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Updated</span><span class="text-sm font-bold" style="color:var(--color-hud-bright)">${ago(config.updatedAt || config.updated_at)}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Phase</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.currentPhase ?? '—'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Niche</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.activeNiche ?? '—'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Cities</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${(config.activeCities || []).join(', ') || '—'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Maintenance</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.maintenanceMode ? '🔴 ON' : '🟢 OFF'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Email Approval</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.emailApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Demo Approval</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.demoApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Launch Approval</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${config.launchApprovalRequired ? '✓ Required' : '✗ Auto'}</span></div>
+          <div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace">Updated</span><span class="text-base font-bold" style="color:var(--color-hud-bright)">${ago(config.updatedAt || config.updated_at)}</span></div>
         </div>`;
 
         await refreshLeads();
@@ -927,43 +1025,43 @@
         }
 
         document.getElementById('scraper-stats-row').innerHTML = `
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Scraped Leads</span>
-            <span class="text-[28px] font-bold">${leadsRes.data.totalDocs ?? 0}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Scraped Leads</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${leadsRes.data.totalDocs ?? 0}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Emails Found</span>
-            <span class="text-[28px] font-bold text-good">${es.withEmail ?? 0}</span>
-            <span class="text-[11px] text-dim">${es.enriched ?? 0} enriched</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Emails Found</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${es.withEmail ?? 0}</span>
+            <span class="text-[13px] text-dim">${es.enriched ?? 0} enriched</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Valid Emails</span>
-            <span class="text-[28px] font-bold text-good">${es.emailValid ?? 0}</span>
-            <span class="text-[11px] text-dim">${es.emailRisky ?? 0} risky, ${es.emailInvalid ?? 0} invalid</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Valid Emails</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${es.emailValid ?? 0}</span>
+            <span class="text-[13px] text-dim">${es.emailRisky ?? 0} risky, ${es.emailInvalid ?? 0} invalid</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Outreach Ready</span>
-            <span class="text-[28px] font-bold text-accent">${es.outreachReady ?? 0}</span>
-            <span class="text-[11px] text-dim">valid email + hot/warm</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Outreach Ready</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-accent">${es.outreachReady ?? 0}</span>
+            <span class="text-[13px] text-dim">valid email + hot/warm</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Phone Fallback</span>
-            <span class="text-[28px] font-bold text-warn">${es.phoneFallbackReady ?? 0}</span>
-            <span class="text-[11px] text-dim">phone only + hot/warm</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Phone Fallback</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${es.phoneFallbackReady ?? 0}</span>
+            <span class="text-[13px] text-dim">phone only + hot/warm</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Contactable</span>
-            <span class="text-[28px] font-bold">${es.contactable ?? 0}</span>
-            <span class="text-[11px] text-dim">email or phone available</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Contactable</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${es.contactable ?? 0}</span>
+            <span class="text-[13px] text-dim">email or phone available</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Priority Split</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Priority Split</span>
             <span class="text-[14px] font-bold">🔴${es.hot ?? 0} 🟡${es.warm ?? 0} ⚪${es.low ?? 0}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Running / Queued</span>
-            <span class="text-[28px] font-bold text-warn">${running.length}</span>
-            <span class="text-[11px] text-dim">${completed.length} runs, ${failed.length} failed</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Running / Queued</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${running.length}</span>
+            <span class="text-[13px] text-dim">${completed.length} runs, ${failed.length} failed</span>
           </div>
         `;
       } catch (err) {
@@ -1117,11 +1215,11 @@
           } else {
             detail = 'Waiting...';
           }
-          return `<div class="flex items-center px-5 py-2.5 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
+          return `<div class="flex items-center px-6 py-3 border-b border-border text-[13px] gap-3 hover:bg-accent-glow transition-all">
             <span class="flex-1 font-medium">${jobType.replace(/_/g, ' ')}${input.niche ? ' — ' + input.niche : ''}${(input.cities || []).length ? ' — ' + input.cities.join(', ') : ''}</span>
-            <span class="text-dim text-[11px]">${detail}</span>
+            <span class="text-dim text-[13px]">${detail}</span>
             ${badge(j.status)}
-            <span class="text-dim text-[11px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
+            <span class="text-dim text-[13px] min-w-[70px] text-right">${ago(j.updatedAt || j.updated_at)}</span>
           </div>`;
         }).join('');
       } catch (err) {
@@ -1144,11 +1242,11 @@
     }
 
     function scoreBarHTML(score) {
-      if (score == null || score === 0) return '<span class="text-dim text-[11px]">—</span>';
+      if (score == null || score === 0) return '<span class="text-dim text-[13px]">—</span>';
       const cls = score >= 70 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
       return `<div class="flex items-center gap-2">
         <div class="score-bar"><div class="score-bar-fill ${cls}" style="width:${score}%"></div></div>
-        <span class="text-dim text-[11px] font-semibold">${score}</span>
+        <span class="text-dim text-[13px] font-semibold">${score}</span>
       </div>`;
     }
 
@@ -1162,29 +1260,29 @@
         const s = r.data;
         const row = document.getElementById('niche-stats-row');
         row.innerHTML = `
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Total Pairs</span>
-            <span class="text-[28px] font-bold">${s.total}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Total Pairs</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${s.total}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Candidates</span>
-            <span class="text-[28px] font-bold text-info">${s.byStatus.candidate}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Candidates</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-info">${s.byStatus.candidate}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Scored</span>
-            <span class="text-[28px] font-bold text-warn">${s.byStatus.scored}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Scored</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${s.byStatus.scored}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Validated</span>
-            <span class="text-[28px] font-bold text-accent">${s.byStatus.validated}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Validated</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-accent">${s.byStatus.validated}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Approved</span>
-            <span class="text-[28px] font-bold text-good">${s.byStatus.approved}/3</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Approved</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${s.byStatus.approved}/3</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Parked</span>
-            <span class="text-[28px] font-bold">${s.byStatus.parked}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Parked</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${s.byStatus.parked}</span>
           </div>
         `;
 
@@ -1449,35 +1547,35 @@
         const s = res.data;
 
         document.getElementById('discovery-stats-row').innerHTML = `
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Status</span>
-            <span class="text-[28px] font-bold text-accent">${s.config?.enabled ? 'Active' : 'Paused'}</span>
-            <span class="text-[11px] text-dim">${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Status</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-accent">${s.config?.enabled ? 'Active' : 'Paused'}</span>
+            <span class="text-[13px] text-dim">${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Total Probed</span>
-            <span class="text-[28px] font-bold">${s.totalCandidate}</span>
-            <span class="text-[11px] text-dim">candidate pairs found</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Total Probed</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;"">${s.totalCandidate}</span>
+            <span class="text-[13px] text-dim">candidate pairs found</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Scored</span>
-            <span class="text-[28px] font-bold text-warn">${s.totalScored}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Scored</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-warn">${s.totalScored}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Validated</span>
-            <span class="text-[28px] font-bold text-info">${s.totalValidated}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Validated</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-info">${s.totalValidated}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Approved</span>
-            <span class="text-[28px] font-bold text-good">${s.totalApproved}</span>
-            <span class="text-[11px] text-dim">ready for campaigns</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Approved</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-good">${s.totalApproved}</span>
+            <span class="text-[13px] text-dim">ready for campaigns</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Parked/Dropped</span>
-            <span class="text-[28px] font-bold text-dim">${s.totalParked} / ${s.totalDropped}</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Parked/Dropped</span>
+            <span class="text-[28px]" font-bold style="font-family:'Share Tech Mono',monospace;" text-dim">${s.totalParked} / ${s.totalDropped}</span>
           </div>
-          <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent transition-all">
-            <span class="text-[11px] uppercase tracking-widest text-dim">Last Run</span>
+          <div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent transition-all">
+            <span class="text-[13px] uppercase tracking-widest text-dim">Last Run</span>
             <span class="text-[14px] font-bold">${ago(s.config?.lastRun)}</span>
           </div>
         `;
@@ -1498,7 +1596,7 @@
           if (c > 0) {
             barHtml += `<div style="width:${(c/total)*100}%;background:${funnelColors[i]}" title="${status}: ${c}"></div>`;
           }
-          legendHtml += `<span class="text-[11px] text-dim flex items-center gap-1">
+          legendHtml += `<span class="text-[13px] text-dim flex items-center gap-1">
             <span class="w-2 h-2 rounded-sm inline-block" style="background:${funnelColors[i]}"></span>
             ${status} (${c})
           </span>`;
@@ -1537,3 +1635,8 @@
 
 </body>
 </html>
+
+
+
+
+
