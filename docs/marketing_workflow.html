@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agency Workflow - Marketing Overview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-dark: #0f172a;
+            --text-light: #f8fafc;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Backgrounds */
+        .glow {
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+            opacity: 0.15;
+            filter: blur(100px);
+            z-index: 0;
+            top: -20%;
+            left: -10%;
+        }
+        
+        .glow-alt {
+            position: absolute;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
+            opacity: 0.15;
+            filter: blur(100px);
+            z-index: 0;
+            bottom: -20%;
+            right: -10%;
+        }
+
+        .content-wrapper {
+            z-index: 10;
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+        }
+
+        p {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .emoji-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #f8fafc;
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            color: #cbd5e1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge-human {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-ai {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: #94a3b8;
+            font-size: 2rem;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+
+        .slide-nav {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-nav">
+        <a href="#slide-1" class="nav-dot"></a>
+        <a href="#slide-2" class="nav-dot"></a>
+        <a href="#slide-3" class="nav-dot"></a>
+        <a href="#slide-4" class="nav-dot"></a>
+        <a href="#slide-5" class="nav-dot"></a>
+        <a href="#slide-6" class="nav-dot"></a>
+    </div>
+
+    <!-- Slide 1: Intro -->
+    <section id="slide-1">
+        <div class="glow"></div>
+        <div class="content-wrapper">
+            <h1>The AI Web Agency</h1>
+            <p>A marketer's guide to how our business runs on autopilot.<br>You provide the strategy, the AI does the heavy lifting.</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <span class="emoji-icon">🧠</span>
+                    <h3>Human Strategy</h3>
+                    <p>You decide <strong>who</strong> to target and <strong>what</strong> the quality standards are.</p>
+                </div>
+                <div class="card">
+                    <span class="emoji-icon">🤖</span>
+                    <h3>AI Execution</h3>
+                    <p>The AI handles the prospecting, emailing, building, and support 24/7.</p>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">↓</div>
+    </section>
+
+    <!-- Slide 2: Discovery -->
+    <section id="slide-2">
+        <div class="glow-alt"></div>
+        <div class="content-wrapper">
+            <span class="badge badge-human">Step 1: Your Job</span>
+            <h2>Define the Target</h2>
+            <p>You don't need to find individual businesses. You just pick the playground.</p>
+            
+            <div class="card" style="margin: 0 auto; max-width: 600px;">
+                <span class="emoji-icon">🎯</span>
+                <h3>City + Niche Strategy</h3>
+                <p>For example, you tell the system: <em>"Find Plumbers in Austin, Texas."</em> The system evaluates if this is a profitable market based on competition and demand. Once you approve it, your job here is done.</p>
+            </div>
+        </div>
+        <div class="scroll-indicator">↓</div>
+    </section>
+
+    <!-- Slide 3: Prospecting -->
+    <section id="slide-3">
+        <div class="glow"></div>
+        <div class="content-wrapper">
+            <span class="badge badge-ai">Step 2: AI's Job</span>
+            <h2>The Automated Hunt</h2>
+            <p>While you sleep, the AI scours the internet for leads in your chosen market.</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <span class="emoji-icon">🕵️‍♂️</span>
+                    <h3>Finding Leads</h3>
+                    <p>The AI scans Google Maps to build a massive list of businesses in your target city and niche.</p>
+                </div>
+                <div class="card">
+                    <span class="emoji-icon">📉</span>
+                    <h3>Auditing Websites</h3>
+                    <p>It visits their websites and scores them. It looks for slow load times, terrible mobile design, and missing information.</p>
+                </div>
+                <div class="card">
+                    <span class="emoji-icon">📧</span>
+                    <h3>Finding Contacts</h3>
+                    <p>It automatically hunts down the correct email address for the business owner and verifies it so it won't bounce.</p>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">↓</div>
+    </section>
+
+    <!-- Slide 4: Outreach -->
+    <section id="slide-4">
+        <div class="glow-alt"></div>
+        <div class="content-wrapper">
+            <span class="badge badge-ai">Step 3: AI's Job</span>
+            <h2>The "Soft Hook" Outreach</h2>
+            <p>We never hard-sell. The AI sends a simple, irresistible question.</p>
+            
+            <div class="card" style="margin: 0 auto; max-width: 700px; text-align: left;">
+                <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 1rem; border-left: 4px solid var(--accent-primary);">
+                    <p style="color: #cbd5e1; font-size: 1.2rem; margin-bottom: 1rem;"><strong>From:</strong> Your Agency<br><strong>To:</strong> Austin Plumber</p>
+                    <p style="color: #f8fafc; font-size: 1.4rem; margin-bottom: 0;">"Hey, I was looking for a plumber in Austin and noticed your website looks a bit broken on mobile phones. I actually fixed the design on my end. <strong>Want me to send you a link to see what it looks like?</strong>"</p>
+                </div>
+                <p style="margin-top: 1.5rem; text-align: center; font-size: 1.1rem;"><em>Notice: No links. No prices. Just pure curiosity. This avoids spam filters and gets responses.</em></p>
+            </div>
+        </div>
+        <div class="scroll-indicator">↓</div>
+    </section>
+
+    <!-- Slide 5: The Sale -->
+    <section id="slide-5">
+        <div class="glow"></div>
+        <div class="content-wrapper">
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <span class="badge badge-ai">Step 4: AI</span>
+                <span class="badge badge-human">Step 4: Human</span>
+            </div>
+            <h2>The Demo & The Close</h2>
+            <p>When the client replies "Yes, show me", the magic happens.</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <span class="emoji-icon">✨</span>
+                    <h3>Instant Demo Generation</h3>
+                    <p>The AI automatically builds a beautiful, tailored mock-up website specifically for that client's business.</p>
+                </div>
+                <div class="card" style="border-color: rgba(245, 158, 11, 0.4);">
+                    <span class="emoji-icon">👀</span>
+                    <h3>Human Quality Check</h3>
+                    <p>Before sending, <strong>you</strong> click a button to approve the demo. We never send garbage to a prospect.</p>
+                </div>
+                <div class="card">
+                    <span class="emoji-icon">💳</span>
+                    <h3>Checkout</h3>
+                    <p>The AI sends the approved demo link along with simple monthly pricing. The client checks out via Stripe/Dodo with zero human sales calls.</p>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">↓</div>
+    </section>
+
+    <!-- Slide 6: Delivery -->
+    <section id="slide-6">
+        <div class="glow-alt"></div>
+        <div class="content-wrapper">
+            <span class="badge badge-ai">Step 5: AI's Job</span>
+            <h2>Delivery on Autopilot</h2>
+            <p>They paid. Now what? The AI takes over fulfillment.</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <span class="emoji-icon">🚀</span>
+                    <h3>Instant Deployment</h3>
+                    <p>The AI connects their custom domain and pushes their new website live to the internet immediately.</p>
+                </div>
+                <div class="card">
+                    <span class="emoji-icon">💬</span>
+                    <h3>Ongoing Support</h3>
+                    <p>The AI monitors website health and handles tier-1 customer support emails. You only get notified if the client is angry or has a complex legal/billing issue.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 4rem;">
+                <h3 style="font-size: 2rem; color: #f8fafc;">The Result?</h3>
+                <p style="font-size: 1.8rem; color: var(--accent-primary); font-weight: 800;">Scale to 50+ clients while working 5 hours a week.</p>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
