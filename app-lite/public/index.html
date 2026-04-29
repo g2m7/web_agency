@@ -17,16 +17,16 @@
       --color-surface-2: #171c18;
       --color-border: #1f2a22;
       --color-border-hud: rgba(120,200,120,0.12);
-      --color-dim: #4a5e4f;
+      --color-dim: #6a8a6f;
       --color-accent: #7dcc5c;
-      --color-accent-dim: #4a7a35;
+      --color-accent-dim: #5aa03e;
       --color-accent-glow: rgba(120,200,120,0.06);
       --color-good: #5cb85c;
       --color-warn: #c8a832;
       --color-bad: #c44030;
       --color-info: #5090b0;
-      --color-hud-text: #9abf8a;
-      --color-hud-bright: #b8e0a0;
+      --color-hud-text: #b0d8a0;
+      --color-hud-bright: #d0f0c0;
     }
   </style>
   <style>
@@ -34,14 +34,13 @@
     *, *::before, *::after { box-sizing: border-box; }
     body {
       font-family: 'Rajdhani', 'Inter', system-ui, sans-serif;
-      background:
+      background-color: #0a0c0b;
+      background-image:
         repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px),
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(90,140,70,0.04) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(50,80,60,0.03) 0%, transparent 50%),
-        var(--color-bg);
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(50,80,60,0.03) 0%, transparent 50%);
       background-attachment: fixed;
-      color: var(--color-hud-text);
-      font-weight: 500;
+      color: #b0d8a0;
     }
     body::before {
       content: '';
@@ -198,7 +197,7 @@
 
       <div class="hud-panel pt-4 col-span-full">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE</h2>
         </div>
         <div class="px-5 pt-4">
           <div class="pipeline-bar" id="pipeline-bar"></div>
@@ -208,7 +207,7 @@
 
       <div class="hud-panel col-span-full">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-users mr-1.5"></i>Leads</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-users mr-1.5"></i>Leads</h2>
           <span class="text-[11px] text-dim" id="lead-count">—</span>
         </div>
         <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
@@ -241,14 +240,14 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="hud-panel overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
           <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-            <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-queue mr-1.5"></i>Jobs</h2>
+            <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-queue mr-1.5"></i>Jobs</h2>
             <span class="text-[11px] text-dim" id="job-count">—</span>
           </div>
           <div class="overflow-y-auto max-h-[360px]" id="jobs-list"></div>
         </div>
         <div class="hud-panel overflow-hidden shadow-[inset_0_1px_6px_rgba(0,0,0,0.35)]">
           <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-            <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-buildings mr-1.5"></i>Clients</h2>
+            <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-buildings mr-1.5"></i>Clients</h2>
             <span class="text-[11px] text-dim" id="client-count">—</span>
           </div>
           <div class="overflow-y-auto max-h-[360px]" id="clients-list"></div>
@@ -257,7 +256,7 @@
 
       <div class="hud-panel col-span-full">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
         </div>
         <div class="overflow-y-auto" id="config-panel"></div>
       </div>
@@ -267,7 +266,7 @@
     <div id="view-discovery" class="view flex flex-col gap-5">
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
           <div class="flex gap-2">
             <button onclick="loadDiscoveryConfig()" class="text-[11px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
             <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[11px] py-1 px-3 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all">Save Config</button>
@@ -314,7 +313,7 @@
 
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
         </div>
         <div class="px-5 pt-4">
           <div class="pipeline-bar" id="discovery-funnel-bar"></div>
@@ -327,7 +326,7 @@
     <div id="view-scraper" class="view flex flex-col gap-5">
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
           <div class="flex gap-2">
             <button onclick="loadScraperConfig()" class="text-[11px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] rounded cursor-pointer hover:border-accent transition-all">Reset</button>
             <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[11px] py-1 px-3 bg-accent border border-accent text-white rounded cursor-pointer hover:opacity-90 transition-all">Save Config</button>
@@ -383,7 +382,7 @@
 
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
           <span class="text-[11px] text-dim" id="scraper-lead-count">—</span>
         </div>
         <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
@@ -428,7 +427,7 @@
 
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Scraper Jobs</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Scraper Jobs</h2>
           <span class="text-[11px] text-dim" id="scraper-job-count">—</span>
         </div>
         <div class="overflow-y-auto max-h-[300px]" id="scraper-jobs-list"></div>
@@ -441,7 +440,7 @@
 
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
         </div>
         <div class="grid grid-cols-2 gap-4 p-5">
           <div class="flex flex-col gap-1.5">
@@ -506,7 +505,7 @@
 
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-map-pin mr-1.5"></i>City + Niche Pairs</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-map-pin mr-1.5"></i>City + Niche Pairs</h2>
           <span class="text-[11px] text-dim" id="niche-pair-count">—</span>
         </div>
         <div class="flex gap-2 px-5 py-3 border-b border-border flex-wrap items-center">
@@ -527,7 +526,7 @@
 
       <div class="hud-panel">
         <div class="px-5 py-2.5 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[10px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
+          <h2 class="text-[11px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
         </div>
         <div class="overflow-y-auto max-h-[400px]" id="niche-top-pairs"></div>
       </div>
@@ -705,34 +704,34 @@
 
         document.getElementById('stats-row').innerHTML = `
           <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[9px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-users mr-1"></i>TOTAL CONTACTS</span>
+            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-users mr-1"></i>TOTAL CONTACTS</span>
             <span class="text-[32px] font-bold leading-none" style="color:var(--color-hud-bright)">${allLeadsRes.data.totalDocs || allLeads.length}</span>
-            <span class="text-[10px] text-dim" style="font-family:'Share Tech Mono',monospace">${statusCounts.new || 0} NEW INCOMING</span>
+            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${statusCounts.new || 0} NEW INCOMING</span>
           </div>
           <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[9px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-thumbs-up mr-1"></i>INTERESTED</span>
+            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-thumbs-up mr-1"></i>INTERESTED</span>
             <span class="text-[32px] font-bold leading-none text-good">${statusCounts.interested || 0}</span>
-            <span class="text-[10px] text-dim" style="font-family:'Share Tech Mono',monospace">${statusCounts.demo_sent || 0} DEMO DEPLOYED</span>
+            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${statusCounts.demo_sent || 0} DEMO DEPLOYED</span>
           </div>
           <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[9px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-buildings mr-1"></i>ACTIVE CLIENTS</span>
+            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-buildings mr-1"></i>ACTIVE CLIENTS</span>
             <span class="text-[32px] font-bold leading-none text-accent">${clientsRes.data.totalDocs || clients.length}</span>
-            <span class="text-[10px] text-dim" style="font-family:'Share Tech Mono',monospace">${clients.filter(c => c.status === 'active').length} OPERATIONAL</span>
+            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${clients.filter(c => c.status === 'active').length} OPERATIONAL</span>
           </div>
           <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[9px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-queue mr-1"></i>QUEUED OPS</span>
+            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-queue mr-1"></i>QUEUED OPS</span>
             <span class="text-[32px] font-bold leading-none text-warn">${jobStatusCounts.queued || 0}</span>
-            <span class="text-[10px] text-dim" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.running || 0} ACTIVE</span>
+            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.running || 0} ACTIVE</span>
           </div>
           <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[9px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-check-circle mr-1"></i>OPS COMPLETE</span>
+            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-check-circle mr-1"></i>OPS COMPLETE</span>
             <span class="text-[32px] font-bold leading-none text-good">${jobStatusCounts.completed || 0}</span>
-            <span class="text-[10px] text-dim" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.failed || 0} FAIL / ${jobStatusCounts.dead || 0} KIA</span>
+            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">${jobStatusCounts.failed || 0} FAIL / ${jobStatusCounts.dead || 0} KIA</span>
           </div>
           <div class="hud-panel p-4 flex flex-col gap-1 hover:border-accent-dim transition-all">
-            <span class="text-[9px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-trophy mr-1"></i>WON / LOST</span>
+            <span class="text-[11px] uppercase tracking-[2px] text-accent-dim" style="font-family:'Share Tech Mono',monospace"><i class="ph ph-trophy mr-1"></i>WON / LOST</span>
             <span class="text-[32px] font-bold leading-none" style="color:var(--color-hud-bright)">${statusCounts.closed_won || 0}<span class="text-dim text-lg"> / </span>${statusCounts.closed_lost || 0}</span>
-            <span class="text-[10px] text-dim" style="font-family:'Share Tech Mono',monospace">CONVERSION PIPELINE</span>
+            <span class="text-[12px] text-hud-text" style="font-family:'Share Tech Mono',monospace">CONVERSION PIPELINE</span>
           </div>
         `;
 
