@@ -5,7 +5,13 @@
 
 ## What Was Done (This Session)
 
-### Dashboard overhaul (`app-lite/public/index.html`)
+### Dashboard JS syntax fix (`app-lite/public/index.html`)
+Fixed `SyntaxError: Unexpected token '??'` on line 1469 that killed the entire `<script>` block — preventing all tabs from loading, all data from rendering, and all tab navigation from working.
+- **Root cause**: `&&` mixed with `??` without parentheses: `r.data.scores && r.data.scores.totalScore ?? r.data.total_score ?? '?'`. JS requires explicit grouping when mixing `&&` with `??` due to operator precedence rules.
+- **Fix**: Wrapped in parentheses: `(r.data.scores && r.data.scores.totalScore) ?? r.data.total_score ?? '?'`.
+- Verified: all 6 tabs (Pipeline, Discovery, Lead Gen, Niches, Activity, Config) now switch and render correctly. 104 leads populate the Pipeline kanban. Zero console errors.
+
+### Dashboard overhaul (`app-lite/public/index.html`) — previous session
 Rebuilt dashboard to be workflow-centric instead of a generic admin panel.
 
 - **Fixed pipeline bar & status alignment**: Pipeline colors and badges now match actual `LEAD_STATUSES` from `types/index.ts` (`new, scored, contacted, replied_interested, replied_objection, demo_sent, paid, lost, archived`). Removed ghost statuses (`interested, excluded, closed_won, closed_lost`) that didn't exist in the state machine.

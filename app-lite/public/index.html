@@ -1466,7 +1466,7 @@
     async function scorePair(id) {
       try {
         var r = await axios.patch(API + '/api/niches/' + id + '/score', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
-        var total = r.data.scores && r.data.scores.totalScore ?? r.data.total_score ?? '?';
+        var total = (r.data.scores && r.data.scores.totalScore) ?? r.data.total_score ?? '?';
         showToast('\u2713 Scored: ' + total + '/100', 'success');
         refreshNichesView();
       } catch (err) {
