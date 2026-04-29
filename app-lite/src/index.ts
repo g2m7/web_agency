@@ -57,6 +57,11 @@ app.get('/', async (c) => {
   return c.html(html)
 })
 
+app.get('/about', async (c) => {
+  const html = await Bun.file(import.meta.dir + '/../public/about.html').text()
+  return c.html(html)
+})
+
 // ── Startup ─────────────────────────────────────────────────
 const port = parseInt(process.env.PORT ?? '3006', 10)
 

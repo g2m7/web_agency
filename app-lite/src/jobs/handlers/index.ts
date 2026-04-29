@@ -14,16 +14,37 @@ import { scoreNichePair, type NicheRawData } from '../../scraper/niche-scorer'
 
 export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Record<string, unknown>> {
   const config = await db.findGlobal({ slug: 'system-config' })
-  const niche = config.activeNiche ?? config.active_niche ?? 'hvac'
-  const cities: string[] = config.activeCities ?? config.active_cities ?? []
+  const approvedPairsRes = await db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'approved' } }, limit: 50 })
+  const approvedPairs = approvedPairsRes.docs
 
   const existingLeads = await db.find({ collection: 'leads', limit: 0 })
   const leadsBefore = existingLeads.totalDocs
 
-  const cityStates = cities.map((entry) => parseCityState(entry))
+  let allBusinesses: Array<{ niche: string; city: string; state: string; biz: ScrapedBusiness; pairId?: string }> = []
+  const errors: string[] = []
+
+  // Group by niche so we can use scrapeMultipleCities
+  const nichesToScrape = new Map<string, { city: string; state: string; pairId?: string }[]>()
+
+  if (approvedPairs.length > 0) {
+    for (const p of approvedPairs) {
+      if (!nichesToScrape.has(p.niche)) nichesToScrape.set(p.niche, [])
+      nichesToScrape.get(p.niche)!.push({ city: p.city, state: p.state, pairId: p.id })
+    }
+  } else {
+    // Fallback to legacy global config
+    const niche = config.activeNiche ?? config.active_niche ?? 'hvac'
+    const cities: string[] = config.activeCities ?? config.active_cities ?? []
+    nichesToScrape.set(niche, cities.map(c => {
+      const parsed = parseCityState(c)
+      return { city: parsed.city, state: parsed.state }
+    }))
+  }
+
+  const totalCities = Array.from(nichesToScrape.values()).reduce((acc, val) => acc + val.length, 0)
 
   const scraperOptions: ScraperOptions = {
-    signal: AbortSignal.timeout(Math.max(cities.length * 60_000, 120_000)),
+    signal: AbortSignal.timeout(Math.max(totalCities * 60_000, 120_000)),
     maxRequestsPerMinute: 8,
     maxRetries: 3,
     retryBaseDelayMs: 4000,
@@ -35,27 +56,27 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
     })),
   }
 
-  let allBusinesses: Array<{ city: string; state: string; biz: ScrapedBusiness }> = []
-  const errors: string[] = []
-
-  try {
-    const results = await scrapeMultipleCities(niche, cityStates, scraperOptions)
-    for (const [key, businesses] of results) {
-      const { city, state } = parseCityState(key)
-      for (const biz of businesses) {
-        allBusinesses.push({ city, state, biz })
+  for (const [niche, cityStates] of nichesToScrape.entries()) {
+    try {
+      const results = await scrapeMultipleCities(niche, cityStates, scraperOptions)
+      for (const [key, businesses] of results) {
+        const { city, state } = parseCityState(key)
+        const pairObj = cityStates.find(c => c.city === city && c.state === state)
+        for (const biz of businesses) {
+          allBusinesses.push({ niche, city, state, biz, pairId: pairObj?.pairId })
+        }
       }
-    }
-  } catch (err: any) {
-    if (err.name !== 'AbortError') {
-      errors.push(`batch scrape: ${err.message}`)
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        errors.push(`batch scrape (${niche}): ${err.message}`)
+      }
     }
   }
 
   let leadsCreated = 0
   let leadsSkipped = 0
 
-  for (const { city, state, biz } of allBusinesses) {
+  for (const { niche, city, state, biz, pairId } of allBusinesses) {
     const nicheCityKey = buildNicheCityKey(niche, city, biz.name)
 
     const existing = await db.find({
@@ -91,6 +112,7 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
           exclusionReason: null,
           source: 'google_maps',
           nicheCityKey,
+          nicheCityPairId: pairId ?? null,
           emailSource: null,
           emailConfidence: null,
           emailStatus: 'pending',
@@ -119,8 +141,8 @@ export async function handleLeadGen(db: DbClient, job: ScheduledJob): Promise<Re
 
   return {
     status: 'completed',
-    niche,
-    cities,
+    total_niches: nichesToScrape.size,
+    total_cities: totalCities,
     leads_before: leadsBefore,
     leads_created: leadsCreated,
     leads_skipped: leadsSkipped,

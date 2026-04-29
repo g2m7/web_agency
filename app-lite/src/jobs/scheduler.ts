@@ -14,7 +14,7 @@ export async function startRecurringJobs(db: DbClient) {
     collection: 'jobs',
     where: {
       and: [
-        { job_type: { in: ['lead_gen', 'monthly_report', 'churn_check'] } },
+        { job_type: { in: ['lead_gen', 'monthly_report', 'churn_check', 'niche_discover'] } },
         { status: { equals: 'queued' } },
       ],
     },
@@ -31,6 +31,23 @@ export async function startRecurringJobs(db: DbClient) {
   }
   if (!existingTypes.has('churn_check')) {
     await enqueueJob(db, 'churn_check', {})
+  }
+
+  // Niche discovery — check if interval has elapsed
+  if (!existingTypes.has('niche_discover')) {
+    const config = await db.findGlobal({ slug: 'system-config' })
+    const enabled = config.discoveryEnabled ?? config.discovery_enabled ?? true
+    const intervalHours = config.discoveryIntervalHours ?? config.discovery_interval_hours ?? 6
+    const lastRun = config.discoveryLastRun ?? config.discovery_last_run
+
+    if (enabled) {
+      const shouldRun = !lastRun ||
+        (Date.now() - new Date(lastRun).getTime()) > intervalHours * 60 * 60 * 1000
+
+      if (shouldRun) {
+        await enqueueJob(db, 'niche_discover', { triggeredBy: 'scheduler' })
+      }
+    }
   }
 
   console.log('Recurring jobs enqueued')

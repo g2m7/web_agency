@@ -54,13 +54,13 @@ Step 8: Support, Retention, Billing
 
 ## Detailed flow (with ownership)
 
-### Step 0 - Niche hunting (city+niche pair selection)
+### Step 0 - Autonomous Niche Discovery (city+niche pair selection)
 
-**Goal:** choose profitable, contactable city+niche pairs before scraping at scale.
+**Goal:** continuously discover and qualify profitable, contactable city+niche pairs before scraping at scale.
 
 - Inputs: demand, competition, website weakness rate, contactability, revenue potential.
-- Process: score pairs on the 100-point model and run mini-validation scrape.
-- Output: approved/parked/dropped city+niche pairs.
+- Process: Autonomous discovery engine generates and evaluates pairs, scoring them on a 100-point model and running mini-validation scrapes. Human-in-the-loop oversight available via dashboard configuration (auto-approve vs manual gating).
+- Output: approved/parked/dropped city+niche pairs ready to be ingested by the lead generation engine.
 - Primary reference: `docs/22-Niche-Hunting-SOP.md`.
 
 ### Step 1 - Lead generation
@@ -171,7 +171,8 @@ Primary references: `docs/13-Risk-Register.md`, `docs/14-Implementation-Roadmap.
 
 ## Job and trigger map
 
-- `lead_gen` -> creates leads from active targeting configuration.
+- `niche_discovery` -> continuously evaluates and scores new city+niche pair candidates.
+- `lead_gen` -> creates leads from the pool of approved autonomous niche-city pairs (falling back to legacy config if empty).
 - `email_enrich` / `email_validate` -> improves outreach readiness.
 - `follow_up_1` / `follow_up_2` -> outreach cadence jobs.
 - `demo_build` -> triggered by interested reply transition.

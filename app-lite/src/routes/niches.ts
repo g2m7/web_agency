@@ -1,8 +1,180 @@
 import { Hono } from 'hono'
 import { getDb } from '../db'
 import { scoreNichePair, evaluateGoNoGo, type NicheRawData } from '../scraper/niche-scorer'
+import { US_CITIES } from '../data/us-cities'
+import { NICHE_LIBRARY, getVerticals } from '../data/niche-library'
 
 export const nicheRoutes = new Hono()
+
+// ── Discovery management ────────────────────────────────────
+
+nicheRoutes.post('/discover', async (c) => {
+  const db = getDb()
+  const body = await c.req.json().catch(() => ({})) as { batchSize?: number }
+
+  // Check if a discovery job is already running
+  const running = await db.find({
+    collection: 'jobs',
+    where: {
+      and: [
+        { job_type: { equals: 'niche_discover' } },
+        { status: { in: ['queued', 'running'] } },
+      ],
+    },
+    limit: 1,
+  })
+
+  if (running.totalDocs > 0) {
+    return c.json({ error: 'A discovery job is already in progress', jobId: running.docs[0]?.id }, 409)
+  }
+
+  const job = await db.create({
+    collection: 'jobs',
+    data: {
+      job_type: 'niche_discover',
+      status: 'queued',
+      input_data: { batchSize: body.batchSize ?? 20, triggeredBy: 'manual' },
+      run_at: new Date().toISOString(),
+      max_attempts: 1,
+      attempts: 0,
+    },
+  })
+
+  return c.json({ queued: true, jobId: job.id, jobType: 'niche_discover' }, 201)
+})
+
+nicheRoutes.get('/discover/config', async (c) => {
+  const db = getDb()
+  const config = await db.findGlobal({ slug: 'system-config' })
+
+  return c.json({
+    enabled: config.discoveryEnabled ?? config.discovery_enabled ?? true,
+    batchSize: config.discoveryBatchSize ?? config.discovery_batch_size ?? 20,
+    intervalHours: config.discoveryIntervalHours ?? config.discovery_interval_hours ?? 6,
+    autoApprove: config.discoveryAutoApprove ?? config.discovery_auto_approve ?? false,
+    excludeNiches: config.discoveryExcludeNiches ?? config.discovery_exclude_niches ?? [],
+    priorityCities: config.discoveryPriorityCities ?? config.discovery_priority_cities ?? [],
+    lastRun: config.discoveryLastRun ?? config.discovery_last_run ?? null,
+    humanReviewCount: config.discoveryHumanReviewCount ?? config.discovery_human_review_count ?? 0,
+    availableCities: US_CITIES.length,
+    availableNiches: NICHE_LIBRARY.length,
+    verticals: getVerticals(),
+  })
+})
+
+nicheRoutes.patch('/discover/config', async (c) => {
+  const db = getDb()
+  const body = await c.req.json()
+  const updates: Record<string, unknown> = {}
+
+  if (body.enabled !== undefined) updates.discovery_enabled = body.enabled
+  if (body.batchSize !== undefined) updates.discovery_batch_size = body.batchSize
+  if (body.intervalHours !== undefined) updates.discovery_interval_hours = body.intervalHours
+  if (body.autoApprove !== undefined) updates.discovery_auto_approve = body.autoApprove
+  if (body.excludeNiches !== undefined) updates.discovery_exclude_niches = body.excludeNiches
+  if (body.priorityCities !== undefined) updates.discovery_priority_cities = body.priorityCities
+
+  const config = await db.updateGlobal({ slug: 'system-config', data: updates })
+  return c.json(config)
+})
+
+nicheRoutes.get('/discover/stats', async (c) => {
+  const db = getDb()
+
+  const [all, candidates, scored, validated, approved, parked, dropped] = await Promise.all([
+    db.find({ collection: 'niche-city-pairs', limit: 0 }),
+    db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'candidate' } }, limit: 0 }),
+    db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'scored' } }, limit: 0 }),
+    db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'validated' } }, limit: 0 }),
+    db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'approved' } }, limit: 0 }),
+    db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'parked' } }, limit: 0 }),
+    db.find({ collection: 'niche-city-pairs', where: { status: { equals: 'dropped' } }, limit: 0 }),
+  ])
+
+  // Discovery job history
+  const discoveryJobs = await db.find({
+    collection: 'jobs',
+    where: { job_type: { equals: 'niche_discover' } },
+    limit: 10,
+    sort: '-createdAt',
+  })
+
+  // Unique cities and niches discovered
+  const allPairs = await db.find({ collection: 'niche-city-pairs', limit: 5000 })
+  const uniqueCities = new Set(allPairs.docs.map((p: any) => `${p.city}, ${p.state}`))
+  const uniqueNiches = new Set(allPairs.docs.map((p: any) => p.niche))
+
+  return c.json({
+    pipeline: {
+      total: all.totalDocs,
+      candidate: candidates.totalDocs,
+      scored: scored.totalDocs,
+      validated: validated.totalDocs,
+      approved: approved.totalDocs,
+      parked: parked.totalDocs,
+      dropped: dropped.totalDocs,
+    },
+    coverage: {
+      uniqueCities: uniqueCities.size,
+      uniqueNiches: uniqueNiches.size,
+      topNiches: [...uniqueNiches].slice(0, 20),
+    },
+    recentJobs: discoveryJobs.docs.map((j: any) => ({
+      id: j.id,
+      status: j.status,
+      createdAt: j.createdAt ?? j.created_at,
+      completedAt: j.completedAt ?? j.completed_at,
+      output: j.outputData ?? j.output_data,
+    })),
+  })
+})
+
+// ── Approve pair (with human review tracking) ───────────────
+
+nicheRoutes.patch('/:id/approve', async (c) => {
+  const db = getDb()
+  const id = c.req.param('id')
+
+  let pair: any
+  try {
+    pair = await db.findByID({ collection: 'niche-city-pairs', id })
+  } catch {
+    return c.json({ error: 'Pair not found' }, 404)
+  }
+
+  // Check 3-sprint cap
+  const approvedCount = await db.find({
+    collection: 'niche-city-pairs',
+    where: { status: { equals: 'approved' } },
+    limit: 0,
+  })
+
+  if (approvedCount.totalDocs >= 3) {
+    return c.json({
+      error: 'Maximum 3 simultaneous approved pairs. Park or drop an existing pair first.',
+    }, 409)
+  }
+
+  await db.update({
+    collection: 'niche-city-pairs',
+    id,
+    data: {
+      status: 'approved',
+      sprint_start: new Date().toISOString(),
+      notes: 'Human-approved',
+    },
+  })
+
+  // Increment human review count
+  const config = await db.findGlobal({ slug: 'system-config' })
+  const currentCount = config.discoveryHumanReviewCount ?? config.discovery_human_review_count ?? 0
+  await db.updateGlobal({
+    slug: 'system-config',
+    data: { discovery_human_review_count: currentCount + 1 },
+  })
+
+  return c.json({ approved: true, id, humanReviewCount: currentCount + 1 })
+})
 
 // ── List all pairs ──────────────────────────────────────────
 

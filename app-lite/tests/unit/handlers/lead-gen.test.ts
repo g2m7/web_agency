@@ -97,20 +97,49 @@ describe('handleLeadGen', () => {
     vi.clearAllMocks()
   })
 
-  it('reads SystemConfig for niche and cities', async () => {
+  it('reads SystemConfig for fallback niche and cities if no approved pairs', async () => {
     const db = mockDb()
     mockedScrapeMultiple.mockResolvedValueOnce(new Map())
     const result = await handleLeadGen(db, mockJob())
 
     expect(db.findGlobal).toHaveBeenCalledWith({ slug: 'system-config' })
-    expect(result.niche).toBe('hvac')
-    expect(result.cities).toEqual(['Austin, TX'])
+    expect(result.total_niches).toBe(1)
+    expect(result.total_cities).toBe(1)
+  })
+
+  it('uses approved niche-city pairs if available', async () => {
+    const db = mockDb({
+      find: vi.fn()
+        // 1. niche-city-pairs
+        .mockResolvedValueOnce({
+          totalDocs: 2,
+          docs: [
+            { id: 'p1', niche: 'roofing', city: 'Dallas', state: 'TX' },
+            { id: 'p2', niche: 'plumbing', city: 'Dallas', state: 'TX' }
+          ]
+        })
+        // 2. existing leads count
+        .mockResolvedValueOnce({ totalDocs: 0, docs: [] })
+        // subsequent lead existing checks
+        .mockResolvedValue({ totalDocs: 0, docs: [] }),
+    })
+    
+    mockedScrapeMultiple.mockResolvedValue(new Map())
+    const result = await handleLeadGen(db, mockJob())
+
+    expect(db.find).toHaveBeenCalledWith({ collection: 'niche-city-pairs', where: { status: { equals: 'approved' } }, limit: 50 })
+    expect(result.total_niches).toBe(2)
+    expect(result.total_cities).toBe(2)
   })
 
   it('returns leads_before count', async () => {
     const db = mockDb({
       find: vi.fn()
+        // 1. niche-city-pairs
+        .mockResolvedValueOnce({ totalDocs: 0, docs: [] })
+        // 2. existingLeads
         .mockResolvedValueOnce({ totalDocs: 5, docs: [] })
+        // subsequent lead existing checks
         .mockResolvedValue({ totalDocs: 0, docs: [] }),
     })
     mockedScrapeMultiple.mockResolvedValueOnce(new Map())
@@ -132,8 +161,13 @@ describe('handleLeadGen', () => {
   it('skips leads that already exist', async () => {
     const db = mockDb({
       find: vi.fn()
+        // 1. niche-city-pairs
         .mockResolvedValueOnce({ totalDocs: 0, docs: [] })
+        // 2. existing leads count
+        .mockResolvedValueOnce({ totalDocs: 0, docs: [] })
+        // 3. lead existing check 1
         .mockResolvedValueOnce({ totalDocs: 1, docs: [{ id: 'existing' }] })
+        // 4. lead existing check 2
         .mockResolvedValue({ totalDocs: 0, docs: [] }),
     })
     mockedScrapeMultiple.mockResolvedValueOnce(singleCityResult('Austin', 'TX', MOCK_BUSINESSES))

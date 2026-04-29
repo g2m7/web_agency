@@ -56,6 +56,7 @@ export const JOB_TYPES = [
   'email_validate',
   'niche_score',
   'niche_validate',
+  'niche_discover',
   'follow_up_1',
   'follow_up_2',
   'demo_build',

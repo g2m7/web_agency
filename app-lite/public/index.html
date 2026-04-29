@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -519,16 +519,18 @@
   <div class="header">
     <h1><span class="dot"></span> Agency Engine</h1>
     <div class="header-meta">
-      <span id="phase">Phase â€”</span>
-      <span id="uptime">â€”</span>
-      <span id="last-refresh">â€”</span>
-      <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:12px">ðŸŒ™</button>
+      <a href="/about" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:500">System Docs</a>
+      <span id="phase">Phase —</span>
+      <span id="uptime">—</span>
+      <span id="last-refresh">—</span>
+      <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:12px">🌙</button>
     </div>
   </div>
 
   <div class="nav-tabs">
     <div class="nav-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</div>
     <div class="nav-tab" data-tab="niches" onclick="switchTab('niches')">Niches</div>
+    <div class="nav-tab" data-tab="discovery" onclick="switchTab('discovery')">Discovery</div>
     <div class="nav-tab" data-tab="scraper" onclick="switchTab('scraper')">Scraper</div>
   </div>
 
@@ -621,6 +623,70 @@
           <div class="panel-body" id="config-panel"></div>
         </div>
       </div>
+
+    <!-- ===================== DISCOVERY VIEW ===================== -->
+    <div id="view-discovery" class="view">
+
+      <!-- Discovery Config -->
+      <div class="panel full-width">
+        <div class="panel-header">
+          <h2>Discovery Config</h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn" onclick="loadDiscoveryConfig()" style="font-size:11px;padding:5px 12px">Reset</button>
+            <button class="btn btn-accent" onclick="saveDiscoveryConfig()" id="btn-discovery-save" style="font-size:11px;padding:5px 12px">Save Config</button>
+          </div>
+        </div>
+        <div class="scraper-config-form">
+          <div class="form-group" style="flex-direction:row;align-items:center">
+            <input type="checkbox" id="dc-enabled">
+            <label for="dc-enabled" style="margin-bottom:0">Enabled</label>
+          </div>
+          <div class="form-group" style="flex-direction:row;align-items:center">
+            <input type="checkbox" id="dc-auto-approve">
+            <label for="dc-auto-approve" style="margin-bottom:0">Auto Approve</label>
+          </div>
+          <div class="form-group">
+            <label>Batch Size</label>
+            <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20">
+          </div>
+          <div class="form-group">
+            <label>Interval (Hours)</label>
+            <input id="dc-interval" type="number" min="1" max="168" placeholder="6">
+          </div>
+          <div class="form-group full-width">
+            <label>Priority Cities (one per line: "City, ST")</label>
+            <textarea id="dc-priority-cities" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Exclude Niches (one per line)</label>
+            <textarea id="dc-exclude-niches" rows="3" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;resize:vertical"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-bar" style="margin-bottom: 0;">
+        <button class="btn btn-accent" onclick="triggerDiscovery()" id="btn-trigger-discovery">
+          <span class="spinner"></span> ðŸ”Ž Trigger Discovery
+        </button>
+        <button class="btn" onclick="refreshDiscoveryView()">
+          <span class="spinner"></span> Refresh
+        </button>
+      </div>
+
+      <!-- Discovery Stats -->
+      <div class="stats-row" id="discovery-stats-row"></div>
+
+      <!-- Funnel visualization -->
+      <div class="panel full-width">
+        <div class="panel-header"><h2>Discovery Funnel</h2></div>
+        <div style="padding: 16px 0 0;">
+          <div class="pipeline-bar" id="discovery-funnel-bar"></div>
+          <div style="display:flex; gap:16px; padding: 0 20px 16px; flex-wrap:wrap;" id="discovery-funnel-legend"></div>
+        </div>
+      </div>
+
+    </div>
 
     <!-- ===================== SCRAPER VIEW ===================== -->
     <div id="view-scraper" class="view">
@@ -931,6 +997,7 @@
       document.getElementById(`view-${tab}`).classList.add('active');
       if (tab === 'scraper') refreshScraperView();
       if (tab === 'niches') refreshNichesView();
+      if (tab === 'discovery') refreshDiscoveryView();
     }
 
     // â”€â”€ Trigger a job (dashboard) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1723,6 +1790,153 @@
       }
     }
 
+    // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+    // â”€â”€ DISCOVERY VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+
+    let discoveryConfigDirty = false;
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('#dc-enabled, #dc-auto-approve, #dc-batch-size, #dc-interval, #dc-priority-cities, #dc-exclude-niches').forEach(el => {
+        el.addEventListener('input', () => { discoveryConfigDirty = true; });
+        el.addEventListener('change', () => { discoveryConfigDirty = true; });
+      });
+    });
+
+    async function refreshDiscoveryView() {
+      const tasks = [refreshDiscoveryStats()];
+      if (!discoveryConfigDirty) tasks.push(loadDiscoveryConfig());
+      await Promise.all(tasks);
+    }
+
+    async function loadDiscoveryConfig() {
+      try {
+        const res = await axios.get(API + '/api/niches/discover/config', { headers });
+        const c = res.data;
+        document.getElementById('dc-enabled').checked = !!c.enabled;
+        document.getElementById('dc-auto-approve').checked = !!c.autoApprove;
+        document.getElementById('dc-batch-size').value = c.batchSize || 20;
+        document.getElementById('dc-interval').value = c.intervalHours || 6;
+        document.getElementById('dc-priority-cities').value = (c.priorityCities || []).join('\\n');
+        document.getElementById('dc-exclude-niches').value = (c.excludeNiches || []).join('\\n');
+        discoveryConfigDirty = false;
+      } catch (err) {
+        console.error('Failed to load discovery config:', err);
+      }
+    }
+
+    async function saveDiscoveryConfig() {
+      const btn = document.getElementById('btn-discovery-save');
+      btn.classList.add('loading');
+      try {
+        const priorityCities = document.getElementById('dc-priority-cities').value
+          .split('\\n').map(s => s.trim()).filter(Boolean);
+        const excludeNiches = document.getElementById('dc-exclude-niches').value
+          .split('\\n').map(s => s.trim()).filter(Boolean);
+
+        const body = {
+          enabled: document.getElementById('dc-enabled').checked,
+          autoApprove: document.getElementById('dc-auto-approve').checked,
+          batchSize: parseInt(document.getElementById('dc-batch-size').value) || 20,
+          intervalHours: parseInt(document.getElementById('dc-interval').value) || 6,
+          priorityCities,
+          excludeNiches
+        };
+
+        await axios.patch(API + '/api/niches/discover/config', body, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('âœ“ Discovery config saved', 'success');
+        discoveryConfigDirty = false;
+        await loadDiscoveryConfig();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function triggerDiscovery() {
+      const btn = document.getElementById('btn-trigger-discovery');
+      btn.classList.add('loading');
+      try {
+        await axios.post(API + '/api/niches/discover', {}, { headers: { ...headers, 'Content-Type': 'application/json' } });
+        showToast('âœ“ Discovery triggered', 'success');
+        refreshDiscoveryView();
+      } catch (err) {
+        showToast('âœ— ' + (err.response?.data?.error || err.message), 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function refreshDiscoveryStats() {
+      try {
+        const res = await axios.get(API + '/api/niches/discover/stats', { headers });
+        const s = res.data;
+        
+        document.getElementById('discovery-stats-row').innerHTML = \`
+          <div class="stat-card">
+            <span class="label">Status</span>
+            <span class="value" style="color:var(--accent)">\${s.config?.enabled ? 'Active' : 'Paused'}</span>
+            <span class="sub">\${s.config?.autoApprove ? 'Auto-approve ON' : 'Human review required'}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Total Probed</span>
+            <span class="value">\${s.totalCandidate}</span>
+            <span class="sub">candidate pairs found</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Scored</span>
+            <span class="value" style="color:var(--yellow)">\${s.totalScored}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Validated</span>
+            <span class="value" style="color:var(--blue)">\${s.totalValidated}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Approved</span>
+            <span class="value" style="color:var(--green)">\${s.totalApproved}</span>
+            <span class="sub">ready for campaigns</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Parked/Dropped</span>
+            <span class="value" style="color:var(--text-dim)">\${s.totalParked} / \${s.totalDropped}</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Last Run</span>
+            <span class="value" style="font-size:14px">\${ago(s.config?.lastRun)}</span>
+          </div>
+        \`;
+
+        // Funnel bar
+        const funnelStatuses = ['candidate', 'scored', 'validated', 'approved'];
+        const funnelCounts = [s.totalCandidate, s.totalScored, s.totalValidated, s.totalApproved];
+        const funnelColors = ['#74b9ff', '#fdcb6e', '#3b82f6', '#00b894'];
+        
+        const total = funnelCounts.reduce((a, b) => a + b, 0) || 1;
+        const bar = document.getElementById('discovery-funnel-bar');
+        const legend = document.getElementById('discovery-funnel-legend');
+        
+        let barHtml = '';
+        let legendHtml = '';
+        
+        funnelStatuses.forEach((status, i) => {
+          const c = funnelCounts[i] || 0;
+          if (c > 0) {
+            barHtml += \`<div style="width:\${(c/total)*100}%;background:\${funnelColors[i]}" title="\${status}: \${c}"></div>\`;
+          }
+          legendHtml += \`<span style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px">
+            <span style="width:8px;height:8px;border-radius:2px;background:\${funnelColors[i]};display:inline-block"></span>
+            \${status} (\${c})
+          </span>\`;
+        });
+        
+        bar.innerHTML = barHtml;
+        legend.innerHTML = legendHtml;
+
+      } catch (err) {
+        console.error('Discovery stats error:', err);
+      }
+    }
+
     // Theme toggle
     function toggleTheme() {
       const html = document.documentElement;
@@ -1749,6 +1963,9 @@
       }
       if (document.getElementById('view-niches').classList.contains('active')) {
         refreshNichesView();
+      }
+      if (document.getElementById('view-discovery').classList.contains('active')) {
+        refreshDiscoveryView();
       }
     }, 5000);
   </script>

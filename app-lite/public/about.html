@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agency Engine — System Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root,[data-theme="dark"]{
+  --bg:#0a0a0f;--surface:#12121a;--surface-2:#1a1a26;--surface-3:#222233;
+  --border:#2a2a3a;--text:#e4e4ef;--text-dim:#7a7a8f;--text-bright:#fff;
+  --accent:#6c5ce7;--accent-2:#a29bfe;--accent-glow:rgba(108,92,231,0.12);
+  --green:#00b894;--yellow:#fdcb6e;--red:#e17055;--blue:#74b9ff;--orange:#f39c12;--pink:#fd79a8;
+  --font:'Inter',system-ui,-apple-system,sans-serif;--mono:'JetBrains Mono','Consolas',monospace;
+}
+[data-theme="light"]{
+  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#f0f1f3;--surface-3:#e8e9ec;
+  --border:#d0d1d6;--text:#1a1a2e;--text-dim:#6b6b80;--text-bright:#000;
+  --accent:#6c5ce7;--accent-2:#5a4bd1;--accent-glow:rgba(108,92,231,0.06);
+  --green:#00a884;--yellow:#c49000;--red:#d63031;--blue:#2563eb;--orange:#c66900;--pink:#e84393;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── Top Bar ─────────────────────────────────── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-back{color:var(--text-dim);text-decoration:none;font-size:13px;display:flex;align-items:center;gap:6px;transition:color .15s}
+.topbar-back:hover{color:var(--accent)}
+.topbar h1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.topbar h1 .icon{width:20px;height:20px;border-radius:4px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-right .theme-toggle{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-dim);cursor:pointer;padding:4px 10px;font-size:12px;transition:all .15s}
+.topbar-right .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── Layout ──────────────────────────────────── */
+.layout{display:flex;flex:1}
+
+/* ── Sidebar ─────────────────────────────────── */
+.sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;overflow-y:auto;height:calc(100vh - 49px);position:sticky;top:49px}
+.sidebar-section{margin-bottom:8px}
+.sidebar-section-label{padding:8px 20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim)}
+.sidebar a{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;color:var(--text-dim);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.sidebar a:hover{color:var(--text);background:var(--accent-glow)}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-glow);font-weight:500}
+.sidebar a .num{font-family:var(--mono);font-size:10px;color:var(--text-dim);width:18px;text-align:right}
+.sidebar a.active .num{color:var(--accent)}
+
+/* ── Main Content ────────────────────────────── */
+.main{flex:1;max-width:960px;padding:40px 48px 120px;margin:0 auto}
+.section{display:none}
+.section.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.section-hero{margin-bottom:40px}
+.section-hero .tag{display:inline-block;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.tag-strategy{background:rgba(253,203,110,0.15);color:var(--yellow)}
+.tag-pipeline{background:rgba(108,92,231,0.15);color:var(--accent-2)}
+.tag-operations{background:rgba(0,184,148,0.15);color:var(--green)}
+.tag-controls{background:rgba(225,112,85,0.15);color:var(--red)}
+.tag-system{background:rgba(116,185,255,0.15);color:var(--blue)}
+.tag-finance{background:rgba(253,121,168,0.15);color:var(--pink)}
+.section-hero h2{font-size:28px;font-weight:800;line-height:1.2;margin-bottom:8px}
+.section-hero p{font-size:15px;color:var(--text-dim);line-height:1.6}
+
+/* ── Typography ──────────────────────────────── */
+h3{font-size:18px;font-weight:700;margin:32px 0 12px;color:var(--text-bright)}
+h4{font-size:14px;font-weight:600;margin:24px 0 8px;color:var(--text)}
+p,.li{font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:12px}
+
+/* ── Cards ───────────────────────────────────── */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+@media(max-width:768px){.card-grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;transition:border-color .2s}
+.card:hover{border-color:var(--accent)}
+.card .card-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
+.card h4{margin:0 0 6px;font-size:14px;font-weight:600}
+.card p{margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.6}
+
+.card-full{grid-column:1/-1}
+.card-3{grid-template-columns:1fr 1fr 1fr}
+
+/* ── Tables ──────────────────────────────────── */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12.5px}
+thead{background:var(--surface-2)}
+th{text-align:left;padding:10px 14px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:var(--accent-glow)}
+
+/* ── Badges ──────────────────────────────────── */
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);white-space:nowrap}
+.badge-green{background:rgba(0,184,148,0.15);color:var(--green)}
+.badge-yellow{background:rgba(253,203,110,0.15);color:var(--yellow)}
+.badge-red{background:rgba(225,112,85,0.15);color:var(--red)}
+.badge-blue{background:rgba(116,185,255,0.15);color:var(--blue)}
+.badge-purple{background:rgba(108,92,231,0.15);color:var(--accent-2)}
+.badge-gray{background:rgba(122,122,143,0.15);color:var(--text-dim)}
+.badge-pink{background:rgba(253,121,168,0.15);color:var(--pink)}
+.badge-orange{background:rgba(243,156,18,0.15);color:var(--orange)}
+
+/* ── Flow / Diagram blocks ───────────────────── */
+.flow{display:flex;flex-direction:column;gap:0;margin:20px 0}
+.flow-step{display:flex;gap:16px;position:relative}
+.flow-line{width:32px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.flow-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);z-index:1;flex-shrink:0}
+.flow-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.flow-connector{width:2px;flex:1;background:var(--border);min-height:20px}
+.flow-content{flex:1;padding-bottom:24px}
+.flow-content h4{margin:0 0 4px;font-size:14px;font-weight:600}
+.flow-content p{margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.5}
+.flow-content .flow-tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.flow-step:last-child .flow-connector{display:none}
+.flow-step:last-child .flow-content{padding-bottom:0}
+
+/* ── Inline SVG diagrams ─────────────────────── */
+.diagram{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;margin:20px 0;overflow-x:auto}
+.diagram svg{width:100%;height:auto;display:block}
+
+/* ── Code / Mono blocks ──────────────────────── */
+.code-block{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text-dim)}
+
+/* ── Callout ──────────────────────────────────── */
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;font-size:13px;line-height:1.6;display:flex;gap:10px}
+.callout-icon{flex-shrink:0;font-size:16px}
+.callout-info{background:rgba(116,185,255,0.08);border:1px solid rgba(116,185,255,0.15)}
+.callout-warn{background:rgba(253,203,110,0.08);border:1px solid rgba(253,203,110,0.15)}
+.callout-danger{background:rgba(225,112,85,0.08);border:1px solid rgba(225,112,85,0.15)}
+.callout-success{background:rgba(0,184,148,0.08);border:1px solid rgba(0,184,148,0.15)}
+
+/* ── Stat mini ───────────────────────────────── */
+.stat-row{display:flex;gap:12px;margin:16px 0;flex-wrap:wrap}
+.stat-mini{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;flex:1;min-width:120px}
+.stat-mini .stat-val{font-size:24px;font-weight:700;font-family:var(--mono);color:var(--text-bright)}
+.stat-mini .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-top:2px}
+
+/* ── Responsive ──────────────────────────────── */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .main{padding:24px 20px 80px}
+  .mobile-nav{display:flex !important}
+}
+.mobile-nav{display:none;gap:0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;padding:0 16px}
+.mobile-nav a{padding:10px 14px;font-size:12px;color:var(--text-dim);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.mobile-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── Tooltip ─────────────────────────────────── */
+.tip{border-bottom:1px dashed var(--text-dim);cursor:help}
+
+/* ── Divider ─────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:32px 0}
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ────────────────────────────────── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="/" class="topbar-back">&#8592; Dashboard</a>
+    <h1><span class="icon">?</span> System Documentation</h1>
+  </div>
+  <div class="topbar-right">
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+  </div>
+</div>
+
+<!-- ── Mobile Nav ─────────────────────────────── -->
+<div class="mobile-nav" id="mobileNav"></div>
+
+<!-- ── Layout ─────────────────────────────────── -->
+<div class="layout">
+
+<!-- ── Sidebar ────────────────────────────────── -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Overview</div>
+    <a href="#overview" class="active" data-section="overview"><span class="num">01</span> What This System Is</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Strategy &amp; Offer</div>
+    <a href="#business-model" data-section="business-model"><span class="num">02</span> Business Model</a>
+    <a href="#pricing" data-section="pricing"><span class="num">03</span> Pricing &amp; Packages</a>
+    <a href="#niche-hunting" data-section="niche-hunting"><span class="num">04</span> Niche Discovery Engine</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Sales Pipeline</div>
+    <a href="#lead-gen" data-section="lead-gen"><span class="num">05</span> Lead Generation</a>
+    <a href="#audit" data-section="audit"><span class="num">06</span> Website Audit &amp; Scoring</a>
+    <a href="#outreach" data-section="outreach"><span class="num">07</span> 2-Step Sales Motion</a>
+    <a href="#payments" data-section="payments"><span class="num">08</span> Payment &amp; Conversion</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Operations</div>
+    <a href="#onboarding" data-section="onboarding"><span class="num">09</span> Client Onboarding</a>
+    <a href="#delivery" data-section="delivery"><span class="num">10</span> Delivery &amp; Launch</a>
+    <a href="#support" data-section="support"><span class="num">11</span> Support &amp; Retention</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Controls</div>
+    <a href="#policy" data-section="policy"><span class="num">12</span> Policy Engine &amp; Guardrails</a>
+    <a href="#state-machine" data-section="state-machine"><span class="num">13</span> State Machine</a>
+    <a href="#phases" data-section="phases"><span class="num">14</span> Rollout Phases</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">System</div>
+    <a href="#api" data-section="api"><span class="num">15</span> API Reference</a>
+    <a href="#kpis" data-section="kpis"><span class="num">16</span> KPIs &amp; Metrics</a>
+    <a href="#risks" data-section="risks"><span class="num">17</span> Risk Register</a>
+  </div>
+</nav>
+
+<!-- ── Main ───────────────────────────────────── -->
+<div class="main" id="main">
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 01: Overview
+     ═══════════════════════════════════════════════ -->
+<div class="section active" id="overview">
+<div class="section-hero">
+  <span class="tag tag-system">01 &mdash; Overview</span>
+  <h2>What This System Is</h2>
+  <p>A complete, AI-agent-operated web agency. One human operator sets strategy. The AI agent handles prospecting, outreach, demo building, delivery, billing, and support 24/7.</p>
+</div>
+
+<h3>The Core Loop</h3>
+<p>Every client follows the same path through this system:</p>
+
+<div class="diagram">
+<svg viewBox="0 0 840 100" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6c5ce7"/></marker>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6c5ce7"/><stop offset="100%" stop-color="#a29bfe"/></linearGradient>
+  </defs>
+  <!-- boxes -->
+  <rect x="0" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="50" y="45" text-anchor="middle" fill="#fdcb6e" font-size="9" font-weight="700">HUMAN</text>
+  <text x="50" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Niche Pick</text>
+
+  <rect x="130" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="180" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
+  <text x="180" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Find Leads</text>
+
+  <rect x="260" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="310" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
+  <text x="310" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Audit &amp; Score</text>
+
+  <rect x="390" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="440" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
+  <text x="440" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Hook Email</text>
+
+  <rect x="520" y="25" width="100" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="570" y="45" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">AI</text>
+  <text x="570" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Demo + Close</text>
+
+  <rect x="650" y="25" width="90" height="50" rx="8" fill="#1a1a26" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="695" y="45" text-anchor="middle" fill="#00b894" font-size="9" font-weight="700">ONGOING</text>
+  <text x="695" y="60" text-anchor="middle" fill="#e4e4ef" font-size="10" font-weight="600">Deliver &amp; Support</text>
+
+  <!-- arrows -->
+  <line x1="100" y1="50" x2="128" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="230" y1="50" x2="258" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="50" x2="388" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="490" y1="50" x2="518" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="620" y1="50" x2="648" y2="50" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- bottom label -->
+  <text x="370" y="95" text-anchor="middle" fill="#7a7a8f" font-size="10">Every step is logged, policy-checked, and auditable. Human gates exist at email review, demo review, and launch.</text>
+</svg>
+</div>
+
+<h3>Who Does What</h3>
+<div class="card-grid card-3">
+  <div class="card">
+    <div class="card-icon" style="background:rgba(253,203,110,0.15)">H</div>
+    <h4>Human Operator (You)</h4>
+    <p>Picks niches, sets strategy, reviews agent output at quality gates, handles legal threats and escalations, manages payment provider accounts, and decides when to remove approval gates.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon" style="background:rgba(108,92,231,0.15)">AI</div>
+    <h4>AI Agent</h4>
+    <p>Runs 24/7. Scrapes leads, audits websites, writes and sends emails, classifies replies, builds demos, assembles sites from templates, handles Tier 1 support, generates monthly reports, monitors billing states.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon" style="background:rgba(225,112,85,0.15)">&#9888;</div>
+    <h4>Policy Engine</h4>
+    <p>Runs before every outbound action. Enforces hard guardrails: no demo before interest, no unauthorized discounts, no guarantees, strict data isolation, legal escalation. Cannot be bypassed by the agent.</p>
+  </div>
+</div>
+
+<h3>Why This Is Different</h3>
+<table>
+  <thead><tr><th>Traditional Web Agency</th><th>This System</th></tr></thead>
+  <tbody>
+    <tr><td>Human does everything</td><td>AI agent operates 24/7 at near-zero marginal cost</td></tr>
+    <tr><td>Demos for every prospect</td><td>Demos only for interested prospects (saves compute, higher close rate)</td></tr>
+    <tr><td>Big upfront project fees</td><td>Manageable monthly subscription ($79&ndash;$249/mo)</td></tr>
+    <tr><td>Custom builds every time</td><td>Niche templates + content swap (one JSON file per client)</td></tr>
+    <tr><td>Hands off after launch</td><td>Ongoing managed service: hosting, analytics, chatbot, support</td></tr>
+    <tr><td>Limited by human capacity</td><td>Scales with compute; human does 3&ndash;5 hrs/week of oversight</td></tr>
+  </tbody>
+</table>
+
+<h3>What the Dashboard Does</h3>
+<p>The dashboard you just came from (<a href="/">/</a>) is the real-time operations monitor. It shows pipeline stats, lead lists, job queue status, client records, scraper config, and niche discovery progress. Everything the agent does is visible there. This documentation page explains how and why it all works.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 02: Business Model
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="business-model">
+<div class="section-hero">
+  <span class="tag tag-strategy">02 &mdash; Strategy</span>
+  <h2>Business Model</h2>
+  <p>The agency sells a managed website retainer to local businesses with weak websites. Revenue is recurring monthly subscriptions, not one-time builds.</p>
+</div>
+
+<h3>What the Client Buys</h3>
+<p>Not just a website. The client buys a complete managed digital presence:</p>
+
+<div class="card-grid">
+  <div class="card">
+    <h4>Website Design &amp; Performance</h4>
+    <p>Mobile-first, fast-loading, conversion-focused site built from proven niche templates. Not a cookie-cutter &mdash; adapted to each business with their real content, services, and branding.</p>
+  </div>
+  <div class="card">
+    <h4>Hosting &amp; Uptime</h4>
+    <p>Deployed on Cloudflare Pages with global CDN, automatic SSL, and 99.9%+ uptime. The client never thinks about servers.</p>
+  </div>
+  <div class="card">
+    <h4>AI Chat Assistant</h4>
+    <p>On-site chatbot trained on the client's FAQ data. Answers common customer questions 24/7. Falls back to human escalation when needed.</p>
+  </div>
+  <div class="card">
+    <h4>Analytics &amp; Monthly Reports</h4>
+    <p>Google Analytics 4 integrated. The agent generates a monthly performance summary showing traffic, key actions, and improvement suggestions.</p>
+  </div>
+  <div class="card">
+    <h4>Ongoing Edits &amp; Support</h4>
+    <p>Content updates, text changes, image swaps handled by the agent within defined monthly limits. Higher tiers get more edits and faster turnaround.</p>
+  </div>
+  <div class="card">
+    <h4>Single Accountable Operator</h4>
+    <p>One point of contact. No handoffs between account managers. The agent handles routine; the human handles escalations and quality.</p>
+  </div>
+</div>
+
+<h3>Revenue Model</h3>
+<p><strong>Primary:</strong> Monthly recurring subscription revenue ($79&ndash;$249/mo per client).<br>
+<strong>Secondary:</strong> Standardized add-ons (extra pages, seasonal landing pages, emergency changes, extra chatbot training).</p>
+
+<div class="callout callout-info">
+  <span class="callout-icon">&#9432;</span>
+  <div><strong>Key economic insight:</strong> Because the AI agent handles delivery, support, and operations at near-zero marginal cost, every additional client after the first is almost pure margin. The main reason to price higher is client quality and lower churn, not cost recovery.</div>
+</div>
+
+<h3>Success Conditions</h3>
+<p>For this model to work, all of the following must be true:</p>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>High-quality niche selection (businesses that feel website pain)</li>
+  <li>Consistent lead generation (50&ndash;100 prospects/day reviewed)</li>
+  <li>Agent-written emails that get real replies (target: &gt;5% reply rate)</li>
+  <li>Demos that convert (target: &gt;30% demo-to-close)</li>
+  <li>Fast, predictable delivery (3&ndash;5 business days to launch)</li>
+  <li>Low month-1 churn (target: &gt;80% retention)</li>
+  <li>Agent error rate below 5% on customer-facing interactions</li>
+</ul>
+
+<h3>Failure Modes</h3>
+<table>
+  <thead><tr><th>If This Breaks</th><th>Consequence</th><th>Who Catches It</th></tr></thead>
+  <tbody>
+    <tr><td>Agent produces low-quality output</td><td>Spam complaints, domain reputation dies</td><td>Human review gates + policy engine</td></tr>
+    <tr><td>Wrong niche selected</td><td>No replies, no demos, no closes</td><td>Niche scoring model + sprint KPIs</td></tr>
+    <tr><td>Agent makes unauthorized promises</td><td>Financial loss, scope creep</td><td>Policy engine hard-blocks discounts/guarantees</td></tr>
+    <tr><td>Data isolation fails</td><td>Client A's content appears on Client B's site</td><td>Automated data isolation check before every launch</td></tr>
+    <tr><td>Agent errors compound</td><td>Wrong content on live sites, billing mistakes</td><td>Pipeline audit trail + human spot-checks</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 03: Pricing
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="pricing">
+<div class="section-hero">
+  <span class="tag tag-finance">03 &mdash; Pricing</span>
+  <h2>Pricing &amp; Packages</h2>
+  <p>Three tiers. Simple, predictable, easy to buy. Prices are hard-coded in the system and enforced by the policy engine.</p>
+</div>
+
+<div class="stat-row">
+  <div class="stat-mini"><div class="stat-val" style="color:var(--green)">$79</div><div class="stat-label">Starter / month</div></div>
+  <div class="stat-mini"><div class="stat-val" style="color:var(--blue)">$129</div><div class="stat-label">Growth / month</div></div>
+  <div class="stat-mini"><div class="stat-val" style="color:var(--accent-2)">$249</div><div class="stat-label">Pro / month</div></div>
+</div>
+
+<h3>What Each Package Includes</h3>
+<table>
+  <thead><tr><th>Feature</th><th>Starter &mdash; $79/mo</th><th>Growth &mdash; $129/mo</th><th>Pro &mdash; $249/mo</th></tr></thead>
+  <tbody>
+    <tr><td>Pages</td><td>5</td><td>8</td><td>12</td></tr>
+    <tr><td>Hosting &amp; SSL</td><td><span class="badge badge-green">Included</span></td><td><span class="badge badge-green">Included</span></td><td><span class="badge badge-green">Included</span></td></tr>
+    <tr><td>Mobile-optimized design</td><td><span class="badge badge-green">Included</span></td><td><span class="badge badge-green">Included</span></td><td><span class="badge badge-green">Included</span></td></tr>
+    <tr><td>AI chat assistant</td><td>Basic FAQ</td><td>25 FAQ entries + conversation controls</td><td>Custom training + advanced controls</td></tr>
+    <tr><td>Analytics</td><td>Basic dashboard</td><td>Basic dashboard</td><td>Advanced summary + monthly insights email</td></tr>
+    <tr><td>Content edits / month</td><td>0 (minor text/image only)</td><td>3</td><td>5</td></tr>
+    <tr><td>Landing page refreshes</td><td>&mdash;</td><td>1 / month</td><td>2 / month (conversion-focused)</td></tr>
+    <tr><td>Support response window</td><td>24 hours</td><td>4 hours</td><td>1 hour (critical)</td></tr>
+    <tr><td>CMS access</td><td>&mdash;</td><td><span class="badge badge-green">Yes</span></td><td><span class="badge badge-green">Yes</span></td></tr>
+    <tr><td>Quarterly review</td><td>&mdash;</td><td>&mdash;</td><td><span class="badge badge-green">Written recommendations</span></td></tr>
+  </tbody>
+</table>
+
+<h3>Pricing Rules (Enforced by Policy Engine)</h3>
+<div class="callout callout-danger">
+  <span class="callout-icon">&#9888;</span>
+  <div>
+    <strong>The agent cannot:</strong><br>
+    &bull; Offer discounts, free months, or price reductions without human approval<br>
+    &bull; Quote prices outside the allowable ranges ($59&ndash;$79, $99&ndash;$149, $199&ndash;$299)<br>
+    &bull; Make guarantees about revenue, SEO rankings, or lead volume<br>
+    &bull; Expand scope beyond what the package includes
+  </div>
+</div>
+
+<h3>What's NOT Included (Scope Boundaries)</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>Not In Base Plan</h4>
+    <p>Custom software development, CRM integrations, unlimited design revisions, SEO guarantees, ad management, logo creation from scratch, original long-form copywriting.</p>
+  </div>
+  <div class="card">
+    <h4>Add-Ons Available</h4>
+    <p>Extra pages ($), seasonal landing pages ($), review/testimonial refresh ($), emergency same-day changes ($), bulk content upload ($), extra chatbot training ($).</p>
+  </div>
+</div>
+
+<h3>Billing Model</h3>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>Monthly auto-renewing subscription via Dodo Payments (merchant-of-record)</li>
+  <li>No setup fee during validation phase</li>
+  <li>Cancel anytime after first billing cycle</li>
+  <li>Failed payments enter grace period &rarr; suspension workflow</li>
+  <li>One payment method on file per client</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 04: Niche Discovery
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="niche-hunting">
+<div class="section-hero">
+  <span class="tag tag-strategy">04 &mdash; Strategy</span>
+  <h2>Niche Discovery Engine</h2>
+  <p>The system doesn't guess at niches. It probes real cities with real Google Maps queries and discovers what businesses actually thrive there. This is Step 0 &mdash; everything else depends on it.</p>
+</div>
+
+<h3>How It Works</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>City Selection</h4>
+      <p>The system maintains a database of 200+ US cities across three tiers: mid-size metros, smaller metros, and growing suburbs. Cities are probed in priority order.</p>
+      <div class="flow-tags"><span class="badge badge-blue">Seed Data</span><span class="badge badge-purple">200+ Cities</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Broad Probing</h4>
+      <p>For each city, the agent sends broad Google Maps queries like "local services", "home services", "professional services". It doesn't use a fixed niche list &mdash; it discovers what categories Google Maps returns organically.</p>
+      <div class="flow-tags"><span class="badge badge-green">Organic Discovery</span><span class="badge badge-blue">Google Maps API</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Category Harvesting</h4>
+      <p>From the Maps results, the agent extracts real business categories. This reveals what actually thrives in each city &mdash; not what we assume should thrive.</p>
+      <div class="flow-tags"><span class="badge badge-purple">Real Data</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Auto-Scoring (100-Point Model)</h4>
+      <p>Each city+niche pair is scored across five dimensions: demand signal, competition density, website weakness rate, contactability, and revenue potential. Pairs scoring 60+ are candidates.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">Scored 0-100</span><span class="badge badge-green">60+ = Candidate</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Mini-Validation Scrape</h4>
+      <p>Top-scoring pairs get a 30-lead test scrape. This confirms the niche actually has weak websites and reachable contacts before committing to a full outreach sprint.</p>
+      <div class="flow-tags"><span class="badge badge-blue">30 Leads</span><span class="badge badge-purple">Validation</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Go/No-Go Decision</h4>
+      <p>First 3 pairs require human approval via <code>PATCH /api/niches/:id/approve</code>. After 3 human reviews, auto-approve can be enabled. Approved pairs feed directly into the lead generation pipeline.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">Human Gate (First 3)</span><span class="badge badge-green">Auto-Approve Option</span></div>
+    </div>
+  </div>
+</div>
+
+<h3>Scoring Dimensions</h3>
+<table>
+  <thead><tr><th>Dimension</th><th>What It Measures</th><th>Weight</th></tr></thead>
+  <tbody>
+    <tr><td>Demand Signal</td><td>How many businesses exist in this niche in this city</td><td>20 pts</td></tr>
+    <tr><td>Competition Density</td><td>How many competitors are already serving this niche well</td><td>15 pts</td></tr>
+    <tr><td>Website Weakness Rate</td><td>% of sampled businesses with clearly bad websites</td><td>25 pts</td></tr>
+    <tr><td>Contactability</td><td>% of businesses with reachable email or phone</td><td>20 pts</td></tr>
+    <tr><td>Revenue Potential</td><td>Average deal value based on niche (from seed library estimates)</td><td>20 pts</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-info">
+  <span class="callout-icon">&#9432;</span>
+  <div><strong>Scheduling:</strong> Discovery runs every 6 hours in the background (configurable via <code>PATCH /api/niches/discover/config</code>). Rate-limited to 4 requests/minute to stay under Google's radar. The scraper uses browser-mimicking headers and random delays.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 05: Lead Generation
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="lead-gen">
+<div class="section-hero">
+  <span class="tag tag-pipeline">05 &mdash; Pipeline</span>
+  <h2>Lead Generation</h2>
+  <p>Once a city+niche pair is approved, the scraper goes to work. It pulls real business data from Google Maps, enriches records with emails, and validates deliverability.</p>
+</div>
+
+<h3>The Scraping Pipeline</h3>
+<div class="diagram">
+<svg viewBox="0 0 840 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+  <defs><marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6c5ce7"/></marker></defs>
+
+  <!-- Row 1: Main pipeline -->
+  <rect x="10" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="75" y="28" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">JOB: lead_gen</text>
+  <text x="75" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Google Maps Scrape</text>
+
+  <line x1="140" y1="32" x2="170" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <rect x="172" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="237" y="28" text-anchor="middle" fill="#e4e4ef" font-size="10">Dedup + Tier</text>
+  <text x="237" y="42" text-anchor="middle" fill="#7a7a8f" font-size="9">hot / warm / low</text>
+
+  <line x1="302" y1="32" x2="332" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <rect x="334" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="399" y="28" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">JOB: email_enrich</text>
+  <text x="399" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Find Owner Emails</text>
+
+  <line x1="464" y1="32" x2="494" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <rect x="496" y="10" width="130" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="561" y="28" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="700">JOB: email_validate</text>
+  <text x="561" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Verify Deliverability</text>
+
+  <line x1="626" y1="32" x2="656" y2="32" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <rect x="658" y="10" width="170" height="44" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="743" y="28" text-anchor="middle" fill="#00b894" font-size="9" font-weight="700">SEGMENTATION</text>
+  <text x="743" y="42" text-anchor="middle" fill="#e4e4ef" font-size="10">Email-ready / Phone / Unreachable</text>
+
+  <!-- Row 2: Segmentation outputs -->
+  <rect x="10" y="90" width="230" height="44" rx="8" fill="rgba(0,184,148,0.08)" stroke="rgba(0,184,148,0.2)"/>
+  <text x="125" y="108" text-anchor="middle" fill="#00b894" font-size="10" font-weight="600">Email-Ready (valid email + hot/warm)</text>
+  <text x="125" y="122" text-anchor="middle" fill="#7a7a8f" font-size="9">&rarr; Enters 2-step outreach pipeline</text>
+
+  <rect x="270" y="90" width="230" height="44" rx="8" fill="rgba(253,203,110,0.08)" stroke="rgba(253,203,110,0.2)"/>
+  <text x="385" y="108" text-anchor="middle" fill="#fdcb6e" font-size="10" font-weight="600">Phone Fallback (no email + has phone)</text>
+  <text x="385" y="122" text-anchor="middle" fill="#7a7a8f" font-size="9">&rarr; Short SMS/phone opener workflow</text>
+
+  <rect x="530" y="90" width="230" height="44" rx="8" fill="rgba(122,122,143,0.08)" stroke="rgba(122,122,143,0.2)"/>
+  <text x="645" y="108" text-anchor="middle" fill="#7a7a8f" font-size="10" font-weight="600">Unreachable (no email + no phone)</text>
+  <text x="645" y="122" text-anchor="middle" fill="#7a7a8f" font-size="9">&rarr; Archived, not contacted</text>
+
+  <!-- connectors from row 1 to row 2 -->
+  <line x1="743" y1="54" x2="125" y2="88" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="743" y1="54" x2="385" y2="88" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="743" y1="54" x2="645" y2="88" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+</svg>
+</div>
+
+<h3>What the Scraper Collects</h3>
+<table>
+  <thead><tr><th>Field</th><th>Source</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Business name</td><td>Google Maps listing</td><td>Personalization, dedup key</td></tr>
+    <tr><td>Website URL</td><td>Google Maps listing</td><td>Audit target</td></tr>
+    <tr><td>Google Maps URL</td><td>Direct link</td><td>Reference, place ID extraction</td></tr>
+    <tr><td>Phone</td><td>Google Maps listing</td><td>Fallback contact channel</td></tr>
+    <tr><td>Address</td><td>Google Maps listing</td><td>City/state extraction</td></tr>
+    <tr><td>Email</td><td>Website contact page, schema.org, footer</td><td>Primary outreach channel</td></tr>
+    <tr><td>Decision maker name</td><td>Website about page, Google reviews</td><td>Email personalization</td></tr>
+  </tbody>
+</table>
+
+<h3>Email Enrichment</h3>
+<p>After scraping, each lead without an email goes through an enrichment phase. The agent visits the business's website and checks up to 5 pages (contact, about, footer, schema.org markup, mailto links) to find owner/decision-maker email addresses. Each found email gets a confidence score (high/medium/low) based on where it was found.</p>
+
+<h3>Exclusion Rules</h3>
+<p>Leads are automatically excluded if:</p>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>Their website is already strong (audit score &lt; 4 out of 10)</li>
+  <li>The business appears permanently closed</li>
+  <li>It's a franchise with centralized marketing control</li>
+  <li>The business is clearly managed by a large corporate marketing team</li>
+  <li>The business reputation is so poor that churn/disputes are likely</li>
+  <li>No useful contact path exists (no email AND no phone)</li>
+</ul>
+
+<div class="callout callout-warn">
+  <span class="callout-icon">&#9888;</span>
+  <div><strong>Anti-detection:</strong> The scraper uses browser-mimicking headers, randomized delays between requests, and rate limiting (8 req/min for production scraping). It parses Google Maps hex place IDs directly. No API keys required.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 06: Audit
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="audit">
+<div class="section-hero">
+  <span class="tag tag-pipeline">06 &mdash; Pipeline</span>
+  <h2>Website Audit &amp; Scoring</h2>
+  <p>Every scraped lead's website is scored on a 0&ndash;10 scale. The audit identifies specific, visible problems and translates them into commercial language that becomes the outreach hook.</p>
+</div>
+
+<h3>Scoring Rubric</h3>
+<p>Seven categories, each scored 0&ndash;2 (0 = acceptable, 1 = weak, 2 = clearly bad). Raw scores (max 14) are normalized to 0&ndash;10.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>What the Agent Checks</th><th>Example Finding</th></tr></thead>
+  <tbody>
+    <tr><td>Mobile Experience</td><td>Layout breaks, text too small, buttons hard to tap</td><td>"Layout breaks on phone"</td></tr>
+    <tr><td>Speed &amp; Responsiveness</td><td>Slow first load, heavy images, delayed interaction</td><td>"Homepage takes 8 seconds to load"</td></tr>
+    <tr><td>Trust &amp; Credibility</td><td>Outdated look, missing testimonials, broken SSL</td><td>"No visible reviews or testimonials"</td></tr>
+    <tr><td>Conversion Structure</td><td>No CTA, buried phone number, no service area</td><td>"No clear call-to-action above the fold"</td></tr>
+    <tr><td>Content Quality</td><td>Thin copy, stale promotions, missing FAQs</td><td>"Service descriptions are one sentence each"</td></tr>
+    <tr><td>Information Architecture</td><td>Confusing navigation, missing pages, no hierarchy</td><td>"Contact page is 3 clicks deep"</td></tr>
+    <tr><td>Business Fit Signals</td><td>Good reviews + weak site = strong prospect</td><td>"4.8 stars on Google but terrible website"</td></tr>
+  </tbody>
+</table>
+
+<h3>Priority Tiers</h3>
+<div class="stat-row">
+  <div class="stat-mini" style="border-left:3px solid var(--red)"><div class="stat-val">7&ndash;10</div><div class="stat-label">HOT &mdash; Immediate outreach</div></div>
+  <div class="stat-mini" style="border-left:3px solid var(--yellow)"><div class="stat-val">4&ndash;6</div><div class="stat-label">WARM &mdash; Queued for outreach</div></div>
+  <div class="stat-mini" style="border-left:3px solid var(--text-dim)"><div class="stat-val">0&ndash;3</div><div class="stat-label">LOW &mdash; Excluded from outreach</div></div>
+</div>
+
+<h3>Commercial Translation</h3>
+<p>Every technical finding is translated into language a business owner understands:</p>
+<table>
+  <thead><tr><th>Technical Finding</th><th>Commercial Translation (used in email)</th></tr></thead>
+  <tbody>
+    <tr><td>Mobile layout breaks</td><td>"People searching on their phone may leave before contacting you"</td></tr>
+    <tr><td>No CTA hierarchy</td><td>"The site doesn't direct visitors toward calling or booking"</td></tr>
+    <tr><td>Outdated design</td><td>"The site can make a legitimate business look less credible than it is"</td></tr>
+    <tr><td>No testimonials</td><td>"Your great reviews aren't visible where prospects are looking"</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-success">
+  <span class="callout-icon">&#10003;</span>
+  <div><strong>Output:</strong> Each scored lead gets: numeric score, top 3 issues, one commercial-translation sentence per issue, the best outreach angle to use, and a priority tier assignment. This data flows directly into the outreach pipeline.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 07: Outreach (2-Step Sales)
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="outreach">
+<div class="section-hero">
+  <span class="tag tag-pipeline">07 &mdash; Pipeline</span>
+  <h2>The 2-Step Sales Motion</h2>
+  <p>The core innovation. The first email NEVER includes a demo. It asks one question. Only interested prospects get a demo + pricing. This saves compute, filters tire-kickers, and produces a higher close rate.</p>
+</div>
+
+<h3>Why 2 Steps</h3>
+<table>
+  <thead><tr><th></th><th>Demo for Everyone</th><th>Demo on Request (Our Model)</th></tr></thead>
+  <tbody>
+    <tr><td>Emails sent per batch</td><td>100</td><td>100</td></tr>
+    <tr><td>Demos built</td><td>100</td><td>3&ndash;5</td></tr>
+    <tr><td>Agent compute per lead</td><td>~500 tokens</td><td>~50 tokens (hook only)</td></tr>
+    <tr><td>Demo quality</td><td>Generic (mass-produced)</td><td>High (focused on interested prospect)</td></tr>
+    <tr><td>Close rate on demos</td><td>Low (cold attachment)</td><td>High (warm, engaged lead)</td></tr>
+    <tr><td>Tire-kicker filtering</td><td>None</td><td>Built-in to the process</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 1: The Hook Email</h3>
+<div class="diagram">
+<svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+  <rect x="10" y="10" width="680" height="140" rx="10" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="30" y="35" fill="#7a7a8f" font-size="10">FROM: First Name &lt;name@outreach-domain.com&gt;</text>
+  <text x="30" y="55" fill="#e4e4ef" font-size="13" font-weight="600">SUBJECT: Quick note about {{business_name}}'s website</text>
+  <line x1="30" y1="65" x2="670" y2="65" stroke="#2a2a3a"/>
+  <text x="30" y="85" fill="#e4e4ef" font-size="12">Hi {{name}},</text>
+  <text x="30" y="105" fill="#e4e4ef" font-size="12">I noticed {{business_name}}'s site &mdash; specifically that {{one_visible_issue}}. It's</text>
+  <text x="30" y="120" fill="#e4e4ef" font-size="12">something that could be quietly costing you leads.</text>
+  <text x="30" y="140" fill="#e4e4ef" font-size="12">Want to see a better version? &mdash; {{first_name}}</text>
+  <rect x="560" y="120" width="120" height="24" rx="4" fill="rgba(0,184,148,0.15)"/>
+  <text x="620" y="136" text-anchor="middle" fill="#00b894" font-size="10" font-weight="600">UNDER 80 WORDS</text>
+</svg>
+</div>
+
+<p><strong>Rules enforced by policy engine:</strong></p>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>Must be under 80 words</li>
+  <li>Must reference one specific, visible issue from the audit</li>
+  <li>Must use the prospect's real business name and city</li>
+  <li>Must NOT include a demo link, preview URL, or pricing</li>
+  <li>Must end with one simple question</li>
+  <li>Must NOT insult the current site or use agency buzzwords</li>
+</ul>
+
+<h3>Follow-Up Sequence</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Email 1 &mdash; Hook</h4>
+      <p>One visible issue + one question. No demo, no link, no pricing.</p>
+      <div class="flow-tags"><span class="badge badge-blue">Day 0</span><span class="badge badge-purple">JOB: outreach-sales</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Follow-Up 1</h4>
+      <p>Brief bump. Restate the issue. Re-offer to show a better version. Still no demo.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">Day 3&ndash;4</span><span class="badge badge-purple">JOB: follow_up_1</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Follow-Up 2</h4>
+      <p>Final check-in. One more mention of the issue. Easy yes/no reply.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">Day 7</span><span class="badge badge-purple">JOB: follow_up_2</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>No Reply &rarr; Archived</h4>
+      <p>Lead is archived. No further contact. The sequence is complete.</p>
+      <div class="flow-tags"><span class="badge badge-gray">ARCHIVED</span></div>
+    </div>
+  </div>
+</div>
+
+<h3>Step 2: Demo + Pricing (Only on Positive Reply)</h3>
+<p>When a prospect replies "yes" or "interested", the agent:</p>
+<ol style="padding-left:24px;margin:12px 0">
+  <li>Classifies the reply with confidence score (>0.9 required)</li>
+  <li>Triggers <code>demo_build</code> job automatically</li>
+  <li>Builds a tailored demo using the niche template + prospect's real content</li>
+  <li>Sends demo email with: demo link, what's included in the plan, price, checkout link</li>
+</ol>
+
+<h3>Reply Classification</h3>
+<table>
+  <thead><tr><th>Reply Type</th><th>Agent Action</th><th>Policy Check</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-green">Interested</span></td><td>Trigger demo build + send demo+pricing email</td><td>Interest confirmed, data isolation OK</td></tr>
+    <tr><td><span class="badge badge-yellow">Question</span></td><td>Answer question, re-offer demo</td><td>No unauthorized promises</td></tr>
+    <tr><td><span class="badge badge-orange">Objection</span></td><td>Classify objection type, respond per guide</td><td>No discounts without human approval</td></tr>
+    <tr><td><span class="badge badge-gray">Not Interested</span></td><td>Archive lead, no further contact</td><td>&mdash;</td></tr>
+    <tr><td><span class="badge badge-red">Angry / Legal</span></td><td>BLOCKED. Escalate to human immediately.</td><td>NO auto-response sent</td></tr>
+  </tbody>
+</table>
+
+<h3>Email Infrastructure</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>Sending Service</h4>
+    <p>Resend (transactional email API). Not personal Gmail. Domain-based sending with SPF/DKIM/DMARC configured.</p>
+  </div>
+  <div class="card">
+    <h4>Warm-Up Schedule</h4>
+    <p>Week 1: 5/day. Week 2: 10/day. Week 3: 15/day. Week 4: 20/day. Never exceed 30/day on a single domain.</p>
+  </div>
+  <div class="card">
+    <h4>Monitoring</h4>
+    <p>Bounce rate must stay &lt;5%. Spam complaint rate must stay &lt;0.3%. If breached: stop sending, investigate, switch domain.</p>
+  </div>
+  <div class="card">
+    <h4>From Address</h4>
+    <p>Real-looking name from dedicated outreach domain. Never noreply@ or generic addresses.</p>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 08: Payment
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="payments">
+<div class="section-hero">
+  <span class="tag tag-finance">08 &mdash; Conversion</span>
+  <h2>Payment &amp; Conversion</h2>
+  <p>Checkout happens via hosted payment link. No sales calls needed. The system receives a webhook when payment succeeds and automatically converts the lead into a client.</p>
+</div>
+
+<h3>Payment Flow</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Prospect Agrees to Plan</h4>
+      <p>Agent confirms: chosen package, monthly price, what's included, expected launch timeline, cancellation terms.</p>
+      <div class="flow-tags"><span class="badge badge-purple">Agent</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Agent Sends Checkout Link</h4>
+      <p>Hosted checkout via Dodo Payments (merchant-of-record). Pre-configured links per package: <code>/starter</code>, <code>/growth</code>, <code>/pro</code>. No custom Stripe integration needed during validation.</p>
+      <div class="flow-tags"><span class="badge badge-blue">Dodo Payments</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Client Completes Checkout</h4>
+      <p>Secure online payment. Monthly auto-renewing subscription created. Client receives confirmation.</p>
+      <div class="flow-tags"><span class="badge badge-green">Webhook Fires</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Webhook Received at <code>/webhooks/dodo</code></h4>
+      <p>Idempotent processing: if the same webhook fires twice, it's ignored. Creates billing_event record, transitions lead to PAID, creates client record, triggers onboarding job.</p>
+      <div class="flow-tags"><span class="badge badge-purple">Idempotent</span><span class="badge badge-blue">State Machine</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Lead &rarr; Client Conversion Complete</h4>
+      <p>Lead status becomes PAID. Client record created with status ONBOARDING. Onboarding job queued automatically.</p>
+      <div class="flow-tags"><span class="badge badge-green">PAID</span><span class="badge badge-blue">ONBOARDING</span></div>
+    </div>
+  </div>
+</div>
+
+<h3>Billing States (Client Lifecycle)</h3>
+<table>
+  <thead><tr><th>State</th><th>Meaning</th><th>Next Transitions</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-blue">pending_payment</span></td><td>Checkout sent, awaiting payment</td><td>&rarr; active (payment success) or &rarr; lost (no payment)</td></tr>
+    <tr><td><span class="badge badge-green">active</span></td><td>Paid, receiving service</td><td>&rarr; payment_failed, &rarr; cancelled</td></tr>
+    <tr><td><span class="badge badge-yellow">payment_failed</span></td><td>Renewal charge failed</td><td>&rarr; grace_period, &rarr; active (retry success)</td></tr>
+    <tr><td><span class="badge badge-orange">grace_period</span></td><td>7-day window to update payment</td><td>&rarr; active (payment recovered), &rarr; suspended</td></tr>
+    <tr><td><span class="badge badge-red">suspended</span></td><td>Service paused, site may be offline</td><td>&rarr; active (payment recovered), &rarr; cancelled</td></tr>
+    <tr><td><span class="badge badge-gray">cancelled</span></td><td>Account terminated</td><td>Final state</td></tr>
+  </tbody>
+</table>
+
+<h3>Failed Payment Workflow</h3>
+<ol style="padding-left:24px;margin:12px 0">
+  <li>Renewal charge fails &rarr; agent sends brief notice to client</li>
+  <li>Agent retries billing according to provider workflow (exponential backoff: 1h, 6h, 24h)</li>
+  <li>If unresolved after retries &rarr; grace period (7 days)</li>
+  <li>Agent suspends non-essential work after grace period</li>
+  <li>Agent alerts human operator if client doesn't respond</li>
+  <li>Agent cancels or reactivates based on final payment outcome</li>
+</ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 09: Onboarding
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="onboarding">
+<div class="section-hero">
+  <span class="tag tag-operations">09 &mdash; Operations</span>
+  <h2>Client Onboarding</h2>
+  <p>Payment confirmed &rarr; welcome email sent &rarr; materials collected &rarr; site assembled from template. Target: 3&ndash;7 business days to launch.</p>
+</div>
+
+<h3>Onboarding Checklist (Agent Collects)</h3>
+<div class="card-grid card-3">
+  <div class="card"><h4>Identity</h4><p>Legal/trading name, contact person, email, phone</p></div>
+  <div class="card"><h4>Brand</h4><p>Logo files, brand colors, social links</p></div>
+  <div class="card"><h4>Content</h4><p>Service list, service areas, photos, copy, testimonials</p></div>
+  <div class="card"><h4>CTA</h4><p>Preferred call-to-action: call, form, WhatsApp, booking link</p></div>
+  <div class="card"><h4>Legal</h4><p>Required legal pages, if any</p></div>
+  <div class="card"><h4>Fallback</h4><p>If no materials in 72h, agent builds from public data + notes assumptions</p></div>
+</div>
+
+<h3>Onboarding Flow</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content"><h4>Payment Confirmed</h4><p>Dodo webhook received, client record created, onboarding job queued.</p><div class="flow-tags"><span class="badge badge-green">Automated</span></div></div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content"><h4>Welcome Email Sent</h4><p>Agent sends thank you, plan confirmation, materials list, expected launch window (3&ndash;7 business days), and support instructions.</p><div class="flow-tags"><span class="badge badge-purple">Agent</span></div></div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content"><h4>Materials Collection</h4><p>Agent collects via email. Follows up once after 48h if missing. After 72h, builds with public data.</p><div class="flow-tags"><span class="badge badge-purple">Agent</span></div></div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content"><h4>Site Assembly</h4><p>Niche template + client content.json. Configure analytics (GA4), chatbot (FAQ training), CTA, contact paths.</p><div class="flow-tags"><span class="badge badge-purple">Agent</span></div></div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content"><h4>Automated QA</h4><p>Mobile layout, forms, links, speed, data isolation check (no other client's content present).</p><div class="flow-tags"><span class="badge badge-blue">JOB: site_qa</span></div></div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+    <div class="flow-content"><h4>Human Review &rarr; Launch</h4><p>Human reviews staging site. If approved, agent publishes live. If issues, agent fixes and re-submits. <strong>This gate is never removed.</strong></p><div class="flow-tags"><span class="badge badge-yellow">HUMAN GATE</span></div></div>
+  </div>
+</div>
+
+<h3>Post-Launch Handoff</h3>
+<p>Agent sends the client:</p>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>Live site URL</li>
+  <li>How to request edits (simple instructions)</li>
+  <li>Billing reminder (next renewal date)</li>
+  <li>What is included each month</li>
+  <li>Support window and response time expectations</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 10: Delivery
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="delivery">
+<div class="section-hero">
+  <span class="tag tag-operations">10 &mdash; Operations</span>
+  <h2>Delivery &amp; Launch</h2>
+  <p>Every client site is built from a niche template + content swap. One JSON file per client. No WordPress, no CMS runtime, no server-side rendering. Static files deployed to Cloudflare Pages.</p>
+</div>
+
+<h3>Template Architecture</h3>
+<div class="code-block">niche-template/
+├── index.html          # Homepage
+├── about.html          # About page
+├── services.html       # Services page
+├── contact.html        # Contact page
+├── gallery.html        # Gallery (optional per niche)
+├── faq.html            # FAQ page (chatbot training source)
+├── assets/
+│   ├── css/custom.css  # Niche-specific overrides + client brand colors
+│   ├── js/chatbot.js   # AI chat assistant widget
+│   └── img/            # Placeholder images replaced per client
+├── data/
+│   ├── content.json    # ALL client-specific content (name, services, areas, testimonials, CTA config, contact info)
+│   └── faq.json        # FAQ entries for chatbot training
+└── config.json         # CTA type, analytics ID, chatbot ID, domain</div>
+
+<div class="callout callout-info">
+  <span class="callout-icon">&#9432;</span>
+  <div><strong>Content swap mechanism:</strong> All client-specific text lives in <code>data/content.json</code> &mdash; not hardcoded in HTML. HTML templates use placeholders populated from the JSON at build time. Adding a new client = editing one JSON file + adding images. The agent never touches HTML.</div>
+</div>
+
+<h3>Delivery Stages</h3>
+<table>
+  <thead><tr><th>Stage</th><th>Owner</th><th>What Happens</th></tr></thead>
+  <tbody>
+    <tr><td>1. Site Assembly</td><td><span class="badge badge-purple">Agent</span></td><td>Apply niche template, insert client content, configure CTA and contact paths</td></tr>
+    <tr><td>2. Feature Setup</td><td><span class="badge badge-purple">Agent</span></td><td>Attach GA4 analytics, configure chatbot knowledge source, set up CMS fields</td></tr>
+    <tr><td>3. Automated QA</td><td><span class="badge badge-blue">JOB: site_qa</span></td><td>Mobile layout, forms, links, speed, data isolation check</td></tr>
+    <tr><td>4. Human Quality Review</td><td><span class="badge badge-yellow">HUMAN</span></td><td>Review assembled site, verify business details, approve for launch or flag fixes</td></tr>
+    <tr><td>5. Launch</td><td><span class="badge badge-purple">Agent</span></td><td>Connect domain, verify HTTPS, publish, re-test core paths</td></tr>
+    <tr><td>6. Ongoing Operations</td><td><span class="badge badge-purple">Agent</span></td><td>Edit requests, chatbot updates, analytics review, monthly reports, uptime monitoring</td></tr>
+  </tbody>
+</table>
+
+<h3>Hosting &amp; Domains</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>Cloudflare Pages</h4>
+    <p>Zero-config SSL, global CDN, free tier covers early clients. Agent deploys via Git push or CLI. Custom domains via DNS CNAME. Target: &lt;3s load on 4G mobile, Lighthouse &gt;85.</p>
+  </div>
+  <div class="card">
+    <h4>Domain Ownership</h4>
+    <p>Default: client owns their domain. Agent configures DNS CNAME. Exception: if client can't manage registration, agency registers on client's behalf with documented beneficial ownership.</p>
+  </div>
+</div>
+
+<h3>Cancellation &amp; Domain Transition</h3>
+<ol style="padding-left:24px;margin:12px 0">
+  <li>Site remains live for 7 calendar days after cancellation (grace period for client to export content)</li>
+  <li>Agent offers static content export upon request</li>
+  <li>If client-owned domain: agent removes DNS records; client points domain wherever they choose</li>
+  <li>If agency-registered domain: agent initiates transfer to client within 14 days</li>
+  <li>After 7-day grace period: agent removes hosted site and staging preview</li>
+  <li>All client assets marked as archived</li>
+</ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 11: Support
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="support">
+<div class="section-hero">
+  <span class="tag tag-operations">11 &mdash; Operations</span>
+  <h2>Support &amp; Retention</h2>
+  <p>Tiered support model. Agent handles Tier 1 automatically (24/7). Human handles escalations, legal threats, and complex requests. Agent actively monitors for churn signals every month.</p>
+</div>
+
+<h3>Support Tiers</h3>
+<table>
+  <thead><tr><th>Tier</th><th>Handled By</th><th>Examples</th><th>Resolution Target</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-green">Tier 1</span></td><td>Agent (auto)</td><td>Text edits, image swaps, contact updates, testimonials, billing questions, FAQ responses, monthly report delivery</td><td>&lt; 24 hours</td></tr>
+    <tr><td><span class="badge badge-yellow">Tier 2</span></td><td>Agent drafts + human approves</td><td>Design/layout changes, new pages, structural changes, anything potentially out of scope</td><td>&lt; 48 hours</td></tr>
+    <tr><td><span class="badge badge-red">Tier 3</span></td><td>Human directly</td><td>Angry clients, legal threats, custom feature requests, disputes, cancellation negotiations</td><td>Variable</td></tr>
+  </tbody>
+</table>
+
+<h3>Response SLAs by Package</h3>
+<table>
+  <thead><tr><th></th><th>Starter</th><th>Growth</th><th>Pro</th></tr></thead>
+  <tbody>
+    <tr><td>Standard response</td><td>24 hours</td><td>4 hours</td><td>1 hour (critical)</td></tr>
+    <tr><td>Content edits / month</td><td>0 (minor only)</td><td>3</td><td>5</td></tr>
+    <tr><td>Same-day turnaround</td><td>No</td><td>No</td><td>Yes</td></tr>
+  </tbody>
+</table>
+
+<h3>Change Request Triage</h3>
+<div class="card-grid card-3">
+  <div class="card" style="border-left:3px solid var(--green)">
+    <h4>Included Minor Edit</h4>
+    <p>Within monthly limits. Agent handles immediately.</p>
+  </div>
+  <div class="card" style="border-left:3px solid var(--yellow)">
+    <h4>Add-On Task</h4>
+    <p>Outside monthly limits. Agent sends pricing, waits for approval.</p>
+  </div>
+  <div class="card" style="border-left:3px solid var(--red)">
+    <h4>Out of Scope</h4>
+    <p>Custom dev, strategy consulting. Agent declines politely, notifies human.</p>
+  </div>
+</div>
+
+<h3>Monthly Retention Actions</h3>
+<p>Every month, the agent sends each active client at least one visible proof of value:</p>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>Auto-generated analytics summary (visitor trends, top pages, key actions)</li>
+  <li>One specific improvement recommendation</li>
+  <li>Small proactive enhancement within scope (if applicable)</li>
+  <li>Chatbot performance note</li>
+  <li>Any site issue detected and fixed before the client noticed</li>
+</ul>
+
+<h3>Churn Signal Detection</h3>
+<p>The agent monitors for these signals and alerts the human operator:</p>
+<table>
+  <thead><tr><th>Signal</th><th>Agent Action</th></tr></thead>
+  <tbody>
+    <tr><td>No engagement for 60+ days</td><td>Send personalized retention message</td></tr>
+    <tr><td>Repeated price sensitivity in messages</td><td>Escalate to human</td></tr>
+    <tr><td>Repeated out-of-scope requests</td><td>Escalate to human</td></tr>
+    <tr><td>Billing failure</td><td>Enter failed payment workflow, alert human if persistent</td></tr>
+    <tr><td>Complaints about unclear value</td><td>Escalate to human</td></tr>
+    <tr><td>Client asks about cancellation</td><td>Escalate to human for retention conversation</td></tr>
+  </tbody>
+</table>
+
+<h3>Agent Support Guardrails (Enforced by Policy Engine)</h3>
+<div class="callout callout-danger">
+  <span class="callout-icon">&#9888;</span>
+  <div>
+    <strong>The agent MUST NOT:</strong><br>
+    &bull; Offer refunds, discounts, or free months without human approval<br>
+    &bull; Promise custom features or scope changes<br>
+    &bull; Respond to messages containing legal threats (escalate, do NOT reply)<br>
+    &bull; Delete or modify content it is not certain about<br>
+    &bull; Escalate frustration by being repetitive or dismissive
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 12: Policy Engine
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="policy">
+<div class="section-hero">
+  <span class="tag tag-controls">12 &mdash; Controls</span>
+  <h2>Policy Engine &amp; Guardrails</h2>
+  <p>A function that runs before every outbound action (email send, demo deploy, site launch, client response). It cannot be bypassed. It checks 12 hard rules derived from the non-negotiable business constraints.</p>
+</div>
+
+<h3>How It Works</h3>
+<div class="diagram">
+<svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+  <defs><marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6c5ce7"/></marker></defs>
+
+  <!-- Input -->
+  <rect x="10" y="40" width="140" height="60" rx="8" fill="#1a1a26" stroke="#2a2a3a"/>
+  <text x="80" y="65" text-anchor="middle" fill="#e4e4ef" font-size="11" font-weight="600">Agent produces</text>
+  <text x="80" y="82" text-anchor="middle" fill="#e4e4ef" font-size="11" font-weight="600">output (email/demo/etc)</text>
+
+  <line x1="150" y1="70" x2="190" y2="70" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+  <!-- Policy Engine -->
+  <rect x="192" y="20" width="200" height="100" rx="10" fill="rgba(225,112,85,0.06)" stroke="rgba(225,112,85,0.3)" stroke-width="2"/>
+  <text x="292" y="45" text-anchor="middle" fill="#e17055" font-size="11" font-weight="700">POLICY ENGINE</text>
+  <text x="292" y="62" text-anchor="middle" fill="#7a7a8f" font-size="9">Checks 12 rules against</text>
+  <text x="292" y="75" text-anchor="middle" fill="#7a7a8f" font-size="9">action type + phase + context</text>
+  <text x="292" y="95" text-anchor="middle" fill="#7a7a8f" font-size="9">Result logged to policy_checks</text>
+  <text x="292" y="108" text-anchor="middle" fill="#7a7a8f" font-size="9">regardless of outcome</text>
+
+  <!-- Three outcomes -->
+  <line x1="392" y1="40" x2="440" y2="30" stroke="#00b894" stroke-width="1.5" marker-end="url(#ar2)"/>
+  <line x1="392" y1="70" x2="440" y2="70" stroke="#e17055" stroke-width="1.5" marker-end="url(#ar2)"/>
+  <line x1="392" y1="100" x2="440" y2="110" stroke="#fdcb6e" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+  <rect x="442" y="10" width="120" height="40" rx="6" fill="rgba(0,184,148,0.1)" stroke="rgba(0,184,148,0.3)"/>
+  <text x="502" y="28" text-anchor="middle" fill="#00b894" font-size="10" font-weight="700">PASS</text>
+  <text x="502" y="42" text-anchor="middle" fill="#00b894" font-size="9">Execute action</text>
+
+  <rect x="442" y="55" width="120" height="40" rx="6" fill="rgba(225,112,85,0.1)" stroke="rgba(225,112,85,0.3)"/>
+  <text x="502" y="73" text-anchor="middle" fill="#e17055" font-size="10" font-weight="700">BLOCKED</text>
+  <text x="502" y="87" text-anchor="middle" fill="#e17055" font-size="9">Log + alert human</text>
+
+  <rect x="442" y="100" width="120" height="40" rx="6" fill="rgba(253,203,110,0.1)" stroke="rgba(253,203,110,0.3)"/>
+  <text x="502" y="118" text-anchor="middle" fill="#fdcb6e" font-size="10" font-weight="700">NEEDS HUMAN</text>
+  <text x="502" y="132" text-anchor="middle" fill="#fdcb6e" font-size="9">Queue for review</text>
+</svg>
+</div>
+
+<h3>The 12 Rules</h3>
+<table>
+  <thead><tr><th>Rule</th><th>Applies To</th><th>What It Checks</th><th>Result If Violated</th></tr></thead>
+  <tbody>
+    <tr><td><code>no_demo_before_interest</code></td><td>Hook emails</td><td>Email body contains demo link or preview URL</td><td><span class="badge badge-red">BLOCKED</span></td></tr>
+    <tr><td><code>no_pricing_in_hook</code></td><td>Hook emails</td><td>Email body contains price, plan name, or checkout URL</td><td><span class="badge badge-red">BLOCKED</span></td></tr>
+    <tr><td><code>hook_under_80_words</code></td><td>Hook emails</td><td>Word count exceeds 80</td><td><span class="badge badge-red">BLOCKED</span></td></tr>
+    <tr><td><code>no_discount_without_approval</code></td><td>All client responses</td><td>Language offering discount, free month, price reduction</td><td><span class="badge badge-red">BLOCKED</span> unless human override</td></tr>
+    <tr><td><code>no_revenue_seo_guarantees</code></td><td>All outbound</td><td>Language promising revenue, rankings, or lead volume</td><td><span class="badge badge-red">BLOCKED</span></td></tr>
+    <tr><td><code>data_isolation_check</code></td><td>Launch + demo deploy</td><td>Cross-client content detected in deployment</td><td><span class="badge badge-red">BLOCKED</span></td></tr>
+    <tr><td><code>legal_threat_escalation</code></td><td>Inbound messages</td><td>Message classified as angry or legal threat</td><td><span class="badge badge-red">BLOCKED</span> &rarr; escalate to human</td></tr>
+    <tr><td><code>payment_before_launch</code></td><td>Site launch</td><td>No successful payment record for this client</td><td><span class="badge badge-red">BLOCKED</span></td></tr>
+    <tr><td><code>human_gate_email_approval</code></td><td>Hook emails (Phase 3)</td><td>Phase &lt; 4 and email_approval_required = true</td><td><span class="badge badge-yellow">NEEDS HUMAN</span></td></tr>
+    <tr><td><code>human_gate_demo_approval</code></td><td>Demo sends (Phase 4)</td><td>Phase &lt; 5 and demo_approval_required = true</td><td><span class="badge badge-yellow">NEEDS HUMAN</span></td></tr>
+    <tr><td><code>human_gate_launch</code></td><td>Site launch</td><td>Always true</td><td><span class="badge badge-yellow">NEEDS HUMAN</span></td></tr>
+    <tr><td><code>scope_boundary</code></td><td>Client responses</td><td>Request classified as out of package scope</td><td><span class="badge badge-red">BLOCKED</span> &rarr; polite decline</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-danger">
+  <span class="callout-icon">&#9888;</span>
+  <div><strong>Every policy check is logged</strong> to the <code>policy_checks</code> table regardless of outcome (pass, blocked, or needs human). This creates a complete audit trail. When something goes wrong, you can trace: which rule fired, what input triggered it, and whether a human override was applied.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 13: State Machine
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="state-machine">
+<div class="section-hero">
+  <span class="tag tag-controls">13 &mdash; Controls</span>
+  <h2>State Machine</h2>
+  <p>Every lead and client follows a strict state machine. Invalid transitions are rejected. Every transition creates an audit trail record. Skills never mutate state directly &mdash; only the orchestrator can.</p>
+</div>
+
+<h3>Lead Pipeline</h3>
+<div class="diagram">
+<svg viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font)">
+  <defs>
+    <marker id="ar3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6c5ce7"/></marker>
+    <marker id="ar3r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#e17055"/></marker>
+    <marker id="ar3g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7a7a8f"/></marker>
+  </defs>
+
+  <!-- NEW -->
+  <rect x="330" y="10" width="120" height="40" rx="8" fill="#1a1a26" stroke="#74b9ff" stroke-width="1.5"/>
+  <text x="390" y="35" text-anchor="middle" fill="#74b9ff" font-size="12" font-weight="700">NEW</text>
+
+  <line x1="390" y1="50" x2="390" y2="75" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+  <!-- SCORED -->
+  <rect x="330" y="78" width="120" height="40" rx="8" fill="#1a1a26" stroke="#fdcb6e" stroke-width="1.5"/>
+  <text x="390" y="103" text-anchor="middle" fill="#fdcb6e" font-size="12" font-weight="700">SCORED</text>
+
+  <line x1="390" y1="118" x2="390" y2="143" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+  <!-- CONTACTED -->
+  <rect x="330" y="146" width="120" height="40" rx="8" fill="#1a1a26" stroke="#6c5ce7" stroke-width="1.5"/>
+  <text x="390" y="171" text-anchor="middle" fill="#a29bfe" font-size="12" font-weight="700">CONTACTED</text>
+
+  <!-- Branches from CONTACTED -->
+  <!-- Left: ARCHIVED -->
+  <line x1="330" y1="166" x2="190" y2="166" stroke="#7a7a8f" stroke-width="1.5" marker-end="url(#ar3g)"/>
+  <rect x="70" y="146" width="120" height="40" rx="8" fill="#1a1a26" stroke="#7a7a8f" stroke-width="1"/>
+  <text x="130" y="171" text-anchor="middle" fill="#7a7a8f" font-size="11" font-weight="600">ARCHIVED</text>
+  <text x="245" y="158" text-anchor="middle" fill="#7a7a8f" font-size="8">no response</text>
+
+  <!-- Down: REPLIED_INTERESTED -->
+  <line x1="390" y1="186" x2="390" y2="214" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <rect x="310" y="217" width="160" height="40" rx="8" fill="#1a1a26" stroke="#00b894" stroke-width="1.5"/>
+  <text x="390" y="242" text-anchor="middle" fill="#00b894" font-size="11" font-weight="700">REPLIED_INTERESTED</text>
+  <text x="405" y="208" text-anchor="middle" fill="#00b894" font-size="8">interested reply</text>
+
+  <!-- Down: DEMO_SENT -->
+  <line x1="390" y1="257" x2="390" y2="282" stroke="#6c5ce7" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <rect x="330" y="285" width="120" height="40" rx="8" fill="#1a1a26" stroke="#fdcb6e" stroke-width="1.5"/>
+  <text x="390" y="310" text-anchor="middle" fill="#fdcb6e" font-size="12" font-weight="700">DEMO_SENT</text>
+
+  <!-- Left from DEMO_SENT: LOST -->
+  <line x1="330" y1="305" x2="190" y2="305" stroke="#e17055" stroke-width="1.5" marker-end="url(#ar3r)"/>
+  <rect x="70" y="285" width="120" height="40" rx="8" fill="#1a1a26" stroke="#e17055" stroke-width="1"/>
+  <text x="130" y="310" text-anchor="middle" fill="#e17055" font-size="11" font-weight="600">LOST</text>
+  <text x="245" y="298" text-anchor="middle" fill="#e17055" font-size="8">declined</text>
+
+  <!-- Right from DEMO_SENT: PAID -->
+  <line x1="450" y1="305" x2="570" y2="305" stroke="#00b894" stroke-width="1.5" marker-end="url(#ar3g)"/>
+  <rect x="572" y="285" width="120" height="40" rx="8" fill="rgba(0,184,148,0.1)" stroke="#00b894" stroke-width="2"/>
+  <text x="632" y="310" text-anchor="middle" fill="#00b894" font-size="12" font-weight="700">PAID</text>
+  <text x="520" y="298" text-anchor="middle" fill="#00b894" font-size="8">payment confirmed</text>
+
+  <!-- PAID transitions to client -->
+  <line x1="632" y1="285" x2="632" y2="255" stroke="#00b894" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="632" y="248" text-anchor="middle" fill="#7a7a8f" font-size="9">&darr; Creates CLIENT record</text>
+</svg>
+</div>
+
+<h3>Transition Rules</h3>
+<table>
+  <thead><tr><th>From</th><th>To</th><th>Trigger</th><th>Policy Check</th><th>Human Gate</th></tr></thead>
+  <tbody>
+    <tr><td>NEW</td><td>SCORED</td><td>lead-gen completes scoring</td><td>&mdash;</td><td>Phase 3: human reviews list</td></tr>
+    <tr><td>SCORED</td><td>CONTACTED</td><td>Hook email sent</td><td>No demo link, no pricing, &lt;80 words</td><td>Phase 3: human approves email</td></tr>
+    <tr><td>CONTACTED</td><td>REPLIED_INTERESTED</td><td>Reply classified as interested</td><td>Classification confidence &gt; threshold</td><td>&mdash;</td></tr>
+    <tr><td>CONTACTED</td><td>ARCHIVED</td><td>No response after full sequence</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr><td>REPLIED_INTERESTED</td><td>DEMO_SENT</td><td>Demo deployed</td><td>Interest confirmed, data isolation OK</td><td>Phase 4: human reviews demo</td></tr>
+    <tr><td>DEMO_SENT</td><td>PAID</td><td>Payment webhook received</td><td>Idempotency check</td><td>&mdash;</td></tr>
+    <tr><td>DEMO_SENT</td><td>LOST</td><td>Prospect declines or no response</td><td>&mdash;</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 14: Rollout Phases
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="phases">
+<div class="section-hero">
+  <span class="tag tag-controls">14 &mdash; Controls</span>
+  <h2>Rollout Phases</h2>
+  <p>The system doesn't go fully autonomous on day one. Human approval gates are removed gradually as agent quality proves out through measurable KPIs.</p>
+</div>
+
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 1: Strategy Lock</h4>
+      <p>Finalize niche, city list, pricing, audit rubric, hook email templates, agent guardrails. No code yet &mdash; pure decisions.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">5&ndash;10 hrs/week</span><span class="badge badge-orange">Human-only</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 2: Agent Foundation</h4>
+      <p>Build the system. Database, state machine, policy engine, job queue, email integration, payment webhooks, deployment pipeline, niche templates, automated evals. First agent capabilities come online.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">10&ndash;15 hrs/week</span><span class="badge badge-blue">Building</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 3: Validation (All Gates Active)</h4>
+      <p>Agent builds first lead list. Human reviews every scored list. Agent drafts emails. Human reviews every email before sending. Controlled batches of 20 emails. All outcomes recorded meticulously.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">5&ndash;10 hrs/week</span><span class="badge badge-red">ALL GATES ON</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 4: Opening Quality Gates</h4>
+      <p>If reply rate &gt;5% and spam complaints &lt;0.3%: remove email approval gate. Build demo capability and reply classification. Human still reviews every demo. <code>email_approval_required = false</code></p>
+      <div class="flow-tags"><span class="badge badge-yellow">3&ndash;5 hrs/week</span><span class="badge badge-green">Email Gate Removed</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 5: First Closes</h4>
+      <p>If demo-to-close rate &gt;30%: remove demo approval gate. Agent handles full flow end-to-end. Human does final launch review. <code>demo_approval_required = false</code></p>
+      <div class="flow-tags"><span class="badge badge-yellow">3&ndash;5 hrs/week</span><span class="badge badge-green">Demo Gate Removed</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot active"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 6: Scale Toward Autonomy</h4>
+      <p>Automate Tier 1 support, monthly reports, churn detection. Reach 10+ active clients. <code>launch_approval_required</code> remains <strong>true forever</strong>. Human monitors dashboard, improves agent.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">3&ndash;5 hrs/week</span><span class="badge badge-red">Launch Gate FOREVER</span></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+    <div class="flow-content">
+      <h4>Phase 7: Entity &amp; Expansion</h4>
+      <p>Form US LLC. Consider Stripe migration for better margins. Introduce annual pricing option. Add second niche. Hire VA for QA if needed. Target 25&ndash;50 clients.</p>
+      <div class="flow-tags"><span class="badge badge-yellow">5&ndash;8 hrs/week</span><span class="badge badge-purple">Scaling</span></div>
+    </div>
+  </div>
+</div>
+
+<h3>Gate Removal Criteria</h3>
+<table>
+  <thead><tr><th>Gate</th><th>Go If</th><th>Stop If</th></tr></thead>
+  <tbody>
+    <tr><td>Remove email approval</td><td>Reply rate &gt;5%, spam complaints &lt;0.3%</td><td>Reply rate &lt;2% or spam &gt;0.5%</td></tr>
+    <tr><td>Remove demo approval</td><td>Demo-to-close rate &gt;30%</td><td>Demo-to-close &lt;15%</td></tr>
+    <tr><td>Remove launch approval</td><td><span class="badge badge-red">NEVER</span></td><td>This gate is permanent</td></tr>
+    <tr><td>Add second niche</td><td>5+ clients, &gt;80% month-2 retention</td><td>Churn &gt;30% or delivery chaotic</td></tr>
+    <tr><td>Form US LLC</td><td>$1,000+ MRR stable for 2+ months</td><td>Revenue unpredictable</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 15: API Reference
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="api">
+<div class="section-hero">
+  <span class="tag tag-system">15 &mdash; System</span>
+  <h2>API Reference</h2>
+  <p>All routes require API key auth (<code>x-api-key</code> header or <code>?api_key=</code> query param) except webhooks (which use their own signature verification).</p>
+</div>
+
+<h3>Core CRUD Routes</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/api/leads</code></td><td>GET</td><td>List leads (filter by status, niche, tier, city)</td></tr>
+    <tr><td><code>/api/leads/:id</code></td><td>GET</td><td>Lead details + interaction history</td></tr>
+    <tr><td><code>/api/leads/:id/score</code></td><td>POST</td><td>Submit audit score from website-audit</td></tr>
+    <tr><td><code>/api/leads/:id/classify-reply</code></td><td>POST</td><td>Classify inbound reply (interested/not/objection)</td></tr>
+    <tr><td><code>/api/leads/:id/transition</code></td><td>POST</td><td>Request state transition (orchestrator validates)</td></tr>
+    <tr><td><code>/api/interactions</code></td><td>POST</td><td>Create draft interaction (email, reply)</td></tr>
+    <tr><td><code>/api/interactions/:id/send</code></td><td>POST</td><td>Send interaction (runs policy checks first)</td></tr>
+    <tr><td><code>/api/interactions/:id/approve</code></td><td>POST</td><td>Human approves draft for sending</td></tr>
+    <tr><td><code>/api/clients</code></td><td>GET</td><td>List clients (filter by status, plan)</td></tr>
+    <tr><td><code>/api/clients/:id</code></td><td>GET</td><td>Client details + support history</td></tr>
+    <tr><td><code>/api/clients/:id/transition</code></td><td>POST</td><td>Request client state transition</td></tr>
+  </tbody>
+</table>
+
+<h3>Operations Routes</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/api/deployments</code></td><td>POST</td><td>Create deployment (trigger site build)</td></tr>
+    <tr><td><code>/api/deployments/:id/deploy</code></td><td>POST</td><td>Deploy to staging or production</td></tr>
+    <tr><td><code>/api/deployments/:id/approve</code></td><td>POST</td><td>Human approves deployment for launch</td></tr>
+    <tr><td><code>/api/jobs</code></td><td>GET</td><td>List jobs (filter by status, type)</td></tr>
+    <tr><td><code>/api/jobs/:id/retry</code></td><td>POST</td><td>Manually retry a dead job</td></tr>
+    <tr><td><code>/api/policy/check</code></td><td>POST</td><td>Run policy checks without executing (dry run)</td></tr>
+  </tbody>
+</table>
+
+<h3>Configuration Routes</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/api/config</code></td><td>GET</td><td>Read system config (phase, active niche, gates)</td></tr>
+    <tr><td><code>/api/config</code></td><td>PATCH</td><td>Update config (phase changes, toggle gates)</td></tr>
+    <tr><td><code>/api/scraper/config</code></td><td>GET/PATCH</td><td>Read or update scraper configuration</td></tr>
+    <tr><td><code>/api/scraper/run</code></td><td>POST</td><td>Manually trigger lead_gen scrape</td></tr>
+    <tr><td><code>/api/scraper/results</code></td><td>GET</td><td>Get scraper results</td></tr>
+    <tr><td><code>/api/scraper/history</code></td><td>GET</td><td>Get scraper run history</td></tr>
+  </tbody>
+</table>
+
+<h3>Niche Discovery Routes</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/api/niches/discover</code></td><td>POST</td><td>Trigger niche discovery run</td></tr>
+    <tr><td><code>/api/niches/discover/config</code></td><td>GET/PATCH</td><td>Discovery config (batch size, interval, auto-approve)</td></tr>
+    <tr><td><code>/api/niches/discover/stats</code></td><td>GET</td><td>Discovery pipeline statistics</td></tr>
+    <tr><td><code>/api/niches/:id/approve</code></td><td>PATCH</td><td>Human approve/validate a niche-city pair</td></tr>
+  </tbody>
+</table>
+
+<h3>Webhook Endpoints (No API Key &mdash; Signature Verified)</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Source</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/webhooks/dodo</code></td><td>Dodo Payments</td><td>Payment events (checkout, renewal, failure, cancel)</td></tr>
+    <tr><td><code>/webhooks/resend</code></td><td>Resend</td><td>Email delivery events (bounced, delivered, opened)</td></tr>
+    <tr><td><code>/webhooks/deploy</code></td><td>Cloudflare Pages</td><td>Deploy status callbacks</td></tr>
+  </tbody>
+</table>
+
+<h3>Job Types</h3>
+<table>
+  <thead><tr><th>Job Type</th><th>Trigger</th><th>Max Retries</th><th>Backoff</th></tr></thead>
+  <tbody>
+    <tr><td><code>lead_gen</code></td><td>Daily cron (6 AM)</td><td>2</td><td>30 min</td></tr>
+    <tr><td><code>email_enrich</code></td><td>After lead_gen</td><td>2</td><td>5 min</td></tr>
+    <tr><td><code>email_validate</code></td><td>After email_enrich</td><td>2</td><td>5 min</td></tr>
+    <tr><td><code>niche_discover</code></td><td>Every 6 hours</td><td>2</td><td>30 min</td></tr>
+    <tr><td><code>follow_up_1</code></td><td>3 days after hook sent</td><td>2</td><td>1 hour</td></tr>
+    <tr><td><code>follow_up_2</code></td><td>7 days after hook sent</td><td>2</td><td>1 hour</td></tr>
+    <tr><td><code>demo_build</code></td><td>On interest reply</td><td>3</td><td>5 min</td></tr>
+    <tr><td><code>onboarding</code></td><td>On payment confirmed</td><td>3</td><td>10 min</td></tr>
+    <tr><td><code>monthly_report</code></td><td>1st of each month</td><td>2</td><td>1 hour</td></tr>
+    <tr><td><code>churn_check</code></td><td>Weekly</td><td>1</td><td>1 hour</td></tr>
+    <tr><td><code>support_auto_reply</code></td><td>On inbound message</td><td>2</td><td>5 min</td></tr>
+    <tr><td><code>billing_retry</code></td><td>On payment failure</td><td>3</td><td>1h, 6h, 24h</td></tr>
+    <tr><td><code>site_qa</code></td><td>After site build</td><td>2</td><td>5 min</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 16: KPIs
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="kpis">
+<div class="section-hero">
+  <span class="tag tag-system">16 &mdash; System</span>
+  <h2>KPIs &amp; Metrics</h2>
+  <p>The business is measured like a system. The first goal is proving the AI-agent model converts, delivers, and retains profitably with minimal human intervention.</p>
+</div>
+
+<h3>Sales Funnel KPIs (Weekly)</h3>
+<div class="stat-row">
+  <div class="stat-mini"><div class="stat-val">50&ndash;100</div><div class="stat-label">Prospects reviewed/day</div></div>
+  <div class="stat-mini"><div class="stat-val">20&ndash;40</div><div class="stat-label">Qualified leads/day</div></div>
+  <div class="stat-mini"><div class="stat-val">&gt;5%</div><div class="stat-label">Reply rate target</div></div>
+  <div class="stat-mini"><div class="stat-val">&gt;30%</div><div class="stat-label">Demo-to-close target</div></div>
+</div>
+
+<h3>Agent Quality KPIs (Critical Early)</h3>
+<table>
+  <thead><tr><th>Metric</th><th>Target</th><th>If Below Target</th></tr></thead>
+  <tbody>
+    <tr><td>Agent email quality (human-rated)</td><td>5&ndash;10 samples/week during validation</td><td>Increase review frequency</td></tr>
+    <tr><td>Agent audit accuracy (human spot-checks)</td><td>5 audits/week during validation</td><td>Retune rubric weights</td></tr>
+    <tr><td>Agent demo quality (human-rated)</td><td>Every demo during validation</td><td>Fix template/content swap</td></tr>
+    <tr><td>Spam complaint rate</td><td>&lt;0.3%</td><td>Stop sending, investigate</td></tr>
+    <tr><td>Agent error rate</td><td>&lt;5%</td><td>Fix skill, add policy rules</td></tr>
+    <tr><td>Agent hallucination incidents</td><td>0</td><td>Immediate human review</td></tr>
+  </tbody>
+</table>
+
+<h3>Financial KPIs</h3>
+<table>
+  <thead><tr><th>Metric</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Monthly recurring revenue (MRR)</td><td>Primary health metric</td></tr>
+    <tr><td>Net revenue after fees</td><td>Dodo/Polar takes a %; track net</td></tr>
+    <tr><td>Average revenue per client</td><td>Should trend toward Growth plan ($129)</td></tr>
+    <tr><td>AI agent cost per client/month</td><td>Target: &lt;10% of revenue</td></tr>
+    <tr><td>Hosting cost per active client</td><td>Near-zero at Cloudflare free tier</td></tr>
+    <tr><td>Gross margin per client</td><td>Should be 70%+ given low marginal cost</td></tr>
+    <tr><td>Gross churn</td><td>Track month 1, 2, 3 retention</td></tr>
+  </tbody>
+</table>
+
+<h3>Delivery KPIs</h3>
+<table>
+  <thead><tr><th>Metric</th><th>Target</th></tr></thead>
+  <tbody>
+    <tr><td>Time to launch</td><td>3&ndash;5 business days after materials received</td></tr>
+    <tr><td>Human review time per launch</td><td>&lt;30 minutes</td></tr>
+    <tr><td>Support ticket volume</td><td>Track trend</td></tr>
+    <tr><td>Agent-resolved vs human-resolved tickets</td><td>Agent should resolve &gt;70% (Tier 1)</td></tr>
+  </tbody>
+</table>
+
+<h3>City+Niche Pair KPIs (Per Pair)</h3>
+<p>Each approved city+niche pair is tracked independently:</p>
+<ul style="list-style:disc;padding-left:24px;margin:12px 0">
+  <li>Pair score (0&ndash;100 from discovery engine)</li>
+  <li>Leads scraped, enriched, validated</li>
+  <li>Hook emails sent &rarr; reply rate &rarr; positive reply rate</li>
+  <li>Demos built &rarr; demo-to-close rate</li>
+  <li>Clients closed</li>
+  <li>Sprint outcome: continue / pause / drop</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 17: Risks
+     ═══════════════════════════════════════════════ -->
+<div class="section" id="risks">
+<div class="section-hero">
+  <span class="tag tag-controls">17 &mdash; Controls</span>
+  <h2>Risk Register</h2>
+  <p>With an AI-agent model, risks shift from human capacity to agent quality, reliability, and guardrails. Every risk has a detection mechanism and a mitigation plan.</p>
+</div>
+
+<h3>Priority Matrix</h3>
+<table>
+  <thead><tr><th>Priority</th><th>Risk</th><th>Detection</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-red">P0</span></td><td>Agent produces low-quality customer-facing output</td><td>Human review gates + spam complaint monitoring</td><td>Gradual gate removal only after KPIs proven; never batch-send without review in Phase 3</td></tr>
+    <tr><td><span class="badge badge-red">P0</span></td><td>Agent data isolation errors (Client A content on Client B site)</td><td>Automated data isolation check before every launch</td><td>Policy engine blocks launch; strict content separation in template architecture</td></tr>
+    <tr><td><span class="badge badge-red">P0</span></td><td>Agent makes unauthorized promises (discounts, features, guarantees)</td><td>Policy engine scans every outbound message</td><td>Hard-coded guardrails; no override without human approval</td></tr>
+    <tr><td><span class="badge badge-yellow">P1</span></td><td>2-step sales motion fails (hook emails don't convert)</td><td>Reply rate tracking per batch</td><td>A/B test hooks; if reply rate &lt;3%, revert to demo-in-first-email as backup</td></tr>
+    <tr><td><span class="badge badge-yellow">P1</span></td><td>Wrong niche selection</td><td>Zero or low reply rates from a niche sprint</td><td>100-point scoring model + mini-validation before committing</td></tr>
+    <tr><td><span class="badge badge-yellow">P1</span></td><td>Low hook email reply rate</td><td>7-day rolling reply rate drops below 2%</td><td>Sharpen issue selection, test subject lines, try SMS fallback channel</td></tr>
+    <tr><td><span class="badge badge-blue">P2</span></td><td>AI API cost scaling</td><td>Daily cost tracking; alert if &gt;2x rolling average</td><td>Cheaper models for routine tasks; budget at &lt;10% of revenue</td></tr>
+    <tr><td><span class="badge badge-blue">P2</span></td><td>Seasonal churn clustering</td><td>Cohort analysis after 5+ clients</td><td>Diversify niches; offer pause option for seasonal businesses</td></tr>
+    <tr><td><span class="badge badge-blue">P2</span></td><td>Platform dependency (Google Maps, email provider, AI provider)</td><td>Service degradation or API changes</td><td>Keep processes modular; identify backup providers</td></tr>
+  </tbody>
+</table>
+
+<h3>Observability &amp; Alerting</h3>
+<table>
+  <thead><tr><th>Alert</th><th>Trigger</th><th>Channel</th></tr></thead>
+  <tbody>
+    <tr><td>Payment webhook failure</td><td>Webhook returns non-200</td><td>Email + dashboard</td></tr>
+    <tr><td>Job dead (exceeded retries)</td><td>Job status &rarr; dead</td><td>Email + dashboard</td></tr>
+    <tr><td>Reply rate drop</td><td>7-day rolling rate &lt;2%</td><td>Dashboard flag</td></tr>
+    <tr><td>Spam complaint spike</td><td>&gt;0.5% in 7 days</td><td>Email (urgent)</td></tr>
+    <tr><td>Policy violation blocked</td><td>Policy engine blocks action</td><td>Dashboard log</td></tr>
+    <tr><td>Data isolation failure</td><td>Cross-client content detected</td><td>Email (urgent)</td></tr>
+    <tr><td>Queue backup</td><td>&gt;100 jobs queued for &gt;2 hours</td><td>Dashboard flag</td></tr>
+    <tr><td>Agent cost spike</td><td>Daily cost &gt;2x rolling average</td><td>Dashboard flag</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-success">
+  <span class="callout-icon">&#10003;</span>
+  <div><strong>Decision trace:</strong> When something goes wrong, you can trace the full chain: <code>pipeline_event &rarr; skill_version &rarr; policy_checks &rarr; interactions &rarr; jobs</code>. This answers: "Why was this email sent?" &rarr; which skill &rarr; what version &rarr; what input &rarr; what decision &rarr; did policy check pass &rarr; who approved.</div>
+</div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+(function(){
+  const sections = document.querySelectorAll('.section');
+  const links = document.querySelectorAll('.sidebar a, .mobile-nav a');
+  const sidebar = document.getElementById('sidebar');
+  const mobileNav = document.getElementById('mobileNav');
+
+  // Build mobile nav
+  if(mobileNav){
+    sidebar.querySelectorAll('a').forEach(a => {
+      const clone = a.cloneNode(true);
+      clone.addEventListener('click', e => { e.preventDefault(); navigate(clone.dataset.section); });
+      mobileNav.appendChild(clone);
+    });
+  }
+
+  function navigate(id){
+    sections.forEach(s => s.classList.remove('active'));
+    links.forEach(l => l.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+    document.querySelectorAll(`[data-section="${id}"]`).forEach(l => l.classList.add('active'));
+    history.replaceState(null, '', '#' + id);
+    window.scrollTo(0, 0);
+  }
+
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      navigate(link.dataset.section);
+    });
+  });
+
+  // Handle hash on load
+  const hash = location.hash.slice(1);
+  if(hash && document.getElementById(hash)){
+    navigate(hash);
+  }
+
+  // Theme
+  const saved = localStorage.getItem('theme');
+  if(saved === 'light') document.documentElement.setAttribute('data-theme','light');
+
+  window.toggleTheme = function(){
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  };
+})();
+</script>
+</body>
+</html>

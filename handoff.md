@@ -1,74 +1,64 @@
 # Handoff — Web Agency Platform
 
 ## Last Updated
-2026-04-23
+2026-04-29
 
 ## What Was Done (This Session)
-Assessed current implementation stage, validated app-lite health, and added a canonical end-to-end workflow document.
+Implemented autonomous niche+city discovery system. The agent now finds profitable niches on its own by probing cities with broad Google Maps queries and harvesting real business categories — no more manual niche picking.
 
-### Documentation Changes
-- `docs/23-Full-Workflow.md` [NEW]
-  - Added one canonical end-to-end workflow map (Step 0 through Step 8).
-  - Added state machine mapping (lead and client paths).
-  - Added policy/human-gate checkpoints and job trigger map.
-  - Added source map to deep-dive SOP and architecture docs.
-- `docs/README.md` [UPDATED]
-  - Added doc 23 to folder map and reading order guidance.
+### New Files
+- `app-lite/src/data/us-cities.ts` — Seed database of 200+ US cities across 3 tiers (mid-size metros, smaller metros, growing suburbs).
+- `app-lite/src/data/niche-library.ts` — 60+ niches across 10 verticals as seed/fallback. Includes revenue estimates and franchise risk flags.
+- `app-lite/src/jobs/handlers/niche-discovery.ts` — Core discovery handler: broad probing → category harvesting → auto-scoring → validation queuing → auto-approve pipeline.
+
+### Modified Files
+- `app-lite/src/db/schema.ts` — Added 8 discovery config fields to systemConfig (enabled, batchSize, intervalHours, autoApprove, excludeNiches, priorityCities, lastRun, humanReviewCount).
+- `app-lite/src/types/index.ts` — Added `niche_discover` to JOB_TYPES.
+- `app-lite/src/jobs/workers.ts` — Registered `handleNicheDiscover` handler.
+- `app-lite/src/jobs/scheduler.ts` — Added interval-based scheduling for `niche_discover` (every 6h, configurable).
+- `app-lite/src/routes/niches.ts` — Added discovery endpoints: POST /discover, GET/PATCH /discover/config, GET /discover/stats, PATCH /:id/approve.
+- `docs/22-Niche-Hunting-SOP.md` — Updated from manual to autonomous discovery. Scoring model and thresholds preserved.
+
+### Migration
+- Generated `drizzle/0000_nostalgic_human_robot.sql` for new discovery config columns.
+- Run `bun run db:migrate` to apply.
 
 ### Validation Run
-- Ran `bun run typecheck` in `app-lite/` -> passed.
-- Ran `bun run test` in `app-lite/` -> 4 test files, 60 tests, all passed.
+- `bun run typecheck` → passed (0 errors).
+- `bun run test` → 6 test files, 105 tests, all passed.
 
-### Stage Snapshot (from app-lite runtime data)
-- Current phase: 2 (Agent foundation).
-- Human gates configured on (email/demo/launch required).
-- Active targeting config: niche `laundry`, cities `Kansas City, MO` and `Arlington, TX`.
-- Records: 81 leads, 0 clients, 153 jobs.
+### Key Design Decisions
+1. **Discovery is organic** — The agent does NOT just cross-product a static niche list against cities. It probes each city with broad queries ("local services", "home services") and harvests the Google Maps categories that come back. This discovers what actually thrives in each city.
+2. **Seed library is fallback** — The 60+ niche library is used when broad probing returns sparse data, but real discovery comes from Maps categories.
+3. **Human gate preserved** — First 3 go/no-go decisions require human approval (via `PATCH /api/niches/:id/approve`). After 3 reviews, `autoApprove` can be enabled.
+4. **Conservative rate limiting** — Discovery runs at 4 req/min (vs 8 for production scraping) to stay under the radar.
 
-### Code Changes
-- No source code changes in `app-lite/src/`.
-- This session changed documentation only.
+## What Was Done (This Session)
+- **Workflow Hookup**: Updated `src/jobs/handlers/index.ts` `handleLeadGen` handler to automatically iterate over approved niche-city pairs instead of using the legacy global `activeNiche`/`activeCities` config. It now scrapes dynamically across all approved niches and pairs.
+- **Testing**: Updated tests in `tests/unit/handlers/lead-gen.test.ts` to reflect the new functionality.
+- **Documentation**: Finalized `docs/23-Full-Workflow.md` Step 0 description to reflect the autonomous discovery lifecycle and updated the Job map.
 
 ## What's In Progress
-- City+niche targeting is fully documented but not yet implemented in the application.
-- Scraper config currently runs one global niche across all cities — needs to support per-city niche configuration.
-- Core workflow is now documented in one place (`docs/23-Full-Workflow.md`), but application behavior still needs parity with Step 0 city+niche orchestration.
+- Continuous testing and monitoring of the autonomous niche discovery in a production-like environment.
 
 ## What's Blocked
 - **Resend API key** — required for production email sends in `follow_up_1`.
 - **Cloudflare tokens** — required for production deployment in `demo_build`.
 
 ## Where Next Agent Should Pick Up
-0. Implement city+niche pair support in the application:
-   - Update scraper config schema (`app-lite/src/db/schema.ts`) to store city+niche pairs with scores and status.
-   - Update scraper routes to accept city+niche pair targeting instead of one global niche.
-   - Add scoring workflow endpoint: submit a city+niche pair → run discovery queries → sample websites → compute score → store result.
-   - Add mini-validation scrape endpoint: run 30-lead scrape on a scored pair and update actual metrics.
-   - Add go/no-go decision logic: auto-approve or park based on thresholds from doc 22.
-   - Update dashboard to show city+niche pair scorecard, sprint status, and per-pair funnel metrics.
-1. Conditional TODO (only if email performance is insufficient):
-   - Set up US phone outreach stack for fallback leads:
-     - Buy US number via OpenPhone (simple) or Twilio/Telnyx (scalable)
-     - Complete SMS compliance (A2P 10DLC or toll-free verification)
-     - Route only `phone-only` hot/warm leads into short phone/SMS opener flow
-     - Keep same constraints as hook email (no demo link, no pricing, one question)
-2. Implement channel-aware outreach execution in `follow_up_1`:
-   - Email path for leads with valid email.
-   - Phone/SMS fallback path for leads without email but with phone.
-3. Add interaction logging for phone/SMS outreach attempts and outcomes.
-4. Add KPI plumbing for phone fallback funnel (`sent`, `replied`, `interested`, `demo_requested`).
-5. Optional: add social/profile enrichment pass for leads with no email + no phone.
-
-6. Documentation consistency follow-up (recommended):
-   - Reconcile `docs/19-Application-Architecture.md` platform language (PostgreSQL/Express/BullMQ) with active `app-lite` stack (SQLite/Hono/DB-backed queue), or add explicit "legacy architecture vs app-lite architecture" note to prevent confusion.
+1. Review the dashboard UI (`app-lite/public/index.html`) discovery pipeline visualization and ensure it meets operational requirements.
+2. Consider adding proxy configuration guidance for scaling discovery beyond 200+ cities.
+3. Review and integrate the email outreach endpoints to complete the end-to-end flow.
 
 ## Current Pipeline Snapshot
 ```text
-Step 0: Niche Hunting (NEW)
-  -> Generate candidate city+niche pairs
-  -> Score on 100-point model (demand, competition, weakness, contactability, revenue)
+Step 0: Niche Discovery (AUTONOMOUS)
+  -> Agent probes cities with broad Google Maps queries
+  -> Harvests real business categories (discovers what city is known for)
+  -> Scores on 100-point model (demand, competition, weakness, contactability, revenue)
   -> Mini-validation scrape (30 leads per top pair)
-  -> Go/no-go decision (score >= 70, contactable >= 60%, weak-site >= 50%)
+  -> Go/no-go decision (human first 3, then auto)
+  -> Runs every 6 hours in background
 
 Step 1: Lead Generation (on approved pairs only)
   -> Scrape (lead_gen)

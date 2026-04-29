@@ -247,6 +247,16 @@ export async function initializeDatabase() {
   safeAddColumn('leads', 'enriched_at', 'TEXT')
   safeAddColumn('leads', 'enrichment_error', 'TEXT')
 
+  // Add discovery columns to system_config
+  safeAddColumn('system_config', 'discovery_enabled', 'INTEGER DEFAULT 1')
+  safeAddColumn('system_config', 'discovery_batch_size', 'INTEGER DEFAULT 20')
+  safeAddColumn('system_config', 'discovery_interval_hours', 'INTEGER DEFAULT 6')
+  safeAddColumn('system_config', 'discovery_auto_approve', 'INTEGER DEFAULT 0')
+  safeAddColumn('system_config', 'discovery_exclude_niches', "TEXT DEFAULT '[]'")
+  safeAddColumn('system_config', 'discovery_priority_cities', "TEXT DEFAULT '[]'")
+  safeAddColumn('system_config', 'discovery_last_run', 'TEXT')
+  safeAddColumn('system_config', 'discovery_human_review_count', 'INTEGER DEFAULT 0')
+
   // Backfill priority_tier on existing leads
   sqlite.exec(`
     UPDATE leads SET priority_tier = CASE

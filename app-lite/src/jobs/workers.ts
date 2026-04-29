@@ -16,6 +16,7 @@ import {
   handleNicheScore,
   handleNicheValidate,
 } from './handlers/index'
+import { handleNicheDiscover } from './handlers/niche-discovery'
 
 const handlers: Record<string, (db: DbClient, job: ScheduledJob) => Promise<Record<string, unknown>>> = {
   lead_gen: handleLeadGen,
@@ -23,6 +24,7 @@ const handlers: Record<string, (db: DbClient, job: ScheduledJob) => Promise<Reco
   email_validate: handleEmailValidate,
   niche_score: handleNicheScore,
   niche_validate: handleNicheValidate,
+  niche_discover: handleNicheDiscover,
   follow_up_1: handleFollowUp1,
   follow_up_2: handleFollowUp2,
   demo_build: handleDemoBuild,

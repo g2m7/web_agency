@@ -265,6 +265,15 @@ export const systemConfig = sqliteTable('system_config', {
   activeCities: text('active_cities', { mode: 'json' }).default('["Austin, TX"]').notNull(),
   dodoCheckoutLinks: text('dodo_checkout_links', { mode: 'json' }).default('{}'),
   maintenanceMode: integer('maintenance_mode', { mode: 'boolean' }).default(false),
+  // ── Discovery config ──
+  discoveryEnabled: integer('discovery_enabled', { mode: 'boolean' }).default(true),
+  discoveryBatchSize: integer('discovery_batch_size').default(20),
+  discoveryIntervalHours: integer('discovery_interval_hours').default(6),
+  discoveryAutoApprove: integer('discovery_auto_approve', { mode: 'boolean' }).default(false),
+  discoveryExcludeNiches: text('discovery_exclude_niches', { mode: 'json' }).default('[]'),
+  discoveryPriorityCities: text('discovery_priority_cities', { mode: 'json' }).default('[]'),
+  discoveryLastRun: text('discovery_last_run'),
+  discoveryHumanReviewCount: integer('discovery_human_review_count').default(0),
   updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
 })

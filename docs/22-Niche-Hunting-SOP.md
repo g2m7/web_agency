@@ -2,7 +2,9 @@
 
 ## Objective
 
-Identify high-opportunity city+niche pairs before committing outreach resources. This is **Step 0** — it runs before lead generation, not during it. The goal is to replace gut-feel niche picks with a repeatable, data-backed scoring process that surfaces under-targeted specialties with weak digital competition and contactable businesses.
+Autonomously discover and score high-opportunity city+niche pairs before committing outreach resources. This is **Step 0** — it runs continuously in the background, not as a manual research task. The agent probes cities with broad queries, harvests Google Maps categories to discover what each city is actually known for, then scores and validates the best pairs.
+
+> **Key shift**: The operator does not manually pick niches. The agent discovers them organically from real Google Maps data — finding what thrives in each city rather than guessing from a static list.
 
 ## Core principle
 
@@ -72,33 +74,23 @@ All queries follow fixed patterns so every agent run produces consistent, compar
 - Record the date and result count for every query execution.
 - If a query returns fewer than 10 results, the pair has insufficient density and should be scored accordingly.
 
-## Candidate generation
+## Candidate generation (automated)
 
-### Step 1: Generate candidate niches per city
+### Step 1: Broad city probing
 
-For each target city, generate **20–40 candidate niches** including:
+The agent probes each city with **generic queries** ("local services", "home services", "health and wellness", etc.) and harvests the **Google Maps categories** returned. This discovers what businesses actually thrive in each city — not what we assume exists.
 
-- Standard local services (HVAC, plumbing, roofing, electrical, landscaping).
-- **Non-obvious specialties** — the real opportunity often lives here:
-  - Pool services, fence/deck builders, garage door, appliance repair.
-  - Pest control, tree service, septic/drain, foundation repair.
-  - Auto detailing, mobile mechanic, towing, body shops.
-  - Dog grooming, pet boarding, veterinary clinics.
-  - Chiropractors, physical therapy, massage therapy, acupuncture.
-  - Tutoring centers, music lessons, martial arts studios.
-  - House cleaning, junk removal, moving companies.
-  - Event venues, caterers, florists, photographers (wedding vertical).
-  - Tattoo studios, barbershops, nail salons, med spas.
+Discovered categories include anything Google Maps surfaces: pool services in Tampa, ski rentals in Denver, crawfish catering in New Orleans, surf shops in San Diego. The agent does not limit itself to a static niche list.
 
-- Do **not** default to HVAC/plumbing/roofing for every city. Those are obvious and often over-targeted.
+A seed library of 60+ niches across 10 verticals (`app-lite/src/data/niche-library.ts`) serves as a fallback for cities where broad probing returns sparse data. The library includes home services, property maintenance, auto, pets, health, education, events, personal care, food, and professional services.
 
-### Step 2: Quick-filter to top 10
+### Step 2: Quick-filter
 
 Before full scoring, apply quick filters to eliminate obvious non-starters:
 
-- Fewer than 15 businesses on Maps → skip (insufficient density).
+- Fewer than 10 businesses on Maps → skip (insufficient density).
 - Niche requires enterprise sales cycle → skip (poor async-close fit).
-- Niche businesses are predominantly franchise/chain → skip (centralized marketing).
+- Niche businesses are predominantly franchise/chain → skip (centralized marketing, flagged via `franchiseRisk` in the niche library).
 
 ## Scoring model — 100-point scale
 
@@ -197,15 +189,17 @@ After the sprint, decide:
 - **Pause**: reply rate 2–5%, no demo requests → park and revisit with a different hook angle.
 - **Drop**: reply rate < 2% or zero positive replies → move to next pair.
 
-## Weekly cadence
+## Automated cadence
 
-| Day | Activity |
-|---|---|
-| Monday | Review prior week's sprint results for active pairs |
-| Tuesday | Score 5–10 new candidate pairs (research + query execution) |
-| Wednesday | Run mini-validation scrapes on top candidates |
-| Thursday | Go/no-go decisions on validated pairs |
-| Friday | Launch new sprint or continue active sprint; update scorecard |
+The `niche_discover` job runs every 6 hours (configurable) and handles candidate generation, probing, scoring, and validation queuing automatically.
+
+| Activity | Frequency | Owner |
+|---|---|---|
+| Discovery probing (broad + targeted) | Every 6h | Agent (automatic) |
+| Scoring discovered pairs | Every 6h | Agent (automatic) |
+| Mini-validation scrapes on top scorers | Every 6h | Agent (automatic) |
+| Go/no-go decisions | Per validated pair | Human (first 3), then agent |
+| Sprint review for active pairs | Weekly (Monday) | Agent + human review |
 
 ## Operational artifact
 
