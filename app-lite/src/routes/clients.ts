@@ -39,10 +39,13 @@ clientRoutes.post('/', async (c) => {
   }
 })
 
-// Update client
+// Update client (status changes must go through POST /:id/transition)
 clientRoutes.patch('/:id', async (c) => {
   const db = getDb()
   const data = await c.req.json()
+  if ('status' in data) {
+    return c.json({ error: 'Use POST /:id/transition to change status' }, 422)
+  }
   try {
     const client = await db.update({ collection: 'clients', id: c.req.param('id'), data })
     return c.json(client)

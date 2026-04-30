@@ -9,48 +9,78 @@ export async function startScheduler(_db: DbClient) {
 }
 
 export async function startRecurringJobs(db: DbClient) {
-  // Enqueue daily/weekly/monthly jobs if not already queued
+  const recurringTypes = ['lead_gen', 'monthly_report', 'churn_check', 'niche_discover'] as const
+
+  for (const jobType of recurringTypes) {
+    if (jobType === 'niche_discover') {
+      await maybeEnqueueDiscovery(db)
+      continue
+    }
+
+    const recent = await db.find({
+      collection: 'jobs',
+      where: {
+        and: [
+          { job_type: { equals: jobType } },
+          { status: { in: ['queued', 'running'] } },
+        ],
+      },
+      limit: 1,
+    })
+
+    if (recent.totalDocs > 0) continue
+
+    const lastCompleted = await db.find({
+      collection: 'jobs',
+      where: {
+        and: [
+          { job_type: { equals: jobType } },
+          { status: { equals: 'completed' } },
+        ],
+      },
+      limit: 1,
+      sort: '-completedAt',
+    })
+
+    if (lastCompleted.totalDocs > 0) {
+      const completedAt = lastCompleted.docs[0].completedAt ?? lastCompleted.docs[0].completed_at
+      const ageMs = Date.now() - new Date(completedAt).getTime()
+      if (ageMs < 60 * 60 * 1000) continue
+    }
+
+    await enqueueJob(db, jobType, {})
+  }
+
+  console.log('Recurring jobs enqueued')
+}
+
+async function maybeEnqueueDiscovery(db: DbClient) {
   const existing = await db.find({
     collection: 'jobs',
     where: {
       and: [
-        { job_type: { in: ['lead_gen', 'monthly_report', 'churn_check', 'niche_discover'] } },
-        { status: { equals: 'queued' } },
+        { job_type: { equals: 'niche_discover' } },
+        { status: { in: ['queued', 'running'] } },
       ],
     },
-    limit: 10,
+    limit: 1,
   })
 
-  const existingTypes = new Set(existing.docs.map((d: any) => d.job_type))
+  if (existing.totalDocs > 0) return
 
-  if (!existingTypes.has('lead_gen')) {
-    await enqueueJob(db, 'lead_gen', {})
+  const config = await db.findGlobal({ slug: 'system-config' })
+  const enabled = config.discoveryEnabled ?? config.discovery_enabled ?? true
+  const intervalHours = config.discoveryIntervalHours ?? config.discovery_interval_hours ?? 6
+  const lastRun = config.discoveryLastRun ?? config.discovery_last_run
+
+  if (!enabled) return
+
+  const shouldRun = !lastRun ||
+    (Date.now() - new Date(lastRun).getTime()) > intervalHours * 60 * 60 * 1000
+
+  if (shouldRun) {
+    await enqueueJob(db, 'niche_discover', { triggeredBy: 'scheduler' })
   }
-  if (!existingTypes.has('monthly_report')) {
-    await enqueueJob(db, 'monthly_report', {})
-  }
-  if (!existingTypes.has('churn_check')) {
-    await enqueueJob(db, 'churn_check', {})
-  }
-
-  // Niche discovery — check if interval has elapsed
-  if (!existingTypes.has('niche_discover')) {
-    const config = await db.findGlobal({ slug: 'system-config' })
-    const enabled = config.discoveryEnabled ?? config.discovery_enabled ?? true
-    const intervalHours = config.discoveryIntervalHours ?? config.discovery_interval_hours ?? 6
-    const lastRun = config.discoveryLastRun ?? config.discovery_last_run
-
-    if (enabled) {
-      const shouldRun = !lastRun ||
-        (Date.now() - new Date(lastRun).getTime()) > intervalHours * 60 * 60 * 1000
-
-      if (shouldRun) {
-        await enqueueJob(db, 'niche_discover', { triggeredBy: 'scheduler' })
-      }
-    }
-  }
-
-  console.log('Recurring jobs enqueued')
 }
 
 export async function scheduleAfterTransition(

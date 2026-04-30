@@ -49,10 +49,13 @@ leadRoutes.post('/', async (c) => {
   }
 })
 
-// Update lead
+// Update lead (status changes must go through POST /:id/transition)
 leadRoutes.patch('/:id', async (c) => {
   const db = getDb()
   const data = await c.req.json()
+  if ('status' in data) {
+    return c.json({ error: 'Use POST /:id/transition to change status' }, 422)
+  }
   try {
     const lead = await db.update({ collection: 'leads', id: c.req.param('id'), data })
     return c.json(lead)

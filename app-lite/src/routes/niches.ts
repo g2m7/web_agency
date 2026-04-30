@@ -104,6 +104,8 @@ nicheRoutes.get('/discover/stats', async (c) => {
   const uniqueCities = new Set(allPairs.docs.map((p: any) => `${p.city}, ${p.state}`))
   const uniqueNiches = new Set(allPairs.docs.map((p: any) => p.niche))
 
+  const config = await db.findGlobal({ slug: 'system-config' })
+
   return c.json({
     pipeline: {
       total: all.totalDocs,
@@ -118,6 +120,11 @@ nicheRoutes.get('/discover/stats', async (c) => {
       uniqueCities: uniqueCities.size,
       uniqueNiches: uniqueNiches.size,
       topNiches: [...uniqueNiches].slice(0, 20),
+    },
+    config: {
+      enabled: config.discoveryEnabled ?? config.discovery_enabled ?? true,
+      autoApprove: config.discoveryAutoApprove ?? config.discovery_auto_approve ?? false,
+      lastRun: config.discoveryLastRun ?? config.discovery_last_run ?? null,
     },
     recentJobs: discoveryJobs.docs.map((j: any) => ({
       id: j.id,

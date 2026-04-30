@@ -50,6 +50,8 @@ app.route('/webhooks/cloudflare', cloudflareWebhook)
 
 // ── Health ──────────────────────────────────────────────────
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
+app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
+app.get('/favicon.ico', (c) => c.newResponse(null, 204))
 
 // ── Root ────────────────────────────────────────────────────
 app.get('/', async (c) => {

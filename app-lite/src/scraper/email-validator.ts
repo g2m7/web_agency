@@ -87,14 +87,14 @@ function isNoreply(email: string): boolean {
 
 // ── MX record check ─────────────────────────────────────────────
 
-async function hasMxRecords(domain: string): Promise<boolean> {
+async function hasMxRecords(domain: string): Promise<'yes' | 'no' | 'unknown'> {
   try {
     const dns = await import('node:dns/promises')
     const records = await dns.resolveMx(domain)
-    return records.length > 0
+    return records.length > 0 ? 'yes' : 'no'
   } catch {
     // DNS failure — could be temporary, don't hard-fail
-    return false
+    return 'unknown'
   }
 }
 
@@ -124,14 +124,19 @@ export async function validateEmail(email: string): Promise<ValidationResult> {
   const roleAddr = isRoleAddress(normalized)
 
   // 5. MX record check
-  const hasMx = await hasMxRecords(domain)
-  if (!hasMx) {
+  const mxStatus = await hasMxRecords(domain)
+  if (mxStatus === 'no') {
     return { status: 'invalid', reason: `No MX records for ${domain}` }
   }
 
   // 6. Final determination
   if (roleAddr) {
     return { status: 'risky', reason: `Role address (${normalized.split('@')[0]})` }
+  }
+
+  // DNS lookup failed — treat as risky rather than invalid since the email may still work
+  if (mxStatus === 'unknown') {
+    return { status: 'risky', reason: `DNS lookup failed for ${domain} — could not verify MX records` }
   }
 
   return { status: 'valid', reason: 'Passed all checks' }

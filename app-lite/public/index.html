@@ -208,6 +208,18 @@
     .pipeline-bar { display: flex; height: 14px; border-radius: 0; overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-border); }
     .pipeline-bar div { height: 100%; transition: width 0.5s ease; border-right: 1px solid var(--color-bg); }
 
+    .step-flow { display: flex; flex-direction: column; gap: 0; }
+    .step-row { display: flex; align-items: stretch; gap: 0; }
+    .step-cell { padding: 8px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--color-border); font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+    .step-cell-label { width: 120px; min-width: 120px; color: var(--color-dim); text-transform: uppercase; letter-spacing: 1px; font-size: 10px; }
+    .step-cell-bar { flex: 1; display: flex; align-items: center; gap: 6px; }
+    .step-cell-count { font-size: 16px; font-weight: bold; min-width: 36px; text-align: right; }
+    .step-bar-track { flex: 1; height: 10px; background: var(--color-bg); border: 1px solid var(--color-border); overflow: hidden; position: relative; }
+    .step-bar-fill { height: 100%; transition: width 0.4s ease; }
+    .step-cell-pct { font-size: 11px; color: var(--color-dim); min-width: 38px; text-align: right; }
+    .step-cell-arrow { width: 28px; display: flex; align-items: center; justify-content: center; color: var(--color-dim); font-size: 10px; }
+    .step-cell-rate { min-width: 50px; text-align: center; font-size: 12px; font-weight: bold; }
+
     .kanban-col {
       min-width: 180px;
       flex: 1;
@@ -277,6 +289,25 @@
       font-family: 'Share Tech Mono', monospace;
     }
     .activity-item:hover { background: var(--color-surface-2); }
+
+    .config-drawer { position:fixed; top:0; right:-420px; width:420px; height:100vh; background:var(--color-surface); border-left:2px solid var(--color-border); z-index:200; transition:right 0.3s ease; overflow-y:auto; box-shadow:-8px 0 24px rgba(0,0,0,0.5); }
+    .config-drawer.open { right:0; }
+    .config-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:199; display:none; }
+    .config-overlay.open { display:block; }
+    .global-progress { background:var(--color-surface); border-bottom:1px solid var(--color-border); position:relative; z-index:1; }
+    .gp-step { flex:1; padding:10px 8px; text-align:center; border-right:1px solid var(--color-border); position:relative; }
+    .gp-step:last-child { border-right:none; }
+    .gp-step-label { font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:var(--color-dim); font-family:'Share Tech Mono',monospace; margin-bottom:2px; }
+    .gp-step-count { font-size:20px; font-weight:700; font-family:'Share Tech Mono',monospace; }
+    .gp-step-bar { height:3px; background:var(--color-bg); margin-top:4px; }
+    .gp-step-bar-fill { height:100%; transition:width 0.5s ease; }
+    .gp-arrow { color:var(--color-dim); font-size:10px; display:flex; align-items:center; padding:0 2px; }
+    .source-badge { background:var(--color-accent-glow); border:1px solid var(--color-accent-dim); padding:8px 16px; display:flex; align-items:center; gap:8px; font-family:'Share Tech Mono',monospace; font-size:13px; }
+    .source-badge i { color:var(--color-accent); }
+    details > summary { cursor:pointer; list-style:none; }
+    details > summary::-webkit-details-marker { display:none; }
+    details > summary::before { content:'\25B6'; display:inline-block; margin-right:8px; font-size:10px; transition:transform 0.2s; color:var(--color-accent); }
+    details[open] > summary::before { transform:rotate(90deg); }
   </style>
 </head>
 <body class="min-h-screen p-0 m-0 bg-bg text-hud-bright">
@@ -290,40 +321,52 @@
       <span class="text-dim text-base">|</span>
       <h1 class="text-base font-bold tracking-wide uppercase" style="font-family:'Space Grotesk',sans-serif;color:var(--color-hud-bright)">Operations Terminal</h1>
     </div>
-    <div class="flex gap-5 text-[13px] tracking-[1px] uppercase" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)">
+    <div class="flex gap-5 items-center text-[13px] tracking-[1px] uppercase" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)">
       <a href="/about" class="text-accent no-underline font-medium hover:underline" style="font-family:'Share Tech Mono',monospace">DOCS</a>
       <span id="phase">PHASE —</span>
       <span id="uptime">—</span>
       <span id="last-refresh">—</span>
+      <button onclick="toggleConfigDrawer()" class="btn bg-surface border border-border text-dim px-3 py-1.5 cursor-pointer hover:border-accent hover:text-accent" title="System Config"><i class="ph ph-gear text-base"></i></button>
     </div>
   </header>
 
   <nav class="nav-shell flex px-8">
-    <button class="nav-tab nav-active px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="pipeline" onclick="switchTab('pipeline')">
-      <i class="ph ph-funnel mr-1"></i>Pipeline
+    <button class="nav-tab nav-active px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="targeting" onclick="switchTab('targeting')">
+      <i class="ph ph-crosshair mr-1"></i>Targeting
     </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="discovery" onclick="switchTab('discovery')">
-      <i class="ph ph-compass mr-1"></i>Discovery
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="leads" onclick="switchTab('leads')">
+      <i class="ph ph-address-book mr-1"></i>Leads
     </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="scraper" onclick="switchTab('scraper')">
-      <i class="ph ph-spider-web mr-1"></i>Lead Gen
-    </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="niches" onclick="switchTab('niches')">
-      <i class="ph ph-crosshair mr-1"></i>Niches
-    </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="activity" onclick="switchTab('activity')">
-      <i class="ph ph-clock-counter-clockwise mr-1"></i>Activity
-    </button>
-    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="config" onclick="switchTab('config')">
-      <i class="ph ph-gear mr-1"></i>Config
+    <button class="nav-tab px-6 py-3 text-[13px] tracking-[2px] uppercase font-semibold cursor-pointer" style="font-family:'Share Tech Mono',monospace" data-tab="sales" onclick="switchTab('sales')">
+      <i class="ph ph-currency-dollar mr-1"></i>Sales
     </button>
   </nav>
 
+  <!-- GLOBAL PIPELINE PROGRESS -->
+  <div class="global-progress px-8 py-2">
+    <div class="flex items-center" id="global-progress-bar"></div>
+  </div>
+
   <main class="p-6 flex flex-col gap-5 w-full">
 
-    <!-- ===================== PIPELINE VIEW ===================== -->
-    <div id="view-pipeline" class="view active flex flex-col gap-5">
+    <!-- ===================== TARGETING VIEW (Discovery + Niches merged) ===================== -->
+    <div id="view-targeting" class="view active flex flex-col gap-5">
+      <!-- Content comes from view-discovery and view-niches sub-views below -->
+    </div>
 
+    <!-- ===================== LEADS VIEW (Scraper wrapper) ===================== -->
+    <div id="view-leads" class="view flex flex-col gap-5">
+      <!-- Active Source Indicator -->
+      <div id="active-source" class="source-badge"><i class="ph ph-link"></i> <span id="active-source-text">Loading active targets...</span></div>
+      <!-- Scraper content comes from view-scraper sub-view below -->
+    </div>
+
+    <!-- ===================== SALES VIEW (Pipeline + Clients + Activity) ===================== -->
+    <div id="view-sales" class="view flex flex-col gap-5">
+    </div>
+
+    <!-- ===================== PIPELINE (sub-view of Sales) ===================== -->
+    <div id="view-pipeline" class="view flex flex-col gap-5" style="display:none">
       <div class="flex gap-2 flex-wrap">
         <button class="btn btn-primary px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
           <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper
@@ -335,11 +378,7 @@
           <span class="spinner"></span><i class="ph ph-chart-bar"></i> Monthly Report
         </button>
       </div>
-
-      <!-- KPI ROW -->
       <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4" id="kpi-row"></div>
-
-      <!-- PIPELINE BAR -->
       <div class="hud-panel">
         <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE FLOW</h2>
@@ -348,17 +387,14 @@
           <div class="pipeline-bar" id="pipeline-bar"></div>
           <div class="flex gap-6 py-4 flex-wrap" id="pipeline-legend"></div>
         </div>
+        <div id="pipeline-steps" class="step-flow"></div>
       </div>
-
-      <!-- KANBAN BOARD -->
       <div class="hud-panel">
         <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-columns mr-1.5"></i>WORKFLOW STAGES</h2>
         </div>
         <div class="flex gap-0 overflow-x-auto" id="kanban-board"></div>
       </div>
-
-      <!-- BOTTOM ROW: JOBS + CLIENTS -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div class="hud-panel overflow-hidden">
           <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
@@ -377,8 +413,8 @@
       </div>
     </div>
 
-    <!-- ===================== ACTIVITY VIEW ===================== -->
-    <div id="view-activity" class="view flex flex-col gap-5">
+    <!-- ===================== ACTIVITY (sub-view of Sales) ===================== -->
+    <div id="view-activity" class="view flex flex-col gap-5" style="display:none">
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-timeline mr-1.5"></i>PIPELINE EVENTS</h2>
@@ -395,18 +431,8 @@
       </div>
     </div>
 
-    <!-- ===================== CONFIG VIEW ===================== -->
-    <div id="view-config" class="view flex flex-col gap-5">
-      <div class="hud-panel">
-        <div class="px-6 py-4 border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
-        </div>
-        <div id="config-panel"></div>
-      </div>
-    </div>
-
-    <!-- ===================== DISCOVERY VIEW ===================== -->
-    <div id="view-discovery" class="view flex flex-col gap-5">
+    <!-- ===================== DISCOVERY SECTION (inside Targeting) ===================== -->
+    <div id="view-discovery" class="view flex flex-col gap-5" style="display:none">
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
@@ -462,11 +488,18 @@
           <div class="pipeline-bar" id="discovery-funnel-bar"></div>
           <div class="flex gap-6 py-4 flex-wrap" id="discovery-funnel-legend"></div>
         </div>
+        <div id="discovery-steps" class="step-flow"></div>
+      </div>
+      <div class="hud-panel">
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Discovery Runs</h2>
+        </div>
+        <div class="overflow-y-auto max-h-[300px]" id="discovery-jobs-list"></div>
       </div>
     </div>
 
-    <!-- ===================== SCRAPER VIEW ===================== -->
-    <div id="view-scraper" class="view flex flex-col gap-5">
+    <!-- ===================== SCRAPER SECTION (inside Leads) ===================== -->
+    <div id="view-scraper" class="view flex flex-col gap-5" style="display:none">
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
@@ -522,6 +555,13 @@
       <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="scraper-stats-row"></div>
 
       <div class="hud-panel">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-arrow-line-down mr-1.5"></i>LEAD GEN FUNNEL</h2>
+        </div>
+        <div id="scraper-steps" class="step-flow"></div>
+      </div>
+
+      <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
           <span class="text-[13px] text-dim" id="scraper-lead-count">—</span>
@@ -575,8 +615,8 @@
       </div>
     </div>
 
-    <!-- ===================== NICHES VIEW ===================== -->
-    <div id="view-niches" class="view flex flex-col gap-5">
+    <!-- ===================== NICHES SECTION (inside Targeting) ===================== -->
+    <div id="view-niches" class="view flex flex-col gap-5" style="display:none">
       <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="niche-stats-row"></div>
 
       <div class="hud-panel">
@@ -675,6 +715,16 @@
 
   </main>
 
+  <!-- CONFIG DRAWER -->
+  <div id="config-overlay" class="config-overlay" onclick="toggleConfigDrawer()"></div>
+  <div id="config-drawer" class="config-drawer">
+    <div class="px-6 py-4 border-b border-border bg-surface-2 flex items-center justify-between">
+      <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
+      <button onclick="toggleConfigDrawer()" class="text-dim hover:text-accent cursor-pointer text-xl">&times;</button>
+    </div>
+    <div id="config-panel"></div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
   <script>
@@ -699,6 +749,36 @@
 
     const PIPELINE_COLORS = {};
     PIPELINE_STAGES.forEach(s => { PIPELINE_COLORS[s.key] = s.color; });
+
+    function stepsHTML(steps) {
+      var maxCount = 0;
+      steps.forEach(function(s) { if (s.count > maxCount) maxCount = s.count; });
+      maxCount = maxCount || 1;
+      var html = '';
+      for (var i = 0; i < steps.length; i++) {
+        var s = steps[i];
+        var pct = ((s.count / maxCount) * 100).toFixed(0);
+        var convRate = '';
+        if (i > 0 && steps[i - 1].count > 0) {
+          var rate = ((s.count / steps[i - 1].count) * 100).toFixed(1);
+          convRate = '<span class="step-cell-rate" style="color:' + (parseFloat(rate) >= 30 ? 'var(--color-good)' : parseFloat(rate) >= 10 ? 'var(--color-warn)' : 'var(--color-dim)') + '">' + rate + '%</span>';
+        } else if (i > 0) {
+          convRate = '<span class="step-cell-rate" style="color:var(--color-dim)">—</span>';
+        }
+        html += '<div class="step-row">' +
+          '<div class="step-cell" style="border-left:3px solid ' + s.color + '">' +
+            '<div class="step-cell-label">' + s.label + '</div>' +
+            '<div class="step-cell-bar">' +
+              '<div class="step-cell-count" style="color:' + s.color + '">' + s.count + '</div>' +
+              '<div class="step-bar-track"><div class="step-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>' +
+              '<div class="step-cell-pct">' + pct + '%</div>' +
+            '</div>' +
+          '</div>' +
+          (i > 0 ? '<div class="step-cell"><div class="step-cell-arrow"><i class="ph ph-arrow-up"></i></div>' + convRate + '</div>' : '') +
+        '</div>';
+      }
+      return html;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#sc-niche, #sc-rpm, #sc-retries, #sc-delay-min, #sc-delay-max, #sc-cities').forEach(el => {
@@ -741,24 +821,57 @@
       setTimeout(function() { t.className = 'toast'; }, 3000);
     }
 
+    // Tab-to-subview mapping
+    var TAB_VIEWS = {
+      targeting: ['view-targeting', 'view-discovery', 'view-niches'],
+      leads: ['view-leads', 'view-scraper'],
+      sales: ['view-sales', 'view-pipeline', 'view-activity']
+    };
+
     function switchTab(tab) {
       document.querySelectorAll('.nav-tab').forEach(function(el) {
         el.style.borderBottomColor = 'transparent';
         el.style.color = 'var(--color-dim)';
         el.classList.remove('nav-active');
       });
-      document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('active'); });
+      // Hide all views
+      document.querySelectorAll('.view').forEach(function(el) {
+        el.classList.remove('active');
+        el.style.display = '';
+      });
       var activeTab = document.querySelector('.nav-tab[data-tab="' + tab + '"]');
       activeTab.style.borderBottomColor = 'var(--color-accent)';
       activeTab.style.color = 'var(--color-accent)';
       activeTab.classList.add('nav-active');
-      document.getElementById('view-' + tab).classList.add('active');
+      // Show all sub-views for this tab
+      var views = TAB_VIEWS[tab] || [];
+      views.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.classList.add('active'); el.style.display = ''; }
+      });
+      // Refresh data
+      if (tab === 'targeting') { refreshDiscoveryView(); refreshNichesView(); }
+      if (tab === 'leads') { refreshScraperView(); loadActiveSource(); }
+      if (tab === 'sales') { refresh(); refreshActivity(); }
+    }
 
-      if (tab === 'scraper') refreshScraperView();
-      if (tab === 'niches') refreshNichesView();
-      if (tab === 'discovery') refreshDiscoveryView();
-      if (tab === 'activity') refreshActivity();
-      if (tab === 'config') refreshConfig();
+    function toggleConfigDrawer() {
+      document.getElementById('config-drawer').classList.toggle('open');
+      document.getElementById('config-overlay').classList.toggle('open');
+      if (document.getElementById('config-drawer').classList.contains('open')) refreshConfig();
+    }
+
+    async function loadActiveSource() {
+      try {
+        var r = await axios.get(API + '/api/niches?status=approved&limit=10', { headers: headers });
+        var pairs = r.data.docs || [];
+        var el = document.getElementById('active-source-text');
+        if (pairs.length === 0) {
+          el.innerHTML = 'No approved targets yet — <a href="#" onclick="switchTab(\'targeting\');return false" style="color:var(--color-accent);text-decoration:underline">go to Targeting</a> to approve niche-city pairs';
+        } else {
+          el.textContent = 'Active targets: ' + pairs.map(function(p) { return p.niche + ' in ' + p.city + ', ' + p.state; }).join(' \u2022 ');
+        }
+      } catch(e) { console.error('Active source error:', e); }
     }
 
     async function triggerJob(jobType) {
@@ -803,9 +916,57 @@
         renderJobs(jobs, results[2].data.totalDocs);
         renderClients(clients, results[1].data.totalDocs);
 
+        renderGlobalProgress(statusCounts, allLeads.length);
       } catch (err) {
         console.error('Refresh failed:', err);
       }
+    }
+
+    function renderGlobalProgress(statusCounts, totalLeads) {
+      var steps = [
+        { label: 'Discovered', key: '_disc', color: '#74b9ff' },
+        { label: 'Scraped', key: '_scraped', color: '#a78bfa' },
+        { label: 'Enriched', key: '_enriched', color: '#818cf8' },
+        { label: 'Outreach Ready', key: '_outreach', color: '#22c55e' },
+        { label: 'Contacted', key: 'contacted', color: '#f0a64b' },
+        { label: 'Interested', key: 'replied_interested', color: '#34d399' },
+        { label: 'Paid', key: 'paid', color: '#22c55e' }
+      ];
+      // Use pipeline counts for what we have
+      var counts = {};
+      steps.forEach(function(s) { counts[s.key] = statusCounts[s.key] || 0; });
+      counts['_scraped'] = totalLeads || 0;
+      // Fetch async data for discovery/enrichment (cached)
+      if (window._gpDiscovery) counts['_disc'] = window._gpDiscovery;
+      if (window._gpEnriched) counts['_enriched'] = window._gpEnriched;
+      if (window._gpOutreach) counts['_outreach'] = window._gpOutreach;
+      var maxCount = 1;
+      steps.forEach(function(s) { if (counts[s.key] > maxCount) maxCount = counts[s.key]; });
+      var html = '';
+      steps.forEach(function(s, i) {
+        var c = counts[s.key];
+        var pct = Math.min(100, (c / maxCount) * 100);
+        if (i > 0) html += '<div class="gp-arrow"><i class="ph ph-caret-right"></i></div>';
+        html += '<div class="gp-step">' +
+          '<div class="gp-step-label">' + s.label + '</div>' +
+          '<div class="gp-step-count" style="color:' + s.color + '">' + c + '</div>' +
+          '<div class="gp-step-bar"><div class="gp-step-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>' +
+        '</div>';
+      });
+      document.getElementById('global-progress-bar').innerHTML = html;
+    }
+
+    // Async fetch for global progress extras
+    async function updateGlobalProgressExtras() {
+      try {
+        var results = await Promise.all([
+          axios.get(API + '/api/niches/stats', { headers: headers }).catch(function() { return { data: { total: 0 } }; }),
+          axios.get(API + '/api/scraper/enrich/stats', { headers: headers }).catch(function() { return { data: {} }; })
+        ]);
+        window._gpDiscovery = results[0].data.total || 0;
+        window._gpEnriched = results[1].data.enriched || 0;
+        window._gpOutreach = results[1].data.outreachReady || 0;
+      } catch(e) {}
     }
 
     function renderKPIs(statusCounts, jobStatusCounts, clients, allLeads) {
@@ -869,6 +1030,13 @@
       });
       bar.innerHTML = barHtml;
       legend.innerHTML = legendHtml;
+
+      var mainFlow = ['new', 'scored', 'contacted', 'replied_interested', 'demo_sent', 'paid'];
+      var pipelineSteps = mainFlow.map(function(key) {
+        var stage = PIPELINE_STAGES.find(function(s) { return s.key === key; });
+        return { label: stage.label, count: statusCounts[key] || 0, color: stage.color };
+      });
+      document.getElementById('pipeline-steps').innerHTML = stepsHTML(pipelineSteps);
     }
 
     function renderKanban(allLeads) {
@@ -1164,6 +1332,15 @@
             '<span class="text-[28px] font-bold text-warn" style="font-family:Share Tech Mono,monospace">' + running.length + '</span>' +
             '<span class="text-[13px] text-dim">' + completed.length + ' done, ' + failed.length + ' failed</span>' +
           '</div>';
+
+        var scraperSteps = [
+          { label: 'Scraped', count: results[0].data.totalDocs ?? 0, color: '#74b9ff' },
+          { label: 'Enriched', count: es.enriched ?? 0, color: '#a78bfa' },
+          { label: 'Email Found', count: es.withEmail ?? 0, color: '#818cf8' },
+          { label: 'Valid Email', count: es.emailValid ?? 0, color: '#34d399' },
+          { label: 'Outreach Ready', count: es.outreachReady ?? 0, color: '#22c55e' },
+        ];
+        document.getElementById('scraper-steps').innerHTML = stepsHTML(scraperSteps);
       } catch (err) {
         console.error('Scraper stats error:', err);
       }
@@ -1576,17 +1753,19 @@
       try {
         var res = await axios.get(API + '/api/niches/discover/stats', { headers: headers });
         var s = res.data;
+        var p = s.pipeline || {};
+        var cfg = s.config || {};
+        var jobs = s.recentJobs || [];
+
         document.getElementById('discovery-stats-row').innerHTML =
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Status</span><span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + (s.config && s.config.enabled ? 'Active' : 'Paused') + '</span><span class="text-[13px] text-dim">' + (s.config && s.config.autoApprove ? 'Auto-approve ON' : 'Human review required') + '</span></div>' +
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Total Probed</span><span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + s.totalCandidate + '</span><span class="text-[13px] text-dim">candidate pairs found</span></div>' +
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Scored</span><span class="text-[28px] font-bold text-warn" style="font-family:Share Tech Mono,monospace">' + s.totalScored + '</span></div>' +
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Validated</span><span class="text-[28px] font-bold text-info" style="font-family:Share Tech Mono,monospace">' + s.totalValidated + '</span></div>' +
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Approved</span><span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + s.totalApproved + '</span><span class="text-[13px] text-dim">ready for campaigns</span></div>' +
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Parked/Dropped</span><span class="text-[28px] font-bold text-dim" style="font-family:Share Tech Mono,monospace">' + s.totalParked + ' / ' + s.totalDropped + '</span></div>' +
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Last Run</span><span class="text-[14px] font-bold">' + ago(s.config && s.config.lastRun) + '</span></div>';
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Status</span><span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + (cfg.enabled ? 'Active' : 'Paused') + '</span><span class="text-[13px] text-dim">' + (cfg.autoApprove ? 'Auto-approve ON' : 'Human review required') + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Total Pairs</span><span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + (p.total || 0) + '</span><span class="text-[13px] text-dim">' + (s.coverage ? s.coverage.uniqueCities : 0) + ' cities, ' + (s.coverage ? s.coverage.uniqueNiches : 0) + ' niches</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Approved</span><span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + (p.approved || 0) + '</span><span class="text-[13px] text-dim">ready for lead gen</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Parked / Dropped</span><span class="text-[28px] font-bold text-dim" style="font-family:Share Tech Mono,monospace">' + (p.parked || 0) + ' / ' + (p.dropped || 0) + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Last Run</span><span class="text-[14px] font-bold">' + ago(cfg.lastRun) + '</span></div>';
 
         var funnelStatuses = ['candidate', 'scored', 'validated', 'approved'];
-        var funnelCounts = [s.totalCandidate, s.totalScored, s.totalValidated, s.totalApproved];
+        var funnelCounts = [p.candidate || 0, p.scored || 0, p.validated || 0, p.approved || 0];
         var funnelColors = ['#74b9ff', '#fdcb6e', '#3b82f6', '#00b894'];
         var total = funnelCounts.reduce(function(a, b) { return a + b; }, 0) || 1;
         var bar = document.getElementById('discovery-funnel-bar');
@@ -1600,6 +1779,26 @@
         });
         bar.innerHTML = barHtml;
         legend.innerHTML = legendHtml;
+
+        var discSteps = [
+          { label: 'Candidate', count: p.candidate || 0, color: '#74b9ff' },
+          { label: 'Scored', count: p.scored || 0, color: '#fdcb6e' },
+          { label: 'Validated', count: p.validated || 0, color: '#3b82f6' },
+          { label: 'Approved', count: p.approved || 0, color: '#00b894' },
+        ];
+        document.getElementById('discovery-steps').innerHTML = stepsHTML(discSteps);
+
+        var jobsHtml = '';
+        jobs.forEach(function(j) {
+          var out = j.output || {};
+          jobsHtml += '<div class="flex items-center gap-3 px-5 py-3 border-b border-border hover:bg-accent-glow">' +
+            '<span class="text-[12px] font-bold" style="font-family:Share Tech Mono,monospace;min-width:90px">' + (j.status === 'completed' ? out.citiesProbed + ' cities' : j.status) + '</span>' +
+            '<span class="text-[12px] text-dim">' + (out.pairsCreated || 0) + ' created, ' + (out.pairsScored || 0) + ' scored, ' + (out.validationQueued || 0) + ' validated</span>' +
+            badge(j.status) +
+            '<span class="text-[12px] text-dim ml-auto">' + ago(j.completedAt || j.createdAt) + '</span>' +
+          '</div>';
+        });
+        document.getElementById('discovery-jobs-list').innerHTML = jobsHtml || '<div class="py-4 px-5 text-dim text-[13px]">No discovery runs yet</div>';
       } catch (err) {
         console.error('Discovery stats error:', err);
       }
@@ -1607,13 +1806,18 @@
 
     // ─── INIT ──────────────────────────────────────────
 
+    // Init: show targeting tab by default
+    switchTab('targeting');
     refresh();
+    updateGlobalProgressExtras();
     setInterval(function() {
       refresh();
-      if (document.getElementById('view-scraper').classList.contains('active')) refreshScraperView();
-      if (document.getElementById('view-niches').classList.contains('active')) refreshNichesView();
-      if (document.getElementById('view-discovery').classList.contains('active')) refreshDiscoveryView();
-      if (document.getElementById('view-activity').classList.contains('active')) refreshActivity();
+      updateGlobalProgressExtras();
+      var activeTab = document.querySelector('.nav-tab.nav-active');
+      var tab = activeTab ? activeTab.getAttribute('data-tab') : '';
+      if (tab === 'targeting') { refreshDiscoveryView(); refreshNichesView(); }
+      if (tab === 'leads') { refreshScraperView(); }
+      if (tab === 'sales') { refreshActivity(); }
     }, 5000);
   </script>
 

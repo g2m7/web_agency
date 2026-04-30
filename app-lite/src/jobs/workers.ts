@@ -38,16 +38,56 @@ const handlers: Record<string, (db: DbClient, job: ScheduledJob) => Promise<Reco
 
 let pollInterval: ReturnType<typeof setInterval> | null = null
 
+const STUCK_JOB_TIMEOUT_MS = 30 * 60 * 1000
+
 export async function startWorkers(db: DbClient) {
-  console.log('Job worker polling started')
+  await recoverStuckJobs(db)
 
   pollInterval = setInterval(async () => {
     try {
+      await recoverStuckJobs(db)
       await pollAndProcess(db)
     } catch (err) {
       console.error('Worker poll error:', err)
     }
-  }, 30_000) // Poll every 30 seconds
+  }, 30_000)
+
+  console.log('Job worker polling started')
+}
+
+async function recoverStuckJobs(db: DbClient) {
+  const cutoff = new Date(Date.now() - STUCK_JOB_TIMEOUT_MS).toISOString()
+  const stuck = await db.find({
+    collection: 'jobs',
+    where: {
+      and: [
+        { status: { equals: 'running' } },
+        { started_at: { less_than: cutoff } },
+      ],
+    },
+    limit: 50,
+  })
+
+  for (const job of stuck.docs) {
+    const attempts = (job.attempts as number) ?? 0
+    const maxAttempts = (job.maxAttempts ?? job.max_attempts ?? 3) as number
+    const isDead = attempts >= maxAttempts
+
+    await db.update({
+      collection: 'jobs',
+      id: String(job.id),
+      data: {
+        status: isDead ? 'dead' : 'queued',
+        failed_at: new Date().toISOString(),
+        error_message: 'Job timed out (stuck in running state)',
+        ...(isDead ? {} : { run_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() }),
+      },
+    })
+  }
+
+  if (stuck.docs.length > 0) {
+    console.log(`Recovered ${stuck.docs.length} stuck jobs`)
+  }
 }
 
 async function pollAndProcess(db: DbClient) {
