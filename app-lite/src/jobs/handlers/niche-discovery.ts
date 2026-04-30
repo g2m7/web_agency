@@ -107,8 +107,8 @@ export async function handleNicheDiscover(
   const priorityCities: string[] = config.discoveryPriorityCities ?? config.discovery_priority_cities ?? []
 
   const scraperOptions: ScraperOptions = {
-    signal: AbortSignal.timeout(600_000), // 10 min max
-    maxRequestsPerMinute: 4, // Conservative — discovery is background
+    signal: AbortSignal.timeout(900_000), // 15 min max
+    maxRequestsPerMinute: 4,
     maxRetries: 2,
     retryBaseDelayMs: 5000,
     interRequestDelayMs: [6000, 15000],
@@ -243,6 +243,10 @@ export async function handleNicheDiscover(
   }
 
   // ── Phase 3: Deduplicate against existing pairs + create ────
+  stats.errors.push(`[DEBUG] Phase 3 start: discoveredPairs.length=${discoveredPairs.length}`)
+  if (discoveredPairs.length > 0) {
+    stats.errors.push(`[DEBUG] Sample pairs: ${discoveredPairs.slice(0, 3).map(p => `${p.niche}/${p.city}`).join(', ')}`)
+  }
   // Limit to batchSize
   const uniquePairs = new Map<string, typeof discoveredPairs[0]>()
   for (const pair of discoveredPairs) {
@@ -252,10 +256,13 @@ export async function handleNicheDiscover(
     }
   }
 
+  const probeSignal = AbortSignal.timeout(900_000) // 15 min for Phase 3 probes
+
   const candidatePairs = [...uniquePairs.values()].slice(0, batchSize)
 
+  stats.errors.push(`[DEBUG] discoveredPairs=${discoveredPairs.length} uniquePairs=${uniquePairs.size} candidatePairs=${candidatePairs.length} batchSize=${batchSize}`)
+
   for (const pair of candidatePairs) {
-    if (scraperOptions.signal?.aborted) break
 
     // Check if this pair already exists
     const existing = await db.find({
@@ -275,18 +282,20 @@ export async function handleNicheDiscover(
       continue
     }
 
-    // If mapsCount is 0, do a quick targeted probe
+    // Only re-probe if the broad probe found very few results.
+    // If broad probe already found >= 3 businesses, trust that count and skip
+    // the expensive targeted re-probe to save rate limit budget.
     let actualMapsCount = pair.mapsCount
     let probeAvgReview = pair.avgReviewCount
     let probePhonePct = pair.phonePct
     let probeWebsitePct = pair.websitePct
-    if (actualMapsCount === 0) {
+    if (actualMapsCount < 3 && !probeSignal.aborted) {
       try {
         const results = await scrapeGoogleMaps(
           pair.niche,
           pair.city,
           pair.state,
-          scraperOptions,
+          { ...scraperOptions, signal: probeSignal },
         )
         actualMapsCount = results.length
         if (results.length > 0) {
@@ -295,12 +304,12 @@ export async function handleNicheDiscover(
           probeWebsitePct = Math.round((results.filter(r => r.website).length / results.length) * 100)
         }
       } catch {
-        actualMapsCount = 0
+        // On error, keep the broad probe count — don't zero it out
       }
     }
 
-    // Quick filter: skip if too few businesses
-    if (actualMapsCount < 10) {
+    // Accept pairs with at least 2 businesses — the scorer will rank them
+    if (actualMapsCount < 2) {
       stats.pairsSkipped++
       continue
     }

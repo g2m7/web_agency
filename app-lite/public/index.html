@@ -1702,11 +1702,24 @@ function toggleCollapsible(id){var body=document.getElementById(id);var header=d
         var jobsHtml = '';
         jobs.forEach(function(j) {
           var out = j.output || {};
-          jobsHtml += '<div class="flex items-center gap-3 px-5 py-3 border-b border-border hover:bg-accent-glow">' +
-            '<span class="text-[12px] font-bold" style="font-family:Share Tech Mono,monospace;min-width:90px">' + (j.status === 'completed' ? out.citiesProbed + ' cities' : j.status) + '</span>' +
-            '<span class="text-[12px] text-dim">' + (out.pairsCreated || 0) + ' created, ' + (out.pairsScored || 0) + ' scored, ' + (out.validationQueued || 0) + ' validated</span>' +
-            badge(j.status) +
-            '<span class="text-[12px] text-dim ml-auto">' + ago(j.completedAt || j.createdAt) + '</span>' +
+          var detailParts = [];
+          if (out.categoriesDiscovered) detailParts.push(out.categoriesDiscovered + ' categories');
+          detailParts.push((out.pairsCreated || 0) + ' created');
+          if (out.pairsSkipped) detailParts.push(out.pairsSkipped + ' skipped');
+          detailParts.push((out.pairsScored || 0) + ' scored');
+          if (out.validationQueued) detailParts.push(out.validationQueued + ' validated');
+          var errors = (out.errors || []).filter(function(e) { return e && !e.startsWith('[DEBUG]'); });
+          var debugs = (out.errors || []).filter(function(e) { return e && e.startsWith('[DEBUG]'); });
+          var errorHtml = errors.length > 0 ? '<span class="text-bad text-[11px]">' + errors.length + ' errors</span>' : '';
+          jobsHtml += '<div class="px-5 py-3 border-b border-border hover:bg-accent-glow">' +
+            '<div class="flex items-center gap-3">' +
+              '<span class="text-[12px] font-bold" style="font-family:Share Tech Mono,monospace;min-width:90px">' + (j.status === 'completed' ? (out.citiesProbed || 0) + ' cities' : j.status) + '</span>' +
+              '<span class="text-[12px] text-dim">' + detailParts.join(', ') + '</span>' +
+              errorHtml +
+              badge(j.status) +
+              '<span class="text-[12px] text-dim ml-auto">' + ago(j.completedAt || j.createdAt) + '</span>' +
+            '</div>' +
+            (debugs.length > 0 ? '<div class="text-[10px] text-dim mt-1 truncate" style="font-family:Share Tech Mono,monospace;max-width:100%;opacity:0.6">' + debugs.slice(0, 2).join(' | ') + '</div>' : '') +
           '</div>';
         });
         document.getElementById('discovery-jobs-list').innerHTML = jobsHtml || '<div class="py-4 px-5 text-dim text-[13px]">No discovery runs yet</div>';

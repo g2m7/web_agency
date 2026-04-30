@@ -1,63 +1,56 @@
 # Handoff — Web Agency Platform
 
 ## Last Updated
-2026-04-30
+2026-05-01
 
 ## What Was Done (This Session)
 
-### Dashboard cleanup — removed config drawer, simplified progress bar
+### Fixed: Niche discovery creating 0 pairs despite finding 150+ categories
 
-The system config drawer (gear icon → slide-out with Phase/Niche/Cities/Maintenance/Approval toggles) was premature complexity for niche-hunting stage. Removed it entirely.
+**Root cause:** The discovery handler was too aggressive with targeted re-probing. Every candidate pair (even those with 5-9 maps results from the broad probe) triggered a fresh Google Maps scrape. With 100 candidates × 6-15 sec delay each, the handler would exhaust its time/rate budget. Additionally, any single scrape error would zero out the maps count (setting `actualMapsCount = 0`), and the minimum threshold was 5 — ensuring every pair got skipped.
 
-- Removed gear button, config drawer HTML, overlay, `toggleConfigDrawer()`, and `refreshConfig()` function
-- Removed "PHASE —" display from header
-- Global progress bar now hides when all counts are zero (no noise)
-- Steps with zero data are filtered out; only shows pipeline steps with actual numbers
-- Relabeled "Enriched" → "Emails found", "Outreach Ready" → "Ready to email"
+**Evidence:** 5 consecutive completed runs all showed `pairsCreated: 0, pairsSkipped: 0` despite `categoriesDiscovered: 120-152` across `citiesProbed: 48-57`. Debug logs confirmed `discoveredPairs=159, uniquePairs=151, candidatePairs=100` entering Phase 3, but all failed the `< 5` filter.
 
-### Discovery handler fix — raw signals not persisted to DB
+**Fix (`niche-discovery.ts`):**
+1. Only re-probe if broad count < 3 (was < 10) — saves rate limit budget
+2. On scrape error, keep the broad probe count instead of zeroing it
+3. Lower creation threshold from 5 to 2 — let the scorer rank them
+4. Check `probeSignal.aborted` before attempting targeted probes
 
-`handleNicheDiscover()` computed `review_velocity`, `weak_site_pct`, `contactable_pct` from probe data and used them to score pairs, but only wrote `maps_count` to the DB on create. The score sub-scores (demand_score, etc.) were written but the raw inputs stayed at 0.
+### Dashboard: Improved discovery job detail display
 
-**Fix:** `niche-discovery.ts` `db.create()` now writes `review_velocity`, `ad_count`, `agency_pages`, `weak_site_pct`, `contactable_pct` from the probe data instead of hardcoding zeros.
-
-**File:** `app-lite/src/jobs/handlers/niche-discovery.ts:313-326`
-
-### Fresh discovery + enrichment triggered
-
-- Deleted 6 broken pairs (all had 0 raw signals, clustered scores of 32-34)
-- Triggered fresh `niche_discover` job — running, ~10 min
-- Triggered `email_enrich` batch (50 leads) — running
-- Current state: 354 leads (305 hot), 63 with emails, 292 pending enrichment
+**File:** `app-lite/public/index.html` — "Recent Runs" section in Discovery tab now shows:
+- Categories discovered count
+- Pairs skipped count  
+- Error/debug message counts
+- Inline debug message preview
 
 ### Validation
 - `bun run typecheck` → 0 errors
 - `bun run test` → 111 tests, all passed
 
 ## What's In Progress
-- `niche_discover` job running (started 13:36 UTC) — broad probe phase
-- `email_enrich` job running (started 13:38 UTC) — processing 50 leads
+- Nothing running.
 
 ## What's Blocked
 - None.
 
 ## Where Next Agent Should Pick Up
-1. Check if discovery job completed and produced pairs with differentiated scores (weakness_score, contact_score should now be non-zero).
-2. Check if email enrichment found more valid emails. Run another batch if needed.
+1. **Trigger a fresh `niche_discover` run** from the dashboard to verify the fix produces actual pairs.
+2. If pairs are created, review and approve high-scorers from the Targeting → Niches tab.
 3. Build outreach handler — the next major gap. 63+ leads with emails, no way to send hook emails yet.
 4. After outreach: reply classification, demo builder, payment integration.
 
 ## Current Pipeline Snapshot
 ```text
 Step 0: Niche Discovery (AUTONOMOUS)
-  -> Probes cities, discovers categories, scores pairs, validates top ones
-  -> Runs every 6 hours
-  -> FIX: now persists raw signals (weak_site_pct, contactable_pct, review_velocity) to DB
+  -> FIX APPLIED: lowered probe threshold, reduced unnecessary re-probes
+  -> Previous 5 runs all created 0 pairs — should be fixed now
+  -> Runs every 6 hours (configurable)
 
 Step 1: Lead Generation (on approved pairs)
   -> Scrape → Tiering → Email enrichment → Email validation
-  -> Outreach segmentation (email-ready / phone fallback / unreachable)
-  -> 354 leads, 305 hot, 63 with emails, enrichment running
+  -> 354 leads, 305 hot, 63 with emails
 
 Step 2: Outreach (NOT BUILT YET)
   -> Hook email sender — the next handler to implement
@@ -65,6 +58,6 @@ Step 2: Outreach (NOT BUILT YET)
 
 ## Data Snapshot
 - Leads: 354 total (305 hot, 28 warm, 21 low)
-- Emails: 63 found (55 invalid, 7 risky, 292 pending enrichment)
-- Niche pairs: 0 (cleared, discovery re-running with fixed handler)
-- Jobs: niche_discover (running), email_enrich (running)
+- Emails: 63 found
+- Niche pairs: 0 (discovery was broken, fix applied — re-run needed)
+- Jobs: all completed, none running
