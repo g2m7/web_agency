@@ -154,17 +154,12 @@ describe('handleNicheScore', () => {
     const result = await handleNicheScore(db, mockJob({ nicheCityPairId: 'pair-1' }))
 
     const scores = result.scores as any
-    // 55 maps (density=15) + 8 velocity (velocity=7) = demand 22
-    expect(scores.demandScore).toBe(22)
-    // 1 ad + 0 agency = 1 total competition -> score 15
-    expect(scores.competitionScore).toBe(15)
-    // 65% weak sites -> score 19
-    expect(scores.weaknessScore).toBe(19)
-    // 75% contactable -> score 15
-    expect(scores.contactScore).toBe(15)
-    // high + growth = 15
+    expect(scores.demandScore).toBe(14)
+    expect(scores.competitionScore).toBe(19)
+    expect(scores.weaknessScore).toBe(16)
+    expect(scores.contactScore).toBe(11)
     expect(scores.revenueScore).toBe(15)
-    expect(scores.totalScore).toBe(86)
+    expect(scores.totalScore).toBe(75)
   })
 })
 

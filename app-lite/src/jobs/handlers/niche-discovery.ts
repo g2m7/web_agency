@@ -27,7 +27,7 @@ import {
   parseCityState,
   type ScraperOptions,
 } from '../../scraper/google-maps'
-import { scoreNichePair, evaluateGoNoGo, type NicheRawData } from '../../scraper/niche-scorer'
+import { scoreNichePair, type NicheRawData } from '../../scraper/niche-scorer'
 import { US_CITIES, sampleCities, type CityEntry } from '../../data/us-cities'
 import { NICHE_LIBRARY, type NicheEntry } from '../../data/niche-library'
 
@@ -105,8 +105,6 @@ export async function handleNicheDiscover(
   const batchSize = config.discoveryBatchSize ?? config.discovery_batch_size ?? 20
   const excludeNiches: string[] = config.discoveryExcludeNiches ?? config.discovery_exclude_niches ?? []
   const priorityCities: string[] = config.discoveryPriorityCities ?? config.discovery_priority_cities ?? []
-  const autoApprove = config.discoveryAutoApprove ?? config.discovery_auto_approve ?? false
-  const humanReviewCount = config.discoveryHumanReviewCount ?? config.discovery_human_review_count ?? 0
 
   const scraperOptions: ScraperOptions = {
     signal: AbortSignal.timeout(600_000), // 10 min max
@@ -123,7 +121,6 @@ export async function handleNicheDiscover(
     pairsSkipped: 0,
     pairsScored: 0,
     validationQueued: 0,
-    autoApproved: 0,
     errors: [] as string[],
   }
 
@@ -153,7 +150,16 @@ export async function handleNicheDiscover(
   }
 
   // ── Phase 2: Broad probe — discover categories per city ────
-  const discoveredPairs: Array<{ city: string; state: string; niche: string; mapsCount: number; revenueEstimate: string }> = []
+  const discoveredPairs: Array<{
+    city: string
+    state: string
+    niche: string
+    mapsCount: number
+    revenueEstimate: string
+    avgReviewCount: number
+    phonePct: number
+    websitePct: number
+  }> = []
 
   for (const cityEntry of citiesToProbe) {
     if (scraperOptions.signal?.aborted) break
@@ -185,10 +191,15 @@ export async function handleNicheDiscover(
           const { niche, revenueEstimate } = categoryToNiche(cat)
           if (excludeNiches.includes(niche)) continue
 
-          // Count businesses in this category from results
-          const mapsCount = results.filter(r =>
+          const catResults = results.filter(r =>
             r.category?.toLowerCase().includes(cat),
-          ).length
+          )
+          const mapsCount = catResults.length
+          const avgReviewCount = catResults.length > 0
+            ? catResults.reduce((s, r) => s + (r.reviewCount ?? 0), 0) / catResults.length
+            : 0
+          const withPhone = catResults.filter(r => r.phone).length
+          const withWebsite = catResults.filter(r => r.website).length
 
           discoveredPairs.push({
             city: cityEntry.city,
@@ -196,6 +207,9 @@ export async function handleNicheDiscover(
             niche,
             mapsCount,
             revenueEstimate,
+            avgReviewCount,
+            phonePct: catResults.length > 0 ? Math.round((withPhone / catResults.length) * 100) : 0,
+            websitePct: catResults.length > 0 ? Math.round((withWebsite / catResults.length) * 100) : 0,
           })
         }
       } catch (err: any) {
@@ -219,8 +233,11 @@ export async function handleNicheDiscover(
         city: city.city,
         state: city.state,
         niche: niche.name,
-        mapsCount: 0, // Will be filled by targeted probe
+        mapsCount: 0,
         revenueEstimate: niche.revenueEstimate,
+        avgReviewCount: 0,
+        phonePct: 0,
+        websitePct: 0,
       })
     }
   }
@@ -260,6 +277,9 @@ export async function handleNicheDiscover(
 
     // If mapsCount is 0, do a quick targeted probe
     let actualMapsCount = pair.mapsCount
+    let probeAvgReview = pair.avgReviewCount
+    let probePhonePct = pair.phonePct
+    let probeWebsitePct = pair.websitePct
     if (actualMapsCount === 0) {
       try {
         const results = await scrapeGoogleMaps(
@@ -269,6 +289,11 @@ export async function handleNicheDiscover(
           scraperOptions,
         )
         actualMapsCount = results.length
+        if (results.length > 0) {
+          probeAvgReview = results.reduce((s, r) => s + (r.reviewCount ?? 0), 0) / results.length
+          probePhonePct = Math.round((results.filter(r => r.phone).length / results.length) * 100)
+          probeWebsitePct = Math.round((results.filter(r => r.website).length / results.length) * 100)
+        }
       } catch {
         actualMapsCount = 0
       }
@@ -289,7 +314,11 @@ export async function handleNicheDiscover(
           state: pair.state,
           niche: pair.niche,
           maps_count: actualMapsCount,
-          review_velocity: 0,
+          review_velocity: Math.round(probeAvgReview / 6),
+          ad_count: 0,
+          agency_pages: 0,
+          weak_site_pct: probeWebsitePct > 0 ? Math.max(10, 100 - probeWebsitePct) : 50,
+          contactable_pct: probePhonePct > 0 ? probePhonePct : 60,
           economic_signal: 'flat',
           revenue_estimate: pair.revenueEstimate,
           status: 'candidate',
@@ -302,11 +331,11 @@ export async function handleNicheDiscover(
       // ── Phase 4: Auto-score the pair ──────────────────────
       const rawData: NicheRawData = {
         mapsCount: actualMapsCount,
-        reviewVelocity: 0, // Conservative — we don't have this yet
-        adCount: 0, // Conservative estimate
+        reviewVelocity: Math.round(probeAvgReview / 6),
+        adCount: 0,
         agencyPages: 0,
-        weakSitePct: 50, // Conservative default
-        contactablePct: 60, // Conservative default
+        weakSitePct: probeWebsitePct > 0 ? Math.max(10, 100 - probeWebsitePct) : 50,
+        contactablePct: probePhonePct > 0 ? probePhonePct : 60,
         economicSignal: 'flat',
         revenueEstimate: pair.revenueEstimate as any,
       }
@@ -355,63 +384,6 @@ export async function handleNicheDiscover(
       stats.validationQueued++
     } catch {
       // Non-fatal
-    }
-  }
-
-  // ── Phase 6: Auto-approve validated pairs (if enabled) ─────
-  if (autoApprove && humanReviewCount >= 3) {
-    const validatedPairs = await db.find({
-      collection: 'niche-city-pairs',
-      where: { status: { equals: 'validated' } },
-      limit: 10,
-      sort: '-totalScore',
-    })
-
-    // Check current approved count (max 3 active)
-    const approvedCount = await db.find({
-      collection: 'niche-city-pairs',
-      where: { status: { equals: 'approved' } },
-      limit: 0,
-    })
-
-    let slotsAvailable = 3 - approvedCount.totalDocs
-
-    for (const pair of validatedPairs.docs) {
-      if (slotsAvailable <= 0) break
-
-      const totalScore = pair.totalScore ?? pair.total_score ?? 0
-      const contactablePct = pair.validationContactablePct ?? pair.validation_contactable_pct ?? 0
-      const weakPct = pair.validationWeakPct ?? pair.validation_weak_pct ?? 0
-      const mapsCount = pair.mapsCount ?? pair.maps_count ?? 0
-
-      const result = evaluateGoNoGo(totalScore, {
-        contactablePct,
-        weakSitePct: weakPct,
-        mapsCount,
-      })
-
-      if (result.decision === 'approved') {
-        await db.update({
-          collection: 'niche-city-pairs',
-          id: String(pair.id),
-          data: {
-            status: 'approved',
-            sprint_start: new Date().toISOString(),
-            notes: `Auto-approved by discovery (score: ${totalScore})`,
-          },
-        })
-        stats.autoApproved++
-        slotsAvailable--
-      } else {
-        await db.update({
-          collection: 'niche-city-pairs',
-          id: String(pair.id),
-          data: {
-            status: 'parked',
-            notes: `Auto-parked: ${result.reasons.join('; ')}`,
-          },
-        })
-      }
     }
   }
 

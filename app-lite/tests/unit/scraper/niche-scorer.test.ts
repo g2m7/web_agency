@@ -11,29 +11,33 @@ import {
 } from '../../../src/scraper/niche-scorer'
 
 describe('scoreDemand', () => {
-  it('scores high demand (50+ Maps, strong velocity)', () => {
+  it('scales linearly with maps count and review velocity', () => {
     const score = scoreDemand(60, 12)
-    expect(score).toBe(25)
-  })
-
-  it('scores moderate demand (25–49 Maps)', () => {
-    const score = scoreDemand(30, 6)
     expect(score).toBe(17)
   })
 
-  it('scores low demand (15–24 Maps)', () => {
-    const score = scoreDemand(18, 3)
+  it('scores moderate demand', () => {
+    const score = scoreDemand(30, 6)
     expect(score).toBe(9)
   })
 
-  it('scores very low demand (<15 Maps)', () => {
+  it('scores low demand', () => {
+    const score = scoreDemand(18, 3)
+    expect(score).toBe(5)
+  })
+
+  it('scores very low demand', () => {
     const score = scoreDemand(10, 1)
-    expect(score).toBe(3)
+    expect(score).toBe(2)
   })
 
   it('caps at 25', () => {
     const score = scoreDemand(100, 20)
-    expect(score).toBeLessThanOrEqual(25)
+    expect(score).toBe(25)
+  })
+
+  it('differentiates close inputs', () => {
+    expect(scoreDemand(20, 2)).not.toBe(scoreDemand(25, 3))
   })
 })
 
@@ -42,60 +46,72 @@ describe('scoreCompetition', () => {
     expect(scoreCompetition(0, 0)).toBe(20)
   })
 
-  it('scores high for minimal competition (1–2 total)', () => {
-    expect(scoreCompetition(1, 1)).toBe(15)
+  it('scores high for minimal competition', () => {
+    expect(scoreCompetition(1, 1)).toBe(17)
   })
 
-  it('scores moderate for 3–5 total', () => {
-    expect(scoreCompetition(3, 2)).toBe(9)
+  it('scores moderate for mid competition', () => {
+    expect(scoreCompetition(3, 2)).toBe(13)
   })
 
-  it('scores low for 6–8 total', () => {
-    expect(scoreCompetition(4, 4)).toBe(4)
+  it('scores low for high competition', () => {
+    expect(scoreCompetition(4, 4)).toBe(9)
   })
 
   it('scores minimum for highly saturated', () => {
-    expect(scoreCompetition(10, 5)).toBe(1)
+    expect(scoreCompetition(10, 5)).toBe(0)
+  })
+
+  it('differentiates close inputs', () => {
+    expect(scoreCompetition(2, 0)).not.toBe(scoreCompetition(3, 0))
   })
 })
 
 describe('scoreWeakness', () => {
-  it('scores maximum for >= 70% weak sites', () => {
-    expect(scoreWeakness(75)).toBe(25)
+  it('scores high for 75% weak sites', () => {
+    expect(scoreWeakness(75)).toBe(19)
   })
 
-  it('scores high for 50–69% weak sites', () => {
-    expect(scoreWeakness(55)).toBe(19)
+  it('scores mid-high for 55% weak sites', () => {
+    expect(scoreWeakness(55)).toBe(14)
   })
 
-  it('scores moderate for 30–49% weak sites', () => {
-    expect(scoreWeakness(40)).toBe(12)
+  it('scores moderate for 40% weak sites', () => {
+    expect(scoreWeakness(40)).toBe(10)
   })
 
-  it('scores low for 15–29% weak sites', () => {
-    expect(scoreWeakness(20)).toBe(6)
+  it('scores low for 20% weak sites', () => {
+    expect(scoreWeakness(20)).toBe(5)
   })
 
-  it('scores minimum for <15% weak sites', () => {
-    expect(scoreWeakness(10)).toBe(2)
+  it('scores minimum near 0%', () => {
+    expect(scoreWeakness(10)).toBe(3)
+  })
+
+  it('differentiates close inputs', () => {
+    expect(scoreWeakness(35)).not.toBe(scoreWeakness(45))
   })
 })
 
 describe('scoreContactability', () => {
-  it('scores maximum for >= 70% contactable', () => {
-    expect(scoreContactability(80)).toBe(15)
+  it('scores high for 80% contactable', () => {
+    expect(scoreContactability(80)).toBe(12)
   })
 
-  it('scores high for 50–69% contactable', () => {
-    expect(scoreContactability(60)).toBe(11)
+  it('scores moderate for 60% contactable', () => {
+    expect(scoreContactability(60)).toBe(9)
   })
 
-  it('scores moderate for 30–49% contactable', () => {
-    expect(scoreContactability(35)).toBe(7)
+  it('scores low for 35% contactable', () => {
+    expect(scoreContactability(35)).toBe(5)
   })
 
-  it('scores low for <15% contactable', () => {
-    expect(scoreContactability(10)).toBe(1)
+  it('scores minimum near 0%', () => {
+    expect(scoreContactability(10)).toBe(2)
+  })
+
+  it('differentiates close inputs', () => {
+    expect(scoreContactability(55)).not.toBe(scoreContactability(65))
   })
 })
 
@@ -129,14 +145,14 @@ describe('scoreRevenue', () => {
 })
 
 describe('scoreNichePair', () => {
-  it('computes a strong pair correctly (all good signals)', () => {
+  it('computes a strong pair near max scores', () => {
     const data: NicheRawData = {
-      mapsCount: 55,
-      reviewVelocity: 12,
+      mapsCount: 80,
+      reviewVelocity: 20,
       adCount: 0,
       agencyPages: 0,
-      weakSitePct: 75,
-      contactablePct: 80,
+      weakSitePct: 100,
+      contactablePct: 100,
       economicSignal: 'growth',
       revenueEstimate: 'high',
     }
@@ -180,6 +196,22 @@ describe('scoreNichePair', () => {
       scores.demandScore + scores.competitionScore + scores.weaknessScore +
       scores.contactScore + scores.revenueScore,
     )
+  })
+
+  it('differentiates pairs with different maps counts', () => {
+    const base: NicheRawData = {
+      mapsCount: 20,
+      reviewVelocity: 3,
+      adCount: 0,
+      agencyPages: 0,
+      weakSitePct: 50,
+      contactablePct: 60,
+      economicSignal: 'flat',
+      revenueEstimate: 'moderate',
+    }
+    const a = scoreNichePair(base)
+    const b = scoreNichePair({ ...base, mapsCount: 35 })
+    expect(b.totalScore).toBeGreaterThan(a.totalScore)
   })
 })
 

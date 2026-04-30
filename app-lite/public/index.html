@@ -255,7 +255,10 @@
     .kanban-card .card-meta { font-size: 11px; color: var(--color-dim); }
 
     .results-table { width: 100%; border-collapse: collapse; font-size: 14px; font-family: 'Share Tech Mono', monospace; }
-    .results-table th { text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-dim); border-bottom: 2px solid var(--color-border); background: var(--color-surface); position: sticky; top: 0; font-family: 'Share Tech Mono', monospace; }
+    .results-table th { text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-dim); border-bottom: 2px solid var(--color-border); background: var(--color-surface); position: sticky; top: 0; font-family: 'Share Tech Mono', monospace; cursor: pointer; user-select: none; white-space: nowrap; }
+    .results-table th:hover { color: var(--color-accent); }
+    .results-table th.sort-asc::after { content: ' \25B2'; font-size: 9px; color: var(--color-accent); }
+    .results-table th.sort-desc::after { content: ' \25BC'; font-size: 9px; color: var(--color-accent); }
     .results-table td { padding: 12px 16px; border-bottom: 1px solid var(--color-border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; font-family: 'Share Tech Mono', monospace; }
     .results-table tr:hover td { background: var(--color-surface-2); }
 
@@ -308,9 +311,23 @@
     details > summary::-webkit-details-marker { display:none; }
     details > summary::before { content:'\25B6'; display:inline-block; margin-right:8px; font-size:10px; transition:transform 0.2s; color:var(--color-accent); }
     details[open] > summary::before { transform:rotate(90deg); }
+    .collapsible-header { cursor:pointer; user-select:none; }
+    .collapsible-header:hover { opacity:0.85; }
+    .collapsible-header::before { content:'\25B6'; display:inline-block; margin-right:8px; font-size:10px; transition:transform 0.2s; color:var(--color-accent); }
+    .collapsible-header.collapsed::before { transform:rotate(0deg); }
+    .collapsible-header.expanded::before { transform:rotate(90deg); }
+    .collapsible-body { transition:max-height 0.3s ease, opacity 0.2s ease; overflow:hidden; }
+    .collapsible-body.collapsed { max-height:0; opacity:0; padding-top:0; padding-bottom:0; }
+    .collapsible-body.expanded { max-height:2000px; opacity:1; }
+
   </style>
 </head>
 <body class="min-h-screen p-0 m-0 bg-bg text-hud-bright">
+
+  <script>function initSortable(table){if(!table)return;var container=table.closest('[id]');var cid=container?container.id:'';var ths=table.querySelectorAll('thead th');var tbody=table.querySelector('tbody');if(!tbody)return;ths.forEach(function(th,colIdx){if(th.dataset.nosort!==undefined)return;th.addEventListener('click',function(){var dir=th.classList.contains('sort-asc')?'desc':'asc';ths.forEach(function(h){h.classList.remove('sort-asc','sort-desc')});th.classList.add('sort-'+dir);if(cid)window._sortState[cid]={col:colIdx,dir:dir};doSort(tbody,ths,colIdx,dir)})});var saved=cid&&window._sortState[cid];if(saved&&ths[saved.col]){ths[saved.col].classList.add('sort-'+saved.dir);doSort(tbody,ths,saved.col,saved.dir)}}
+function doSort(tbody,ths,colIdx,dir){var rows=Array.from(tbody.querySelectorAll('tr'));rows.sort(function(a,b){var va=a.children[colIdx].dataset.sort||a.children[colIdx].textContent.trim();var vb=b.children[colIdx].dataset.sort||b.children[colIdx].textContent.trim();var na=parseFloat(va),nb=parseFloat(vb);if(!isNaN(na)&&!isNaN(nb)){return dir==='asc'?na-nb:nb-na}return dir==='asc'?va.localeCompare(vb):vb.localeCompare(va)});rows.forEach(function(r){tbody.appendChild(r)})}
+function toggleCollapsible(id){var body=document.getElementById(id);var header=document.querySelector('[data-collapse="'+id+'"]');if(!body||!header)return;if(body.classList.contains('collapsed')){body.classList.remove('collapsed');body.classList.add('expanded');header.classList.remove('collapsed');header.classList.add('expanded')}else{body.classList.remove('expanded');body.classList.add('collapsed');header.classList.remove('expanded');header.classList.add('collapsed')}}
+</script>
 
   <header class="header-shell px-10 py-4 flex items-center justify-between sticky top-0 z-100">
     <div class="flex items-center gap-4">
@@ -323,10 +340,8 @@
     </div>
     <div class="flex gap-5 items-center text-[13px] tracking-[1px] uppercase" style="font-family:'Share Tech Mono',monospace;color:var(--color-dim)">
       <a href="/about" class="text-accent no-underline font-medium hover:underline" style="font-family:'Share Tech Mono',monospace">DOCS</a>
-      <span id="phase">PHASE —</span>
       <span id="uptime">—</span>
       <span id="last-refresh">—</span>
-      <button onclick="toggleConfigDrawer()" class="btn bg-surface border border-border text-dim px-3 py-1.5 cursor-pointer hover:border-accent hover:text-accent" title="System Config"><i class="ph ph-gear text-base"></i></button>
     </div>
   </header>
 
@@ -349,39 +364,20 @@
 
   <main class="p-6 flex flex-col gap-5 w-full">
 
-    <!-- ===================== TARGETING VIEW (Discovery + Niches merged) ===================== -->
-    <div id="view-targeting" class="view active flex flex-col gap-5">
-      <!-- Content comes from view-discovery and view-niches sub-views below -->
-    </div>
+    <div id="view-targeting" class="view active flex flex-col gap-5"></div>
 
-    <!-- ===================== LEADS VIEW (Scraper wrapper) ===================== -->
     <div id="view-leads" class="view flex flex-col gap-5">
-      <!-- Active Source Indicator -->
-      <div id="active-source" class="source-badge"><i class="ph ph-link"></i> <span id="active-source-text">Loading active targets...</span></div>
-      <!-- Scraper content comes from view-scraper sub-view below -->
+      <div id="active-source" class="source-badge"><i class="ph ph-link"></i> <span id="active-source-text">Loading...</span></div>
     </div>
 
-    <!-- ===================== SALES VIEW (Pipeline + Clients + Activity) ===================== -->
-    <div id="view-sales" class="view flex flex-col gap-5">
-    </div>
+    <div id="view-sales" class="view flex flex-col gap-5"></div>
 
-    <!-- ===================== PIPELINE (sub-view of Sales) ===================== -->
+    <!-- PIPELINE (Sales) -->
     <div id="view-pipeline" class="view flex flex-col gap-5" style="display:none">
-      <div class="flex gap-2 flex-wrap">
-        <button class="btn btn-primary px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
-          <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper
-        </button>
-        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
-          <span class="spinner"></span><i class="ph ph-user-minus"></i> Churn Check
-        </button>
-        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
-          <span class="spinner"></span><i class="ph ph-chart-bar"></i> Monthly Report
-        </button>
-      </div>
       <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4" id="kpi-row"></div>
       <div class="hud-panel">
         <div class="px-6 py-4 border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>LEAD PIPELINE FLOW</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Pipeline</h2>
         </div>
         <div class="px-5 pt-4">
           <div class="pipeline-bar" id="pipeline-bar"></div>
@@ -391,7 +387,7 @@
       </div>
       <div class="hud-panel">
         <div class="px-6 py-4 border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-columns mr-1.5"></i>WORKFLOW STAGES</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-columns mr-1.5"></i>Stages</h2>
         </div>
         <div class="flex gap-0 overflow-x-auto" id="kanban-board"></div>
       </div>
@@ -411,75 +407,79 @@
           <div class="overflow-y-auto max-h-[360px]" id="clients-list"></div>
         </div>
       </div>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-primary px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5" onclick="triggerJob('lead_gen')" id="btn-lead-gen">
+          <span class="spinner"></span><i class="ph ph-spider-web"></i> Scrape Leads
+        </button>
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow" onclick="triggerJob('churn_check')" id="btn-churn-check">
+          <span class="spinner"></span><i class="ph ph-user-minus"></i> Churn Check
+        </button>
+        <button class="btn bg-surface border-border text-[#c8cdc9] px-6 py-3 border cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow" onclick="triggerJob('monthly_report')" id="btn-monthly-report">
+          <span class="spinner"></span><i class="ph ph-chart-bar"></i> Monthly Report
+        </button>
+      </div>
     </div>
 
-    <!-- ===================== ACTIVITY (sub-view of Sales) ===================== -->
+    <!-- ACTIVITY (Sales) -->
     <div id="view-activity" class="view flex flex-col gap-5" style="display:none">
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-timeline mr-1.5"></i>PIPELINE EVENTS</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-timeline mr-1.5"></i>Events</h2>
           <span class="text-[13px] text-dim" id="event-count">—</span>
         </div>
         <div class="overflow-y-auto max-h-[600px]" id="events-list"></div>
       </div>
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-shield-check mr-1.5"></i>POLICY CHECKS</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-shield-check mr-1.5"></i>Policy Checks</h2>
           <span class="text-[13px] text-dim" id="policy-count">—</span>
         </div>
         <div class="overflow-y-auto max-h-[400px]" id="policy-list"></div>
       </div>
     </div>
 
-    <!-- ===================== DISCOVERY SECTION (inside Targeting) ===================== -->
-    <div id="view-discovery" class="view flex flex-col gap-5" style="display:none">
+    <!-- TARGETING: Niches sub-view -->
+    <div id="view-niches" class="view flex flex-col gap-5" style="display:none">
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="niche-stats-row"></div>
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-compass mr-1.5"></i>Discovery Config</h2>
-          <div class="flex gap-2">
-            <button onclick="loadDiscoveryConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">Reset</button>
-            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[13px] py-1 px-3 btn-primary cursor-pointer">Save Config</button>
-          </div>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-map-pin mr-1.5"></i>Niche + City Pairs</h2>
+          <span class="text-[13px] text-dim" id="niche-pair-count">—</span>
         </div>
-        <div class="grid grid-cols-2 gap-6 p-5">
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="dc-enabled">
-            <label for="dc-enabled" class="text-base text-dim uppercase tracking-wide">Enabled</label>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="dc-auto-approve">
-            <label for="dc-auto-approve" class="text-base text-dim uppercase tracking-wide">Auto Approve</label>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Batch Size</label>
-            <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Interval (Hours)</label>
-            <input id="dc-interval" type="number" min="1" max="168" placeholder="6">
-          </div>
-          <div class="col-span-2 flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Priority Cities (one per line: "City, ST")</label>
-            <textarea id="dc-priority-cities" rows="3"></textarea>
-          </div>
-          <div class="col-span-2 flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Exclude Niches (one per line)</label>
-            <textarea id="dc-exclude-niches" rows="3"></textarea>
-          </div>
+        <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
+          <label class="text-[13px] text-dim">Status</label>
+          <select id="nf-status" onchange="refreshNichePairs()">
+            <option value="">All</option><option value="candidate">Candidate</option><option value="scored">Scored</option><option value="validated">Validated</option><option value="approved">Approved</option><option value="parked">Parked</option><option value="dropped">Dropped</option>
+          </select>
+          <label class="text-[13px] text-dim">Niche</label>
+          <input id="nf-niche" type="text" placeholder="Filter..." oninput="debounceNiches()" class="min-w-[140px]">
+          <label class="text-[13px] text-dim">City</label>
+          <input id="nf-city" type="text" placeholder="Filter..." oninput="debounceNiches()" class="min-w-[140px]">
+          <button onclick="clearNicheFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">
+            <i class="ph ph-x"></i> Clear
+          </button>
         </div>
+        <div class="overflow-y-auto max-h-[600px]" id="niche-pairs-list"></div>
       </div>
+      <div class="hud-panel">
+        <div class="px-6 py-4 border-b border-border bg-surface-2">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
+        </div>
+        <div class="overflow-y-auto max-h-[400px]" id="niche-top-pairs"></div>
+      </div>
+    </div>
 
+    <!-- TARGETING: Discovery sub-view -->
+    <div id="view-discovery" class="view flex flex-col gap-5" style="display:none">
       <div class="flex gap-2 flex-wrap">
         <button onclick="triggerDiscovery()" id="btn-trigger-discovery" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5">
-          <span class="spinner"></span><i class="ph ph-magnifying-glass"></i> Trigger Discovery
+          <span class="spinner"></span><i class="ph ph-magnifying-glass"></i> Discover Niches
         </button>
         <button onclick="refreshDiscoveryView()" class="btn bg-surface border border-border text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
           <span class="spinner"></span><i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
       </div>
-
       <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="discovery-stats-row"></div>
-
       <div class="hud-panel">
         <div class="px-6 py-4 border-b border-border bg-surface-2">
           <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-funnel mr-1.5"></i>Discovery Funnel</h2>
@@ -492,56 +492,75 @@
       </div>
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Discovery Runs</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Recent Runs</h2>
         </div>
         <div class="overflow-y-auto max-h-[300px]" id="discovery-jobs-list"></div>
       </div>
-    </div>
-
-    <!-- ===================== SCRAPER SECTION (inside Leads) ===================== -->
-    <div id="view-scraper" class="view flex flex-col gap-5" style="display:none">
       <div class="hud-panel">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Config</h2>
-          <div class="flex gap-2">
-            <button onclick="loadScraperConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">Reset</button>
-            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[13px] py-1 px-3 btn-primary cursor-pointer">Save Config</button>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2 collapsible-header collapsed" data-collapse="discovery-config-body" onclick="toggleCollapsible('discovery-config-body')">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Discovery Settings</h2>
+          <div class="flex gap-2" onclick="event.stopPropagation()">
+            <button onclick="loadDiscoveryConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">Reset</button>
+            <button onclick="saveDiscoveryConfig()" id="btn-discovery-save" class="text-[13px] py-1 px-3 btn-primary cursor-pointer">Save</button>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-6 p-5">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Active Niche</label>
-            <input id="sc-niche" type="text" placeholder="e.g. hvac, plumber, dentist">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Max Requests / Minute</label>
-            <input id="sc-rpm" type="number" min="1" max="30" placeholder="8">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Max Retries</label>
-            <input id="sc-retries" type="number" min="0" max="10" placeholder="3">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Delay Range (ms)</label>
-            <div class="flex gap-2 items-center">
-              <input id="sc-delay-min" type="number" min="1000" placeholder="5000" class="w-24">
-              <span class="text-dim">to</span>
-              <input id="sc-delay-max" type="number" min="1000" placeholder="12000" class="w-24">
+        <div id="discovery-config-body" class="collapsible-body collapsed">
+          <div class="grid grid-cols-2 gap-6 p-5">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="dc-enabled">
+              <label for="dc-enabled" class="text-base text-dim">Enabled</label>
             </div>
-          </div>
-          <div class="col-span-2 flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Cities (one per line: "City, ST")</label>
-            <textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR"></textarea>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] text-dim">Batch size</label>
+              <input id="dc-batch-size" type="number" min="1" max="100" placeholder="20">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] text-dim">Interval (hours)</label>
+              <input id="dc-interval" type="number" min="1" max="168" placeholder="6">
+            </div>
+            <div class="col-span-2 flex flex-col gap-1.5">
+              <label class="text-[13px] text-dim">Priority cities (one per line: "City, ST")</label>
+              <textarea id="dc-priority-cities" rows="3"></textarea>
+            </div>
+            <div class="col-span-2 flex flex-col gap-1.5">
+              <label class="text-[13px] text-dim">Excluded niches (one per line)</label>
+              <textarea id="dc-exclude-niches" rows="3"></textarea>
+            </div>
           </div>
         </div>
       </div>
+      <div class="hud-panel">
+        <div class="px-6 py-4 border-b border-border bg-surface-2 collapsible-header collapsed" data-collapse="add-pair-body" onclick="toggleCollapsible('add-pair-body')">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Manually Add a Pair</h2>
+        </div>
+        <div id="add-pair-body" class="collapsible-body collapsed">
+          <div class="grid grid-cols-2 gap-6 p-5">
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Niche</label><input id="np-niche" type="text" placeholder="e.g. pool services"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">City</label><input id="np-city" type="text" placeholder="e.g. Tampa"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">State</label><input id="np-state" type="text" placeholder="FL" maxlength="2" class="uppercase"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Businesses on Maps</label><input id="np-maps" type="number" min="0" placeholder="Count"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Avg reviews / 6mo</label><input id="np-velocity" type="number" min="0" placeholder="0"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Google Ads count</label><input id="np-ads" type="number" min="0" placeholder="0"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Agency pages</label><input id="np-agency" type="number" min="0" placeholder="0"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Weak site %</label><input id="np-weak" type="number" min="0" max="100" placeholder="0–100"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Contactable %</label><input id="np-contact" type="number" min="0" max="100" placeholder="0–100"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Economy</label><select id="np-econ"><option value="growth">Growing</option><option value="flat" selected>Flat</option><option value="shrinking">Shrinking</option></select></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Revenue potential</label><select id="np-revenue"><option value="high">High</option><option value="moderate" selected>Moderate</option><option value="low">Low</option><option value="very_low">Very low</option></select></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Notes</label><input id="np-notes" type="text" placeholder="Optional"></div>
+            <div class="self-end"><button onclick="addNichePair()" id="btn-add-pair" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5"><span class="spinner"></span><i class="ph ph-plus"></i> Add & Score</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- LEADS: Scraper sub-view -->
+    <div id="view-scraper" class="view flex flex-col gap-5" style="display:none">
       <div class="flex gap-2 flex-wrap items-center">
         <button onclick="runScraper()" id="btn-run-scraper" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5">
-          <span class="spinner"></span><i class="ph ph-spider-web"></i> Run Scraper Now
+          <span class="spinner"></span><i class="ph ph-spider-web"></i> Scrape Now
         </button>
         <button onclick="runEnrich()" id="btn-enrich" class="btn bg-surface border border-good text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
-          <span class="spinner"></span><i class="ph ph-at"></i> Enrich Emails
+          <span class="spinner"></span><i class="ph ph-at"></i> Find Emails
         </button>
         <button onclick="runValidate()" id="btn-validate" class="btn bg-surface border border-border text-[#c8cdc9] px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5 hover:border-accent hover:bg-accent-glow">
           <span class="spinner"></span><i class="ph ph-check-circle"></i> Validate Emails
@@ -551,51 +570,42 @@
         </button>
         <span id="scraper-status-text" class="text-base text-dim ml-2"></span>
       </div>
-
       <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="scraper-stats-row"></div>
-
-      <div class="hud-panel">
-        <div class="px-6 py-4 border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-arrow-line-down mr-1.5"></i>LEAD GEN FUNNEL</h2>
-        </div>
-        <div id="scraper-steps" class="step-flow"></div>
-      </div>
-
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Scraped Leads</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-list mr-1.5"></i>Leads</h2>
           <span class="text-[13px] text-dim" id="scraper-lead-count">—</span>
         </div>
         <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
-          <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
+          <label class="text-[13px] text-dim">Status</label>
           <select id="sf-status" onchange="refreshScraperResults()">
             <option value="">All</option><option value="new">New</option><option value="scored">Scored</option><option value="contacted">Contacted</option><option value="archived">Archived</option>
           </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Priority</label>
+          <label class="text-[13px] text-dim">Priority</label>
           <select id="sf-priority" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="low">Low</option>
           </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Email</label>
+          <label class="text-[13px] text-dim">Email</label>
           <select id="sf-email" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="true">Has email</option><option value="false">No email</option>
           </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Contact</label>
+          <label class="text-[13px] text-dim">Contact</label>
           <select id="sf-contact-mode" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="email">Email-ready</option><option value="phone_only">Phone-only</option><option value="unreachable">No contact</option>
           </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Email Status</label>
+          <label class="text-[13px] text-dim">Email check</label>
           <select id="sf-email-status" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="valid">Valid</option><option value="risky">Risky</option><option value="invalid">Invalid</option><option value="pending">Pending</option>
           </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-          <input id="sf-city" type="text" placeholder="Filter city..." oninput="debounceScraperResults()" class="min-w-[140px]">
-          <label class="text-[13px] text-dim uppercase tracking-wide">Search</label>
-          <input id="sf-search" type="text" placeholder="Business name..." oninput="debounceScraperResults()" class="min-w-[140px]">
-          <label class="text-[13px] text-dim uppercase tracking-wide">Website</label>
+          <label class="text-[13px] text-dim">City</label>
+          <input id="sf-city" type="text" placeholder="Filter..." oninput="debounceScraperResults()" class="min-w-[140px]">
+          <label class="text-[13px] text-dim">Name</label>
+          <input id="sf-search" type="text" placeholder="Search..." oninput="debounceScraperResults()" class="min-w-[140px]">
+          <label class="text-[13px] text-dim">Website</label>
           <select id="sf-website" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="true">Has website</option><option value="false">No website</option>
           </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Phone</label>
+          <label class="text-[13px] text-dim">Phone</label>
           <select id="sf-phone" onchange="refreshScraperResults()">
             <option value="">Any</option><option value="true">Has phone</option><option value="false">No phone</option>
           </select>
@@ -605,125 +615,40 @@
         </div>
         <div class="overflow-y-auto max-h-[500px]" id="scraper-results-list"></div>
       </div>
-
       <div class="hud-panel">
         <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Scraper Jobs</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-clock-counter-clockwise mr-1.5"></i>Jobs</h2>
           <span class="text-[13px] text-dim" id="scraper-job-count">—</span>
         </div>
         <div class="overflow-y-auto max-h-[300px]" id="scraper-jobs-list"></div>
       </div>
-    </div>
-
-    <!-- ===================== NICHES SECTION (inside Targeting) ===================== -->
-    <div id="view-niches" class="view flex flex-col gap-5" style="display:none">
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4" id="niche-stats-row"></div>
-
       <div class="hud-panel">
         <div class="px-6 py-4 border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-plus-circle mr-1.5"></i>Add City + Niche Pair</h2>
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-arrow-line-down mr-1.5"></i>Funnel</h2>
         </div>
-        <div class="grid grid-cols-2 gap-6 p-5">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
-            <input id="np-niche" type="text" placeholder="e.g. pool services, tree removal">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-            <input id="np-city" type="text" placeholder="e.g. Tampa">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">State</label>
-            <input id="np-state" type="text" placeholder="e.g. FL" maxlength="2" class="uppercase">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Maps Count</label>
-            <input id="np-maps" type="number" min="0" placeholder="Number of businesses on Maps">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Review Velocity</label>
-            <input id="np-velocity" type="number" min="0" placeholder="Avg reviews / 6 months">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Ad Count</label>
-            <input id="np-ads" type="number" min="0" placeholder="Google Ads on first page">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Agency Pages</label>
-            <input id="np-agency" type="number" min="0" placeholder="Agency listing pages">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Weak Site %</label>
-            <input id="np-weak" type="number" min="0" max="100" placeholder="0–100">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Contactable %</label>
-            <input id="np-contact" type="number" min="0" max="100" placeholder="0–100">
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Economic Signal</label>
-            <select id="np-econ">
-              <option value="growth">Growth</option><option value="flat" selected>Flat</option><option value="shrinking">Shrinking</option>
-            </select>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Revenue Estimate</label>
-            <select id="np-revenue">
-              <option value="high">High</option><option value="moderate" selected>Moderate</option><option value="low">Low</option><option value="very_low">Very Low</option>
-            </select>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] text-dim uppercase tracking-wide">Notes</label>
-            <input id="np-notes" type="text" placeholder="Optional notes">
-          </div>
-          <div class="self-end">
-            <button onclick="addNichePair()" id="btn-add-pair" class="btn btn-primary px-6 py-3 cursor-pointer text-base font-medium flex items-center gap-1.5">
-              <span class="spinner"></span><i class="ph ph-plus"></i> Add & Score
-            </button>
-          </div>
-        </div>
+        <div id="scraper-steps" class="step-flow"></div>
       </div>
-
       <div class="hud-panel">
-        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-map-pin mr-1.5"></i>City + Niche Pairs</h2>
-          <span class="text-[13px] text-dim" id="niche-pair-count">—</span>
+        <div class="px-6 py-4 flex items-center justify-between border-b border-border bg-surface-2 collapsible-header collapsed" data-collapse="scraper-config-body" onclick="toggleCollapsible('scraper-config-body')">
+          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-sliders mr-1.5"></i>Scraper Settings</h2>
+          <div class="flex gap-2" onclick="event.stopPropagation()">
+            <button onclick="loadScraperConfig()" class="text-[13px] py-1 px-3 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">Reset</button>
+            <button onclick="saveScraperConfig()" id="btn-scraper-save" class="text-[13px] py-1 px-3 btn-primary cursor-pointer">Save</button>
+          </div>
         </div>
-        <div class="flex gap-2 px-6 py-4 border-b border-border flex-wrap items-center" style="background:rgba(255,255,255,0.01)">
-          <label class="text-[13px] text-dim uppercase tracking-wide">Status</label>
-          <select id="nf-status" onchange="refreshNichePairs()">
-            <option value="">All</option><option value="candidate">Candidate</option><option value="scored">Scored</option><option value="validated">Validated</option><option value="approved">Approved</option><option value="parked">Parked</option><option value="dropped">Dropped</option>
-          </select>
-          <label class="text-[13px] text-dim uppercase tracking-wide">Niche</label>
-          <input id="nf-niche" type="text" placeholder="Filter niche..." oninput="debounceNiches()" class="min-w-[140px]">
-          <label class="text-[13px] text-dim uppercase tracking-wide">City</label>
-          <input id="nf-city" type="text" placeholder="Filter city..." oninput="debounceNiches()" class="min-w-[140px]">
-          <button onclick="clearNicheFilters()" class="ml-auto text-base py-1 px-2.5 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent">
-            <i class="ph ph-x"></i> Clear
-          </button>
+        <div id="scraper-config-body" class="collapsible-body collapsed">
+          <div class="grid grid-cols-2 gap-6 p-5">
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Niche</label><input id="sc-niche" type="text" placeholder="e.g. hvac, plumber"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Requests per minute</label><input id="sc-rpm" type="number" min="1" max="30" placeholder="8"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Max retries</label><input id="sc-retries" type="number" min="0" max="10" placeholder="3"></div>
+            <div class="flex flex-col gap-1.5"><label class="text-[13px] text-dim">Delay between requests (ms)</label><div class="flex gap-2 items-center"><input id="sc-delay-min" type="number" min="1000" placeholder="5000" class="w-24"><span class="text-dim">to</span><input id="sc-delay-max" type="number" min="1000" placeholder="12000" class="w-24"></div></div>
+            <div class="col-span-2 flex flex-col gap-1.5"><label class="text-[13px] text-dim">Cities (one per line: "City, ST")</label><textarea id="sc-cities" rows="4" placeholder="Austin, TX&#10;Denver, CO&#10;Portland, OR"></textarea></div>
+          </div>
         </div>
-        <div class="overflow-y-auto max-h-[600px]" id="niche-pairs-list"></div>
-      </div>
-
-      <div class="hud-panel">
-        <div class="px-6 py-4 border-b border-border bg-surface-2">
-          <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-trophy mr-1.5"></i>Top Scoring Pairs</h2>
-        </div>
-        <div class="overflow-y-auto max-h-[400px]" id="niche-top-pairs"></div>
       </div>
     </div>
 
   </main>
-
-  <!-- CONFIG DRAWER -->
-  <div id="config-overlay" class="config-overlay" onclick="toggleConfigDrawer()"></div>
-  <div id="config-drawer" class="config-drawer">
-    <div class="px-6 py-4 border-b border-border bg-surface-2 flex items-center justify-between">
-      <h2 class="text-[13px] font-bold uppercase tracking-[2px]" style="font-family:'Share Tech Mono',monospace;color:var(--color-accent-dim)"><i class="ph ph-gear mr-1.5"></i>System Config</h2>
-      <button onclick="toggleConfigDrawer()" class="text-dim hover:text-accent cursor-pointer text-xl">&times;</button>
-    </div>
-    <div id="config-panel"></div>
-  </div>
 
   <div id="toast" class="toast"></div>
 
@@ -734,6 +659,7 @@
     const startTime = Date.now();
     let configDirty = false;
     let discoveryConfigDirty = false;
+    window._sortState = {};
 
     const PIPELINE_STAGES = [
       { key: 'new', label: 'NEW', color: '#74b9ff', icon: 'ph-dots-three' },
@@ -785,7 +711,7 @@
         el.addEventListener('input', () => { configDirty = true; });
         el.addEventListener('change', () => { configDirty = true; });
       });
-      document.querySelectorAll('#dc-enabled, #dc-auto-approve, #dc-batch-size, #dc-interval, #dc-priority-cities, #dc-exclude-niches').forEach(el => {
+      document.querySelectorAll('#dc-enabled, #dc-batch-size, #dc-interval, #dc-priority-cities, #dc-exclude-niches').forEach(el => {
         el.addEventListener('input', () => { discoveryConfigDirty = true; });
         el.addEventListener('change', () => { discoveryConfigDirty = true; });
       });
@@ -855,12 +781,6 @@
       if (tab === 'sales') { refresh(); refreshActivity(); }
     }
 
-    function toggleConfigDrawer() {
-      document.getElementById('config-drawer').classList.toggle('open');
-      document.getElementById('config-overlay').classList.toggle('open');
-      if (document.getElementById('config-drawer').classList.contains('open')) refreshConfig();
-    }
-
     async function loadActiveSource() {
       try {
         var r = await axios.get(API + '/api/niches?status=approved&limit=10', { headers: headers });
@@ -901,7 +821,6 @@
         var jobs = results[2].data.docs || [];
         var config = results[3].data;
 
-        document.getElementById('phase').textContent = 'Phase ' + (config.currentPhase || '\u2014');
         document.getElementById('uptime').textContent = uptime();
         document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString();
 
@@ -923,23 +842,23 @@
     }
 
     function renderGlobalProgress(statusCounts, totalLeads) {
-      var steps = [
+      var allSteps = [
         { label: 'Discovered', key: '_disc', color: '#74b9ff' },
         { label: 'Scraped', key: '_scraped', color: '#a78bfa' },
-        { label: 'Enriched', key: '_enriched', color: '#818cf8' },
-        { label: 'Outreach Ready', key: '_outreach', color: '#22c55e' },
+        { label: 'Emails found', key: '_enriched', color: '#818cf8' },
+        { label: 'Ready to email', key: '_outreach', color: '#22c55e' },
         { label: 'Contacted', key: 'contacted', color: '#f0a64b' },
         { label: 'Interested', key: 'replied_interested', color: '#34d399' },
         { label: 'Paid', key: 'paid', color: '#22c55e' }
       ];
-      // Use pipeline counts for what we have
       var counts = {};
-      steps.forEach(function(s) { counts[s.key] = statusCounts[s.key] || 0; });
+      allSteps.forEach(function(s) { counts[s.key] = statusCounts[s.key] || 0; });
       counts['_scraped'] = totalLeads || 0;
-      // Fetch async data for discovery/enrichment (cached)
       if (window._gpDiscovery) counts['_disc'] = window._gpDiscovery;
       if (window._gpEnriched) counts['_enriched'] = window._gpEnriched;
       if (window._gpOutreach) counts['_outreach'] = window._gpOutreach;
+      var steps = allSteps.filter(function(s) { return counts[s.key] > 0; });
+      if (steps.length === 0) { document.getElementById('global-progress-bar').innerHTML = ''; return; }
       var maxCount = 1;
       steps.forEach(function(s) { if (counts[s.key] > maxCount) maxCount = counts[s.key]; });
       var html = '';
@@ -1111,25 +1030,6 @@
             '<span class="text-dim text-[13px] min-w-[70px] text-right">' + ago(c.createdAt || c.created_at) + '</span>' +
           '</div>';
         }).join('');
-      }
-    }
-
-    async function refreshConfig() {
-      try {
-        var res = await axios.get(API + '/api/config', { headers: headers });
-        var config = res.data;
-        document.getElementById('config-panel').innerHTML = '<div class="grid grid-cols-2 gap-px bg-border">' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Phase</span><span class="text-base font-bold">' + (config.currentPhase ?? '\u2014') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Niche</span><span class="text-base font-bold">' + (config.activeNiche ?? '\u2014') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Cities</span><span class="text-base font-bold">' + ((config.activeCities || []).join(', ') || '\u2014') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Maintenance</span><span class="text-base font-bold">' + (config.maintenanceMode ? 'ON' : 'OFF') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Email Approval</span><span class="text-base font-bold">' + (config.emailApprovalRequired ? '\u2713 Required' : '\u2717 Auto') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Demo Approval</span><span class="text-base font-bold">' + (config.demoApprovalRequired ? '\u2713 Required' : '\u2717 Auto') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Launch Approval</span><span class="text-base font-bold">' + (config.launchApprovalRequired ? '\u2713 Required' : '\u2717 Auto') + '</span></div>' +
-          '<div class="bg-surface px-6 py-4 flex flex-col gap-0.5"><span class="text-[9px] text-accent-dim uppercase tracking-[2px]" style="font-family:Share Tech Mono,monospace">Updated</span><span class="text-base font-bold">' + ago(config.updatedAt || config.updated_at) + '</span></div>' +
-        '</div>';
-      } catch (err) {
-        console.error('Config load error:', err);
       }
     }
 
@@ -1396,12 +1296,13 @@
           var status = l.status || 'new';
           var created = l.createdAt || l.created_at;
           var contactMode = email ? 'email' : (phone ? 'phone_only' : 'unreachable');
+          var priorityOrder = priority === 'hot' ? '0' : priority === 'warm' ? '1' : priority === 'low' ? '2' : '3';
 
           var priorityHtml = priority
             ? '<span class="priority-dot priority-dot-' + priority + '"></span><span class="badge badge-' + priority + '">' + priority + '</span>'
             : '<span class="text-dim">\u2014</span>';
           var emailHtml = email
-            ? '<span class="has-indicator" title="' + email + '" style="font-size:11px">' + (email.length > 22 ? email.substring(0, 22) + '\u2026' : email) + '</span>'
+            ? '<a href="mailto:' + email + '" class="has-indicator" title="' + email + '" style="font-size:11px;color:var(--accent);text-decoration:none" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' + (email.length > 22 ? email.substring(0, 22) + '\u2026' : email) + '</a>'
             : '<span class="text-dim">\u2014</span>';
           var eStatusHtml = email
             ? '<span class="badge badge-' + eStatus + '">' + eStatus + '</span>'
@@ -1413,19 +1314,20 @@
               : '<span class="badge badge-low">none</span>';
 
           return '<tr>' +
-            '<td style="max-width:200px" title="' + name + '">' + name + '</td>' +
-            '<td class="mono">' + city + (state ? ', ' + state : '') + '</td>' +
-            '<td>' + priorityHtml + '</td>' +
-            '<td>' + contactModeHtml + '</td>' +
-            '<td class="mono" style="max-width:180px">' + emailHtml + '</td>' +
-            '<td>' + eStatusHtml + '</td>' +
-            '<td class="mono">' + (phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="text-dim">\u2014</span>') + '</td>' +
-            '<td class="mono" style="max-width:160px">' + (website ? '<span class="has-indicator" title="' + website + '">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</span>' : '<span class="text-dim">\u2014</span>') + '</td>' +
-            '<td>' + badge(status) + '</td>' +
-            '<td class="mono" style="font-size:10px">' + ago(created) + '</td>' +
+            '<td style="max-width:200px" title="' + name + '" data-sort="' + name.toLowerCase() + '">' + name + '</td>' +
+            '<td class="mono" data-sort="' + (city + ', ' + state).toLowerCase() + '">' + city + (state ? ', ' + state : '') + '</td>' +
+            '<td data-sort="' + priorityOrder + '">' + priorityHtml + '</td>' +
+            '<td data-sort="' + contactMode + '">' + contactModeHtml + '</td>' +
+            '<td class="mono" style="max-width:180px" data-sort="' + (email || '') + '">' + emailHtml + '</td>' +
+            '<td data-sort="' + eStatus + '">' + eStatusHtml + '</td>' +
+            '<td class="mono" data-sort="' + (phone || '') + '">' + (phone ? '<span class="has-indicator">' + phone + '</span>' : '<span class="text-dim">\u2014</span>') + '</td>' +
+            '<td class="mono" style="max-width:160px" data-sort="' + (website || '') + '">' + (website ? '<a href="' + website + '" target="_blank" rel="noopener" class="has-indicator" title="' + website + '" style="color:var(--accent);text-decoration:none" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' + website.replace(/^https?:\/\//, '').substring(0, 22) + '</a>' : '<span class="text-dim">\u2014</span>') + '</td>' +
+            '<td data-sort="' + status + '">' + badge(status) + '</td>' +
+            '<td class="mono" style="font-size:10px" data-sort="' + (created ? new Date(created).getTime() : 0) + '">' + ago(created) + '</td>' +
           '</tr>';
         }).join('') +
         '</tbody></table>';
+        initSortable(list.querySelector('table'));
       } catch (err) {
         console.error('Scraper results error:', err);
       }
@@ -1526,18 +1428,19 @@
           '</tr></thead><tbody>' +
           s.topPairs.map(function(p) {
             return '<tr>' +
-              '<td>' + p.niche + '</td>' +
-              '<td>' + p.city + ', ' + p.state + '</td>' +
-              '<td>' + scoreBarHTML(p.totalScore ?? p.total_score) + '</td>' +
-              '<td>' + badge(p.status) + '</td>' +
-              '<td class="mono">' + (p.demandScore ?? p.demand_score ?? '\u2014') + '</td>' +
-              '<td class="mono">' + (p.competitionScore ?? p.competition_score ?? '\u2014') + '</td>' +
-              '<td class="mono">' + (p.weaknessScore ?? p.weakness_score ?? '\u2014') + '</td>' +
-              '<td class="mono">' + (p.contactScore ?? p.contact_score ?? '\u2014') + '</td>' +
-              '<td class="mono">' + (p.revenueScore ?? p.revenue_score ?? '\u2014') + '</td>' +
+              '<td data-sort="' + p.niche.toLowerCase() + '">' + p.niche + '</td>' +
+              '<td data-sort="' + (p.city + ', ' + p.state).toLowerCase() + '">' + p.city + ', ' + p.state + '</td>' +
+              '<td data-sort="' + (p.totalScore ?? p.total_score ?? 0) + '">' + scoreBarHTML(p.totalScore ?? p.total_score) + '</td>' +
+              '<td data-sort="' + p.status + '">' + badge(p.status) + '</td>' +
+              '<td class="mono" data-sort="' + (p.demandScore ?? p.demand_score ?? 0) + '">' + (p.demandScore ?? p.demand_score ?? '\u2014') + '</td>' +
+              '<td class="mono" data-sort="' + (p.competitionScore ?? p.competition_score ?? 0) + '">' + (p.competitionScore ?? p.competition_score ?? '\u2014') + '</td>' +
+              '<td class="mono" data-sort="' + (p.weaknessScore ?? p.weakness_score ?? 0) + '">' + (p.weaknessScore ?? p.weakness_score ?? '\u2014') + '</td>' +
+              '<td class="mono" data-sort="' + (p.contactScore ?? p.contact_score ?? 0) + '">' + (p.contactScore ?? p.contact_score ?? '\u2014') + '</td>' +
+              '<td class="mono" data-sort="' + (p.revenueScore ?? p.revenue_score ?? 0) + '">' + (p.revenueScore ?? p.revenue_score ?? '\u2014') + '</td>' +
             '</tr>';
           }).join('') +
           '</tbody></table>';
+          initSortable(topEl.querySelector('table'));
         } else {
           topEl.innerHTML = '<div class="py-10 px-5 text-center text-dim text-[13px]">No scored pairs yet</div>';
         }
@@ -1566,7 +1469,7 @@
           return;
         }
         list.innerHTML = '<table class="results-table"><thead><tr>' +
-          '<th>Niche</th><th>City</th><th>Score</th><th>Status</th><th>Maps</th><th>Weak%</th><th>Contact%</th><th>Actions</th>' +
+          '<th>Niche</th><th>City</th><th>Score</th><th>Status</th><th>Maps</th><th>Weak%</th><th>Contact%</th><th data-nosort>Actions</th>' +
         '</tr></thead><tbody>' +
         r.data.docs.map(function(p) {
           var id = p.id;
@@ -1583,25 +1486,29 @@
           if (st === 'scored' || st === 'candidate') {
             actions += '<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-[#c8cdc9] cursor-pointer hover:border-accent" onclick="validatePair(\'' + id + '\')">Validate</button> ';
           }
-          if (st === 'validated' || st === 'scored') {
-            actions += '<button class="btn text-[10px] py-1 px-2 bg-accent border border-accent text-white cursor-pointer hover:opacity-90" onclick="decidePair(\'' + id + '\')">Go/No-Go</button> ';
+          if ((st === 'validated' || st === 'scored') && (score || 0) >= 55) {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-good border border-good text-white cursor-pointer hover:opacity-90" onclick="approvePair(\'' + id + '\')">Approve</button> ';
           }
-          if (st !== 'approved') {
-            actions += '<button class="btn text-[10px] py-1 px-2 bg-surface border border-border cursor-pointer hover:border-accent" style="color:var(--color-bad)" onclick="deletePair(\'' + id + '\')">\u2715</button>';
+          if (st === 'parked' && (score || 0) >= 55) {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-good border border-good text-white cursor-pointer hover:opacity-90" onclick="approvePair(\'' + id + '\')">Approve</button> ';
+          }
+          if (st === 'approved') {
+            actions += '<button class="btn text-[10px] py-1 px-2 bg-surface border border-border text-dim cursor-pointer hover:border-accent" onclick="parkPair(\'' + id + '\')">Park</button> ';
           }
 
           return '<tr>' +
-            '<td>' + p.niche + '</td>' +
-            '<td>' + p.city + ', ' + p.state + '</td>' +
-            '<td>' + scoreBarHTML(score) + '</td>' +
-            '<td>' + badge(st) + '</td>' +
-            '<td class="mono">' + maps + '</td>' +
-            '<td class="mono">' + weak + (weak !== '\u2014' ? '%' : '') + '</td>' +
-            '<td class="mono">' + contact + (contact !== '\u2014' ? '%' : '') + '</td>' +
+            '<td data-sort="' + p.niche.toLowerCase() + '">' + p.niche + '</td>' +
+            '<td data-sort="' + (p.city + ', ' + p.state).toLowerCase() + '">' + p.city + ', ' + p.state + '</td>' +
+            '<td data-sort="' + (score ?? 0) + '">' + scoreBarHTML(score) + '</td>' +
+            '<td data-sort="' + st + '">' + badge(st) + '</td>' +
+            '<td class="mono" data-sort="' + (maps === '\u2014' ? -1 : maps) + '">' + maps + '</td>' +
+            '<td class="mono" data-sort="' + (weak === '\u2014' ? -1 : weak) + '">' + weak + (weak !== '\u2014' ? '%' : '') + '</td>' +
+            '<td class="mono" data-sort="' + (contact === '\u2014' ? -1 : contact) + '">' + contact + (contact !== '\u2014' ? '%' : '') + '</td>' +
             '<td>' + actions + '</td>' +
           '</tr>';
         }).join('') +
         '</tbody></table>';
+        initSortable(list.querySelector('table'));
       } catch (err) {
         console.error('Niche pairs error:', err);
       }
@@ -1661,14 +1568,20 @@
       }
     }
 
-    async function decidePair(id) {
+    async function approvePair(id) {
       try {
-        var r = await axios.patch(API + '/api/niches/' + id + '/decide', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
-        var decision = r.data.decision;
-        var reasons = r.data.reasons || [];
-        if (decision === 'approved') showToast('\u2713 APPROVED \u2014 Sprint started!', 'success');
-        else if (decision === 'blocked') showToast('\u26a0 ' + reasons[0], 'error');
-        else showToast('\u26a0 PARKED \u2014 ' + reasons.join('; '), 'error');
+        var r = await axios.patch(API + '/api/niches/' + id + '/approve', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Approved \u2014 ready for lead gen!', 'success');
+        refreshNichesView();
+      } catch (err) {
+        showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
+      }
+    }
+
+    async function parkPair(id) {
+      try {
+        await axios.patch(API + '/api/niches/' + id + '/decide', {}, { headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }) });
+        showToast('\u2713 Parked', 'success');
         refreshNichesView();
       } catch (err) {
         showToast('\u2717 ' + (err.response && err.response.data && err.response.data.error || err.message), 'error');
@@ -1699,7 +1612,6 @@
         var res = await axios.get(API + '/api/niches/discover/config', { headers: headers });
         var c = res.data;
         document.getElementById('dc-enabled').checked = !!c.enabled;
-        document.getElementById('dc-auto-approve').checked = !!c.autoApprove;
         document.getElementById('dc-batch-size').value = c.batchSize || 20;
         document.getElementById('dc-interval').value = c.intervalHours || 6;
         document.getElementById('dc-priority-cities').value = (c.priorityCities || []).join('\n');
@@ -1718,7 +1630,6 @@
         var excludeNiches = document.getElementById('dc-exclude-niches').value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
         var body = {
           enabled: document.getElementById('dc-enabled').checked,
-          autoApprove: document.getElementById('dc-auto-approve').checked,
           batchSize: parseInt(document.getElementById('dc-batch-size').value) || 20,
           intervalHours: parseInt(document.getElementById('dc-interval').value) || 6,
           priorityCities: priorityCities,
@@ -1758,7 +1669,7 @@
         var jobs = s.recentJobs || [];
 
         document.getElementById('discovery-stats-row').innerHTML =
-          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Status</span><span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + (cfg.enabled ? 'Active' : 'Paused') + '</span><span class="text-[13px] text-dim">' + (cfg.autoApprove ? 'Auto-approve ON' : 'Human review required') + '</span></div>' +
+          '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Status</span><span class="text-[28px] font-bold text-accent" style="font-family:Share Tech Mono,monospace">' + (cfg.enabled ? 'Active' : 'Paused') + '</span><span class="text-[13px] text-dim">Human approval required (score ≥ 55)</span></div>' +
           '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Total Pairs</span><span class="text-[28px] font-bold" style="font-family:Share Tech Mono,monospace">' + (p.total || 0) + '</span><span class="text-[13px] text-dim">' + (s.coverage ? s.coverage.uniqueCities : 0) + ' cities, ' + (s.coverage ? s.coverage.uniqueNiches : 0) + ' niches</span></div>' +
           '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Approved</span><span class="text-[28px] font-bold text-good" style="font-family:Share Tech Mono,monospace">' + (p.approved || 0) + '</span><span class="text-[13px] text-dim">ready for lead gen</span></div>' +
           '<div class="hud-panel p-6 flex flex-col gap-1 hover:border-accent"><span class="text-[13px] uppercase tracking-widest text-dim">Parked / Dropped</span><span class="text-[28px] font-bold text-dim" style="font-family:Share Tech Mono,monospace">' + (p.parked || 0) + ' / ' + (p.dropped || 0) + '</span></div>' +

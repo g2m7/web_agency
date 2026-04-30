@@ -46,66 +46,30 @@ export interface ValidationData {
  * Demand score (0–25)
  * Based on Maps business count, review volume, and review velocity.
  */
-export function scoreDemand(mapsCount: number, reviewVelocity: number): number {
-  // Maps density scoring
-  let densityScore: number
-  if (mapsCount >= 50) densityScore = 15
-  else if (mapsCount >= 25) densityScore = 10
-  else if (mapsCount >= 15) densityScore = 5
-  else densityScore = 2
-
-  // Review velocity scoring (avg reviews in last 6 months)
-  let velocityScore: number
-  if (reviewVelocity >= 10) velocityScore = 10
-  else if (reviewVelocity >= 5) velocityScore = 7
-  else if (reviewVelocity >= 2) velocityScore = 4
-  else velocityScore = 1
-
-  return Math.min(25, densityScore + velocityScore)
+function lerp(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
+  const t = Math.max(0, Math.min(1, (value - inMin) / (inMax - inMin)))
+  return Math.round((outMin + t * (outMax - outMin)) * 10) / 10
 }
 
-/**
- * Competition saturation — inverse (0–20)
- * Fewer ads + fewer agency pages = higher score.
- */
+export function scoreDemand(mapsCount: number, reviewVelocity: number): number {
+  const densityScore = lerp(Math.min(mapsCount, 80), 0, 80, 0, 15)
+  const velocityScore = lerp(Math.min(reviewVelocity, 20), 0, 20, 0, 10)
+  return Math.min(25, Math.round(densityScore + velocityScore))
+}
+
 export function scoreCompetition(adCount: number, agencyPages: number): number {
   const total = adCount + agencyPages
-
-  if (total === 0) return 20
-  if (total <= 2) return 15
-  if (total <= 5) return 9
-  if (total <= 8) return 4
-  return 1
+  return Math.round(lerp(Math.min(total, 15), 0, 15, 20, 0))
 }
 
-/**
- * Website weakness rate (0–25)
- * % of sampled businesses with weak sites.
- */
 export function scoreWeakness(weakSitePct: number): number {
-  if (weakSitePct >= 70) return 25
-  if (weakSitePct >= 50) return 19
-  if (weakSitePct >= 30) return 12
-  if (weakSitePct >= 15) return 6
-  return 2
+  return Math.round(lerp(Math.min(weakSitePct, 100), 0, 100, 0, 25))
 }
 
-/**
- * Contactability (0–15)
- * % of businesses with reachable email or phone.
- */
 export function scoreContactability(contactablePct: number): number {
-  if (contactablePct >= 70) return 15
-  if (contactablePct >= 50) return 11
-  if (contactablePct >= 30) return 7
-  if (contactablePct >= 15) return 3
-  return 1
+  return Math.round(lerp(Math.min(contactablePct, 100), 0, 100, 0, 15))
 }
 
-/**
- * Revenue potential (0–15)
- * Based on estimated lead value and niche margin.
- */
 export function scoreRevenue(
   revenueEstimate: 'high' | 'moderate' | 'low' | 'very_low',
   economicSignal: EconomicSignal,
@@ -117,10 +81,7 @@ export function scoreRevenue(
     very_low: 2,
   }
   const base = baseScores[revenueEstimate] ?? 6
-
-  // Economic signal modifier
   const modifier = economicSignal === 'growth' ? 1 : economicSignal === 'shrinking' ? -2 : 0
-
   return Math.max(0, Math.min(15, base + modifier))
 }
 

@@ -5,50 +5,66 @@
 
 ## What Was Done (This Session)
 
-### Dashboard UX overhaul — 6 tabs → 3 workflow phases
+### Dashboard cleanup — removed config drawer, simplified progress bar
 
-Collapsed 6 disconnected tabs into 3 logical workflow phases that mirror the actual operational pipeline:
+The system config drawer (gear icon → slide-out with Phase/Niche/Cities/Maintenance/Approval toggles) was premature complexity for niche-hunting stage. Removed it entirely.
 
-| Old Tabs | New Tab | What's Inside |
-|---|---|---|
-| Discovery + Niches | **🎯 Targeting** | Discovery config, funnel, niche pairs table, scoring |
-| Lead Gen (Scraper) | **📋 Leads** | Active source indicator, scraper config, lead gen funnel, scraped leads table |
-| Pipeline + Clients + Activity | **💰 Sales** | KPIs, pipeline flow, kanban, jobs, clients, pipeline events, policy checks |
+- Removed gear button, config drawer HTML, overlay, `toggleConfigDrawer()`, and `refreshConfig()` function
+- Removed "PHASE —" display from header
+- Global progress bar now hides when all counts are zero (no noise)
+- Steps with zero data are filtered out; only shows pipeline steps with actual numbers
+- Relabeled "Enriched" → "Emails found", "Outreach Ready" → "Ready to email"
 
-**New features added:**
-- **Global progress bar** — Always-visible horizontal stepper showing end-to-end pipeline counts: Discovered → Scraped → Enriched → Outreach Ready → Contacted → Interested → Paid
-- **Active source indicator** — In the Leads tab, shows which approved niche-city pairs are feeding the scraper. If none approved, links back to Targeting tab
-- **Config drawer** — System config moved from standalone tab to a slide-out drawer via ⚙ gear icon in header
+### Discovery handler fix — raw signals not persisted to DB
 
-### Email validation fix — DNS failures no longer hard-fail
+`handleNicheDiscover()` computed `review_velocity`, `weak_site_pct`, `contactable_pct` from probe data and used them to score pairs, but only wrote `maps_count` to the DB on create. The score sub-scores (demand_score, etc.) were written but the raw inputs stayed at 0.
 
-`hasMxRecords()` was returning `false` on DNS lookup failure, causing valid emails to be marked `invalid`. Now returns a tri-state (`yes`/`no`/`unknown`), and `unknown` results in `risky` status instead of `invalid`.
+**Fix:** `niche-discovery.ts` `db.create()` now writes `review_velocity`, `ad_count`, `agency_pages`, `weak_site_pct`, `contactable_pct` from the probe data instead of hardcoding zeros.
 
-**File:** `src/scraper/email-validator.ts`
+**File:** `app-lite/src/jobs/handlers/niche-discovery.ts:313-326`
+
+### Fresh discovery + enrichment triggered
+
+- Deleted 6 broken pairs (all had 0 raw signals, clustered scores of 32-34)
+- Triggered fresh `niche_discover` job — running, ~10 min
+- Triggered `email_enrich` batch (50 leads) — running
+- Current state: 354 leads (305 hot), 63 with emails, 292 pending enrichment
 
 ### Validation
 - `bun run typecheck` → 0 errors
-- `bun run test` → 106 tests, all passed
+- `bun run test` → 111 tests, all passed
 
 ## What's In Progress
-- None.
+- `niche_discover` job running (started 13:36 UTC) — broad probe phase
+- `email_enrich` job running (started 13:38 UTC) — processing 50 leads
 
 ## What's Blocked
 - None.
 
 ## Where Next Agent Should Pick Up
-1. The data pipeline works (scrape → enrich → validate → score). Next: outreach handler to send hook emails.
-2. After outreach: reply classification, demo builder, payment integration.
-3. Consider client lifecycle kanban (pending_payment → onboarding → active → cancelled).
-4. The "Run Scraper" action button is on the Sales tab (inherited from old pipeline view). Consider moving to Leads tab.
+1. Check if discovery job completed and produced pairs with differentiated scores (weakness_score, contact_score should now be non-zero).
+2. Check if email enrichment found more valid emails. Run another batch if needed.
+3. Build outreach handler — the next major gap. 63+ leads with emails, no way to send hook emails yet.
+4. After outreach: reply classification, demo builder, payment integration.
 
 ## Current Pipeline Snapshot
 ```text
 Step 0: Niche Discovery (AUTONOMOUS)
   -> Probes cities, discovers categories, scores pairs, validates top ones
   -> Runs every 6 hours
+  -> FIX: now persists raw signals (weak_site_pct, contactable_pct, review_velocity) to DB
 
 Step 1: Lead Generation (on approved pairs)
   -> Scrape → Tiering → Email enrichment → Email validation
   -> Outreach segmentation (email-ready / phone fallback / unreachable)
+  -> 354 leads, 305 hot, 63 with emails, enrichment running
+
+Step 2: Outreach (NOT BUILT YET)
+  -> Hook email sender — the next handler to implement
 ```
+
+## Data Snapshot
+- Leads: 354 total (305 hot, 28 warm, 21 low)
+- Emails: 63 found (55 invalid, 7 risky, 292 pending enrichment)
+- Niche pairs: 0 (cleared, discovery re-running with fixed handler)
+- Jobs: niche_discover (running), email_enrich (running)

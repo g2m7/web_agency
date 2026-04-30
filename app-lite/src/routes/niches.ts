@@ -35,7 +35,7 @@ nicheRoutes.post('/discover', async (c) => {
       status: 'queued',
       input_data: { batchSize: body.batchSize ?? 20, triggeredBy: 'manual' },
       run_at: new Date().toISOString(),
-      max_attempts: 1,
+      max_attempts: 3,
       attempts: 0,
     },
   })
@@ -51,7 +51,6 @@ nicheRoutes.get('/discover/config', async (c) => {
     enabled: config.discoveryEnabled ?? config.discovery_enabled ?? true,
     batchSize: config.discoveryBatchSize ?? config.discovery_batch_size ?? 20,
     intervalHours: config.discoveryIntervalHours ?? config.discovery_interval_hours ?? 6,
-    autoApprove: config.discoveryAutoApprove ?? config.discovery_auto_approve ?? false,
     excludeNiches: config.discoveryExcludeNiches ?? config.discovery_exclude_niches ?? [],
     priorityCities: config.discoveryPriorityCities ?? config.discovery_priority_cities ?? [],
     lastRun: config.discoveryLastRun ?? config.discovery_last_run ?? null,
@@ -70,7 +69,6 @@ nicheRoutes.patch('/discover/config', async (c) => {
   if (body.enabled !== undefined) updates.discovery_enabled = body.enabled
   if (body.batchSize !== undefined) updates.discovery_batch_size = body.batchSize
   if (body.intervalHours !== undefined) updates.discovery_interval_hours = body.intervalHours
-  if (body.autoApprove !== undefined) updates.discovery_auto_approve = body.autoApprove
   if (body.excludeNiches !== undefined) updates.discovery_exclude_niches = body.excludeNiches
   if (body.priorityCities !== undefined) updates.discovery_priority_cities = body.priorityCities
 
@@ -123,7 +121,6 @@ nicheRoutes.get('/discover/stats', async (c) => {
     },
     config: {
       enabled: config.discoveryEnabled ?? config.discovery_enabled ?? true,
-      autoApprove: config.discoveryAutoApprove ?? config.discovery_auto_approve ?? false,
       lastRun: config.discoveryLastRun ?? config.discovery_last_run ?? null,
     },
     recentJobs: discoveryJobs.docs.map((j: any) => ({
@@ -147,6 +144,11 @@ nicheRoutes.patch('/:id/approve', async (c) => {
     pair = await db.findByID({ collection: 'niche-city-pairs', id })
   } catch {
     return c.json({ error: 'Pair not found' }, 404)
+  }
+
+  const totalScore = pair.totalScore ?? pair.total_score ?? 0
+  if (totalScore < 55) {
+    return c.json({ error: `Score ${totalScore} is below minimum of 55 to approve. Park or improve the pair first.` }, 422)
   }
 
   // Check 3-sprint cap
