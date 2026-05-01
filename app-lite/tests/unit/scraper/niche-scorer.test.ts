@@ -12,28 +12,28 @@ import {
 
 describe('scoreDemand', () => {
   it('scales linearly with maps count and review velocity', () => {
-    const score = scoreDemand(60, 12)
-    expect(score).toBe(17)
+    const score = scoreDemand(40, 8)
+    expect(score).toBe(12)
   })
 
   it('scores moderate demand', () => {
-    const score = scoreDemand(30, 6)
-    expect(score).toBe(9)
+    const score = scoreDemand(25, 4)
+    expect(score).toBe(7)
   })
 
   it('scores low demand', () => {
-    const score = scoreDemand(18, 3)
-    expect(score).toBe(5)
+    const score = scoreDemand(10, 2)
+    expect(score).toBe(3)
   })
 
   it('scores very low demand', () => {
-    const score = scoreDemand(10, 1)
+    const score = scoreDemand(5, 1)
     expect(score).toBe(2)
   })
 
-  it('caps at 25', () => {
-    const score = scoreDemand(100, 20)
-    expect(score).toBe(25)
+  it('caps at 15', () => {
+    const score = scoreDemand(100, 30)
+    expect(score).toBe(15)
   })
 
   it('differentiates close inputs', () => {
@@ -43,19 +43,19 @@ describe('scoreDemand', () => {
 
 describe('scoreCompetition', () => {
   it('scores maximum for zero ads and agency pages', () => {
-    expect(scoreCompetition(0, 0)).toBe(20)
+    expect(scoreCompetition(0, 0)).toBe(15)
   })
 
   it('scores high for minimal competition', () => {
-    expect(scoreCompetition(1, 1)).toBe(17)
+    expect(scoreCompetition(1, 1)).toBe(13)
   })
 
   it('scores moderate for mid competition', () => {
-    expect(scoreCompetition(3, 2)).toBe(13)
+    expect(scoreCompetition(3, 2)).toBe(10)
   })
 
   it('scores low for high competition', () => {
-    expect(scoreCompetition(4, 4)).toBe(9)
+    expect(scoreCompetition(4, 4)).toBe(7)
   })
 
   it('scores minimum for highly saturated', () => {
@@ -69,19 +69,19 @@ describe('scoreCompetition', () => {
 
 describe('scoreWeakness', () => {
   it('scores high for 75% weak sites', () => {
-    expect(scoreWeakness(75)).toBe(19)
+    expect(scoreWeakness(75)).toBe(23)
   })
 
   it('scores mid-high for 55% weak sites', () => {
-    expect(scoreWeakness(55)).toBe(14)
+    expect(scoreWeakness(55)).toBe(17)
   })
 
   it('scores moderate for 40% weak sites', () => {
-    expect(scoreWeakness(40)).toBe(10)
+    expect(scoreWeakness(40)).toBe(12)
   })
 
   it('scores low for 20% weak sites', () => {
-    expect(scoreWeakness(20)).toBe(5)
+    expect(scoreWeakness(20)).toBe(6)
   })
 
   it('scores minimum near 0%', () => {
@@ -95,19 +95,19 @@ describe('scoreWeakness', () => {
 
 describe('scoreContactability', () => {
   it('scores high for 80% contactable', () => {
-    expect(scoreContactability(80)).toBe(12)
+    expect(scoreContactability(80)).toBe(20)
   })
 
   it('scores moderate for 60% contactable', () => {
-    expect(scoreContactability(60)).toBe(9)
+    expect(scoreContactability(60)).toBe(15)
   })
 
   it('scores low for 35% contactable', () => {
-    expect(scoreContactability(35)).toBe(5)
+    expect(scoreContactability(35)).toBe(9)
   })
 
   it('scores minimum near 0%', () => {
-    expect(scoreContactability(10)).toBe(2)
+    expect(scoreContactability(10)).toBe(3)
   })
 
   it('differentiates close inputs', () => {
@@ -147,8 +147,8 @@ describe('scoreRevenue', () => {
 describe('scoreNichePair', () => {
   it('computes a strong pair near max scores', () => {
     const data: NicheRawData = {
-      mapsCount: 80,
-      reviewVelocity: 20,
+      mapsCount: 50,
+      reviewVelocity: 10,
       adCount: 0,
       agencyPages: 0,
       weakSitePct: 100,
@@ -157,10 +157,10 @@ describe('scoreNichePair', () => {
       revenueEstimate: 'high',
     }
     const scores = scoreNichePair(data)
-    expect(scores.demandScore).toBe(25)
-    expect(scores.competitionScore).toBe(20)
-    expect(scores.weaknessScore).toBe(25)
-    expect(scores.contactScore).toBe(15)
+    expect(scores.demandScore).toBe(15)
+    expect(scores.competitionScore).toBe(15)
+    expect(scores.weaknessScore).toBe(30)
+    expect(scores.contactScore).toBe(25)
     expect(scores.revenueScore).toBe(15)
     expect(scores.totalScore).toBe(100)
   })
@@ -212,6 +212,21 @@ describe('scoreNichePair', () => {
     const a = scoreNichePair(base)
     const b = scoreNichePair({ ...base, mapsCount: 35 })
     expect(b.totalScore).toBeGreaterThan(a.totalScore)
+  })
+
+  it('realistic niche can score above 70', () => {
+    const data: NicheRawData = {
+      mapsCount: 30,
+      reviewVelocity: 8,
+      adCount: 0,
+      agencyPages: 0,
+      weakSitePct: 70,
+      contactablePct: 75,
+      economicSignal: 'flat',
+      revenueEstimate: 'high',
+    }
+    const scores = scoreNichePair(data)
+    expect(scores.totalScore).toBeGreaterThanOrEqual(70)
   })
 })
 

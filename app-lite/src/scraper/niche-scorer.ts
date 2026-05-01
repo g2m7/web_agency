@@ -21,10 +21,10 @@ export interface NicheRawData {
 }
 
 export interface NicheScores {
-  demandScore: number       // 0–25
-  competitionScore: number  // 0–20
-  weaknessScore: number     // 0–25
-  contactScore: number      // 0–15
+  demandScore: number       // 0–15
+  competitionScore: number  // 0–15
+  weaknessScore: number     // 0–30
+  contactScore: number      // 0–25
   revenueScore: number      // 0–15
   totalScore: number        // 0–100
 }
@@ -43,8 +43,10 @@ export interface ValidationData {
 // ── Scoring functions ────────────────────────────────────────
 
 /**
- * Demand score (0–25)
- * Based on Maps business count, review volume, and review velocity.
+ * Demand score (0–15)
+ * Based on Maps business count and avg review count.
+ * Rebalanced: maps density ceiling lowered from 80→50, velocity range 0→10
+ * to match realistic local niche data.
  */
 function lerp(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
   const t = Math.max(0, Math.min(1, (value - inMin) / (inMax - inMin)))
@@ -52,22 +54,22 @@ function lerp(value: number, inMin: number, inMax: number, outMin: number, outMa
 }
 
 export function scoreDemand(mapsCount: number, reviewVelocity: number): number {
-  const densityScore = lerp(Math.min(mapsCount, 80), 0, 80, 0, 15)
-  const velocityScore = lerp(Math.min(reviewVelocity, 20), 0, 20, 0, 10)
-  return Math.min(25, Math.round(densityScore + velocityScore))
+  const densityScore = lerp(Math.min(mapsCount, 50), 0, 50, 0, 8)
+  const velocityScore = lerp(Math.min(reviewVelocity, 10), 0, 10, 0, 7)
+  return Math.min(15, Math.round(densityScore + velocityScore))
 }
 
 export function scoreCompetition(adCount: number, agencyPages: number): number {
   const total = adCount + agencyPages
-  return Math.round(lerp(Math.min(total, 15), 0, 15, 20, 0))
+  return Math.round(lerp(Math.min(total, 15), 0, 15, 15, 0))
 }
 
 export function scoreWeakness(weakSitePct: number): number {
-  return Math.round(lerp(Math.min(weakSitePct, 100), 0, 100, 0, 25))
+  return Math.round(lerp(Math.min(weakSitePct, 100), 0, 100, 0, 30))
 }
 
 export function scoreContactability(contactablePct: number): number {
-  return Math.round(lerp(Math.min(contactablePct, 100), 0, 100, 0, 15))
+  return Math.round(lerp(Math.min(contactablePct, 100), 0, 100, 0, 25))
 }
 
 export function scoreRevenue(

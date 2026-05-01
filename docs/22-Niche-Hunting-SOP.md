@@ -98,49 +98,49 @@ Score each surviving city+niche pair on five dimensions:
 
 | Dimension | Weight | What it measures |
 |---|---:|---|
-| Demand | 25 | Maps business count, review volume, review velocity |
-| Competition saturation (inverse) | 20 | Fewer ads + fewer agency pages = higher score |
-| Website weakness rate | 25 | % of sampled businesses with clearly weak sites |
-| Contactability | 15 | % of businesses with reachable email or phone |
+| Demand | 15 | Maps business count, avg review count |
+| Competition saturation (inverse) | 15 | Fewer ads + fewer agency pages = higher score |
+| Website weakness rate | 30 | % of sampled businesses with clearly weak sites |
+| Contactability | 25 | % of businesses with reachable email or phone |
 | Revenue potential | 15 | Lead value per customer, retainer affordability, niche margin |
 
 ### Scoring rubric per dimension
 
-#### Demand (0–25)
+#### Demand (0–15)
 
 | Score | Criteria |
 |---:|---|
-| 20–25 | 50+ businesses on Maps, strong review velocity, clear local demand |
-| 13–19 | 25–49 businesses, moderate reviews, demand is present |
-| 7–12 | 15–24 businesses, thin reviews, demand uncertain |
-| 0–6 | < 15 businesses, stale or no reviews |
+| 12–15 | 40+ businesses on Maps, high avg reviews, clear local demand |
+| 8–11 | 20–39 businesses, moderate reviews, demand is present |
+| 4–7 | 10–19 businesses, thin reviews, demand uncertain |
+| 0–3 | < 10 businesses, stale or no reviews |
 
-#### Competition saturation — inverse (0–20)
-
-| Score | Criteria |
-|---:|---|
-| 16–20 | No ads, no agency pages targeting this pair |
-| 10–15 | 1–2 ads or agency pages, low competition |
-| 5–9 | 3–5 ads, multiple agency pages, moderate competition |
-| 0–4 | 6+ ads, saturated by agencies |
-
-#### Website weakness rate (0–25)
+#### Competition saturation — inverse (0–15)
 
 | Score | Criteria |
 |---:|---|
-| 20–25 | ≥ 70% of sampled businesses have weak sites |
-| 13–19 | 50–69% weak sites |
-| 7–12 | 30–49% weak sites |
-| 0–6 | < 30% weak sites |
+| 12–15 | No ads, no agency pages targeting this pair |
+| 8–11 | 1–2 ads or agency pages, low competition |
+| 4–7 | 3–5 ads, multiple agency pages, moderate competition |
+| 0–3 | 6+ ads, saturated by agencies |
 
-#### Contactability (0–15)
+#### Website weakness rate (0–30)
 
 | Score | Criteria |
 |---:|---|
-| 12–15 | ≥ 70% contactable (email or phone) |
-| 8–11 | 50–69% contactable |
-| 4–7 | 30–49% contactable |
-| 0–3 | < 30% contactable |
+| 24–30 | ≥ 70% of sampled businesses have weak sites |
+| 16–23 | 50–69% weak sites |
+| 9–15 | 30–49% weak sites |
+| 0–8 | < 30% weak sites |
+
+#### Contactability (0–25)
+
+| Score | Criteria |
+|---:|---|
+| 20–25 | ≥ 70% contactable (email or phone) |
+| 13–19 | 50–69% contactable |
+| 7–12 | 30–49% contactable |
+| 0–6 | < 30% contactable |
 
 #### Revenue potential (0–15)
 
@@ -217,10 +217,10 @@ Maintain a running scorecard at `data/niche-city-scorecard.csv` with one row per
 | weak_site_pct | % of sampled businesses with weak sites |
 | contactable_pct | % with email or phone |
 | economic_signal | growth / flat / shrinking |
-| demand_score | 0–25 |
-| competition_score | 0–20 |
-| weakness_score | 0–25 |
-| contact_score | 0–15 |
+| demand_score | 0–15 |
+| competition_score | 0–15 |
+| weakness_score | 0–30 |
+| contact_score | 0–25 |
 | revenue_score | 0–15 |
 | total_score | 0–100 |
 | status | candidate / validated / approved / parked / dropped |

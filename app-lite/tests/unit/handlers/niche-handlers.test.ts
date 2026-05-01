@@ -155,11 +155,11 @@ describe('handleNicheScore', () => {
 
     const scores = result.scores as any
     expect(scores.demandScore).toBe(14)
-    expect(scores.competitionScore).toBe(19)
-    expect(scores.weaknessScore).toBe(16)
-    expect(scores.contactScore).toBe(11)
+    expect(scores.competitionScore).toBe(14)
+    expect(scores.weaknessScore).toBe(20)
+    expect(scores.contactScore).toBe(19)
     expect(scores.revenueScore).toBe(15)
-    expect(scores.totalScore).toBe(75)
+    expect(scores.totalScore).toBe(82)
   })
 })
 

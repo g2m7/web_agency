@@ -33,10 +33,10 @@ Full scoring methodology, query library, and thresholds are defined in `docs/22-
 
 | Dimension | Weight | What it measures |
 |---|---:|---|
-| Demand | 25 | Maps business count, review volume, review velocity |
-| Competition saturation (inverse) | 20 | Fewer ads + fewer agency pages = higher score |
-| Website weakness rate | 25 | % of sampled businesses with clearly weak sites |
-| Contactability | 15 | % of businesses with reachable email or phone |
+| Demand | 15 | Maps business count, avg review count |
+| Competition saturation (inverse) | 15 | Fewer ads + fewer agency pages = higher score |
+| Website weakness rate | 30 | % of sampled businesses with clearly weak sites |
+| Contactability | 25 | % of businesses with reachable email or phone |
 | Revenue potential | 15 | Lead value per customer, retainer affordability, niche margin |
 
 ### Go/no-go thresholds
@@ -56,10 +56,10 @@ Evaluated pairs are tracked in `data/niche-city-scorecard.csv` with full score b
 
 | City | Niche | Demand | Competition | Weakness | Contact | Revenue | Total | Status |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| Tampa | Pool services | 22 | 17 | 21 | 13 | 12 | 85 | Approved |
-| Austin | Garage door | 20 | 15 | 19 | 11 | 11 | 76 | Approved |
-| Charlotte | HVAC | 23 | 6 | 14 | 12 | 13 | 68 | Parked |
-| Denver | Dog grooming | 18 | 16 | 20 | 9 | 8 | 71 | Validated |
+| Tampa | Pool services | 13 | 13 | 25 | 20 | 12 | 83 | Approved |
+| Austin | Garage door | 11 | 12 | 20 | 17 | 11 | 71 | Approved |
+| Charlotte | HVAC | 12 | 5 | 17 | 19 | 13 | 66 | Parked |
+| Denver | Dog grooming | 10 | 13 | 23 | 14 | 8 | 68 | Validated |
 
 ## Geographic filters
 

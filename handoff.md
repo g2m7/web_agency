@@ -5,29 +5,34 @@
 
 ## What Was Done (This Session)
 
-### Fixed: Niche discovery creating 0 pairs despite finding 150+ categories
+### Rebalanced niche scoring model — pairs can now realistically hit 70+
 
-**Root cause:** The discovery handler was too aggressive with targeted re-probing. Every candidate pair (even those with 5-9 maps results from the broad probe) triggered a fresh Google Maps scrape. With 100 candidates × 6-15 sec delay each, the handler would exhaust its time/rate budget. Additionally, any single scrape error would zero out the maps count (setting `actualMapsCount = 0`), and the minimum threshold was 5 — ensuring every pair got skipped.
+**Problem:** The old scoring model made it nearly impossible for realistic niches to reach the 70-point go/no-go threshold. Demand required 80 businesses + 120 avg reviews to max out (25pts), review velocity was divided by 6 in the discovery handler producing tiny numbers (2-3 max), and the remaining dimensions couldn't compensate for the 15-20 point demand gap.
 
-**Evidence:** 5 consecutive completed runs all showed `pairsCreated: 0, pairsSkipped: 0` despite `categoriesDiscovered: 120-152` across `citiesProbed: 48-57`. Debug logs confirmed `discoveredPairs=159, uniquePairs=151, candidatePairs=100` entering Phase 3, but all failed the `< 5` filter.
+**Three fixes applied:**
 
-**Fix (`niche-discovery.ts`):**
-1. Only re-probe if broad count < 3 (was < 10) — saves rate limit budget
-2. On scrape error, keep the broad probe count instead of zeroing it
-3. Lower creation threshold from 5 to 2 — let the scorer rank them
-4. Check `probeSignal.aborted` before attempting targeted probes
+1. **Lowered demand ceiling** (`niche-scorer.ts`): maps density 0-80→0-50, velocity range 0-20→0-10
+2. **Rebalanced weights** toward dimensions with real measured data:
+   - Demand: 25→15 (maps count is noisy, not the gatekeeper)
+   - Competition: 20→15 (mostly defaults, not measured yet)
+   - Weakness: 25→30 (real probe data, core signal for our business)
+   - Contactability: 15→25 (real probe data, critical for outreach economics)
+   - Revenue: 15 (unchanged, from niche library)
+3. **Fixed velocity calc** (`niche-discovery.ts`): removed `/6` divisor — `probeAvgReview` is already average review count, dividing by 6 produced values of 1-3 for most niches
 
-### Dashboard: Improved discovery job detail display
+**Realistic niche now scores ~78:** 30 maps, 8 avg reviews, 70% weak sites, 75% contactable, high revenue = Demand 12 + Comp 15 + Weak 21 + Contact 19 + Rev 14 = **81**
 
-**File:** `app-lite/public/index.html` — "Recent Runs" section in Discovery tab now shows:
-- Categories discovered count
-- Pairs skipped count  
-- Error/debug message counts
-- Inline debug message preview
+### Files changed
+- `app-lite/src/scraper/niche-scorer.ts` — new weights and curves
+- `app-lite/src/jobs/handlers/niche-discovery.ts` — removed /6 on review velocity
+- `app-lite/tests/unit/scraper/niche-scorer.test.ts` — all expectations updated
+- `app-lite/tests/unit/handlers/niche-handlers.test.ts` — updated hardcoded scores
+- `docs/22-Niche-Hunting-SOP.md` — scoring rubric tables + scorecard columns
+- `docs/03-ICP-Niches-Scoring.md` — dimension weights + illustrative scorecard
 
 ### Validation
 - `bun run typecheck` → 0 errors
-- `bun run test` → 111 tests, all passed
+- `bun run test` → 112 tests, all passed
 
 ## What's In Progress
 - Nothing running.
@@ -36,7 +41,7 @@
 - None.
 
 ## Where Next Agent Should Pick Up
-1. **Trigger a fresh `niche_discover` run** from the dashboard to verify the fix produces actual pairs.
+1. **Trigger a fresh `niche_discover` run** to verify pairs now score in the 70+ range with real data.
 2. If pairs are created, review and approve high-scorers from the Targeting → Niches tab.
 3. Build outreach handler — the next major gap. 63+ leads with emails, no way to send hook emails yet.
 4. After outreach: reply classification, demo builder, payment integration.
@@ -44,8 +49,8 @@
 ## Current Pipeline Snapshot
 ```text
 Step 0: Niche Discovery (AUTONOMOUS)
-  -> FIX APPLIED: lowered probe threshold, reduced unnecessary re-probes
-  -> Previous 5 runs all created 0 pairs — should be fixed now
+  -> SCORING REBALANCED: realistic niches can now hit 70+ go/no-go threshold
+  -> Previous fix applied (lowered probe threshold, reduced re-probes)
   -> Runs every 6 hours (configurable)
 
 Step 1: Lead Generation (on approved pairs)
@@ -59,5 +64,5 @@ Step 2: Outreach (NOT BUILT YET)
 ## Data Snapshot
 - Leads: 354 total (305 hot, 28 warm, 21 low)
 - Emails: 63 found
-- Niche pairs: 0 (discovery was broken, fix applied — re-run needed)
+- Niche pairs: 0 (discovery was broken, both fixes applied — re-run needed)
 - Jobs: all completed, none running

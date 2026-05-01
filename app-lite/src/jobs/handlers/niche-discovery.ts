@@ -323,7 +323,7 @@ export async function handleNicheDiscover(
           state: pair.state,
           niche: pair.niche,
           maps_count: actualMapsCount,
-          review_velocity: Math.round(probeAvgReview / 6),
+          review_velocity: Math.round(probeAvgReview),
           ad_count: 0,
           agency_pages: 0,
           weak_site_pct: probeWebsitePct > 0 ? Math.max(10, 100 - probeWebsitePct) : 50,
@@ -340,7 +340,7 @@ export async function handleNicheDiscover(
       // ── Phase 4: Auto-score the pair ──────────────────────
       const rawData: NicheRawData = {
         mapsCount: actualMapsCount,
-        reviewVelocity: Math.round(probeAvgReview / 6),
+        reviewVelocity: Math.round(probeAvgReview),
         adCount: 0,
         agencyPages: 0,
         weakSitePct: probeWebsitePct > 0 ? Math.max(10, 100 - probeWebsitePct) : 50,
